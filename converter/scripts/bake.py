@@ -68,7 +68,7 @@ def convert_empty_to_mesh(empty: 'bpy.types.Object'):
         if other_object.parent != empty:
             continue
 
-        with bpy_context.Focus_Objects([object, other_object]):
+        with bpy_context.Focus([object, other_object]):
             bpy.context.view_layer.objects.active = object
             bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
 

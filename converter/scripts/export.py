@@ -118,7 +118,7 @@ def convert_rig_proxy():
 
     objects = [object for object in bpy_utils.get_view_layer_objects() if object.get('rig_proxy')]
 
-    bpy_context.Focus_Objects(objects).__enter__()
+    bpy_context.Focus(objects).__enter__()
 
     for object in objects:
         if object.data.shape_keys:
@@ -236,9 +236,9 @@ def triangulate_geometry(objects: typing.Optional[typing.List['bpy.types.Object'
         if object.get(configuration.ATOOL_COLLISION_OBJECT_PROP_KEY) is not None:
             continue
 
-        with bpy_context.Focus_Objects(object):
+        with bpy_context.Focus(object):
 
-            with bpy_context.Focus_Objects(object, mode = 'EDIT'):
+            with bpy_context.Focus(object, mode = 'EDIT'):
                 bpy.ops.mesh.reveal()
                 bpy.ops.mesh.select_all(action='SELECT')
                 bpy.ops.mesh.delete_loose()
@@ -334,7 +334,7 @@ def convert_collision_shape(object: 'bpy.types.Object', collision_type: str):
     dimensions = get_dimensions(object.data)
 
 
-    with bpy_context.Focus_Objects(object):
+    with bpy_context.Focus(object):
         bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
 
@@ -423,7 +423,7 @@ def convert_collision_shape(object: 'bpy.types.Object', collision_type: str):
         object.display_type = 'WIRE'
         object.hide_render = True
 
-        with bpy_context.Focus_Objects(object):
+        with bpy_context.Focus(object):
             bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 
     else:
@@ -488,10 +488,10 @@ def convert_collisions_to_convex():
 
         object = bpy_utils.convert_to_mesh(object)
 
-        with bpy_context.Focus_Objects(object):
+        with bpy_context.Focus(object):
             bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 
-        with bpy_context.Focus_Objects(object,  mode='EDIT'):
+        with bpy_context.Focus(object,  mode='EDIT'):
             bpy.ops.mesh.reveal()
             bpy.ops.mesh.select_all(action='SELECT')
             bpy.ops.mesh.convex_hull()
