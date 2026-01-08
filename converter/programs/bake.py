@@ -179,6 +179,8 @@ def convert_to_blend_BAKED(blend_path, top_folder: str, textures_folder: str):
 
     program.run(blender, scripts_bake.join_objects)
 
+    program.run(blender, scripts_bake.make_paths_relative)
+
     program.run(blender, save_as_mainfile, result_path)
 
 

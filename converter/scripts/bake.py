@@ -305,3 +305,8 @@ def create_game_rig_and_bake_actions():
                     modifier.object = new
 
         bpy.data.objects.remove(armature)
+
+
+def make_paths_relative():
+
+    bpy.ops.file.make_paths_relative()
