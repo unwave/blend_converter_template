@@ -176,17 +176,12 @@ def get_programs():
         if not last_blend:
             continue
 
-        if folder.name.startswith('SK_'):
-            programs.append(convert_to_skeletal_mesh(last_blend))
-        elif folder.name.startswith('GROUP_SM_'):
-            # split into multiple fbx with shared materials
-            pass
-            # programs.append(convert_to_fbx_GROUP_SM(baked_model.result_path))
-        elif folder.name.startswith('SM_'):
-            programs.append(convert_to_static_mesh(last_blend))
+        if folder.name.startswith('GROUP_'):
+            raise NotImplementedError("split into multiple fbx with shared materials")
+        elif folder.name.startswith('SPLIT_'):
+            raise NotImplementedError("split into multiple fbx with independent materials")
         else:
-            import warnings
-            warnings.warn(f"Unexpected folder prefix: {folder.name}")
+            programs.append(convert_to_static_mesh(last_blend))
 
 
     return programs
