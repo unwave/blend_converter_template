@@ -1,0 +1,72 @@
+import os
+
+
+import configuration
+
+import scripts_scan
+
+
+def get_scan_program(blend_path, result_dir):
+
+    from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
+    from blend_converter.blender import Blender
+    from blend_converter import common
+
+    import os
+
+    blend_path = common.File(blend_path)
+
+    result_path = os.path.join(result_dir, blend_path.dir_name + '.blend')
+
+    blender = Blender(configuration.BLENDER_EXECUTABLE)
+
+    program = common.Program(
+        blend_path = blend_path,
+        result_path = result_path,
+        blender_executable = blender.binary_path
+    )
+
+    program.run(blender, open_mainfile, blend_path)
+
+    program.run(blender, scripts_scan.make_low_poly_and_cage)
+
+    program.run(blender, scripts_scan.the_bake, result_dir)
+
+    program.run(blender, save_as_mainfile, result_path)
+
+    return program
+
+
+def get_programs():
+
+    from blend_converter import utils
+    programs = utils.Appendable_Dict()
+
+    asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_MAIN) if file.is_dir()]
+
+    for folder in asset_folders:
+
+        if folder.name.startswith('_'):  # temp or WIP assets to ignore
+            continue
+
+        high_poly_folder = os.path.join(folder, 'high_poly')
+        low_poly_folder = os.path.join(folder, 'low_poly')
+
+        if not os.path.exists(high_poly_folder):
+            continue
+
+        for file in os.scandir(high_poly_folder):
+
+            if not file.is_dir():
+                continue
+
+            last_blend = utils.get_last_blend(file.path)
+            if not last_blend:
+                continue
+
+            result_dir = os.path.join(low_poly_folder, file.name)
+
+            programs.append(get_scan_program(last_blend, result_dir))
+
+
+    return programs
