@@ -1,7 +1,12 @@
+import sys
+import os
+
+
+ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+if not ROOT in sys.path:
+    sys.path.append(ROOT)
 
 import configuration
-
-import sys
 
 
 if 'bpy' in sys.modules:

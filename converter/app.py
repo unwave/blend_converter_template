@@ -50,14 +50,32 @@ if __name__ == '__main__':
     ROOT = os.path.join(os.path.dirname(__file__))
 
     names = [
-        (os.path.join(ROOT, 'programs_bake.py'), 'get_programs'),
-        (os.path.join(ROOT, 'programs_export.py'), 'get_programs'),
-        (os.path.join(ROOT, 'programs_export.py'), 'get_anim_programs'),
-        (os.path.join(ROOT, 'programs_extra.py'), 'get_programs'),
-        (os.path.join(ROOT, 'programs_prebake.py'), 'get_programs'),
+        (os.path.join(ROOT, 'programs', 'bake.py'), 'get_programs'),
+        (os.path.join(ROOT, 'programs', 'godot.py'), 'get_programs'),
+        (os.path.join(ROOT, 'programs', 'export.py'), 'get_anim_programs'),
+        (os.path.join(ROOT, 'programs', 'extra.py'), 'get_programs'),
+        (os.path.join(ROOT, 'programs', 'prebake.py'), 'get_programs'),
     ]
 
-    for i, name in enumerate(names, start=1):
-        print(f"{i}) {name}")
+    print(sys.argv)
 
-    main([names[int(n) - 1] for n in input("Enter the numbers (e.g.: '1 2 3'):").split()])
+    numbers = []
+
+    for arg in sys.argv[1:]:
+
+        try:
+            n = int(arg)
+            assert len(names) >= n > 0
+            numbers.append(n)
+        except (ValueError, AssertionError):
+            break
+
+    if not numbers:
+
+        for i, name in enumerate(names, start=1):
+            print(f"{i}) {name}")
+
+        print("Enter the numbers, e.g.: 1 2 3.")
+
+    else:
+        main([names[int(n) - 1] for n in numbers])

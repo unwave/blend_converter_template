@@ -2,7 +2,7 @@
 	"folders": [
 		{
 			"path": "."
-		}
+		},
 	],
 	"settings": {
 		"files.trimTrailingWhitespace": true,
@@ -10,6 +10,6 @@
 		"files.insertFinalNewline": true,
 		"files.exclude": {
 			"**/__pycache__": true
-		},
+		}
 	}
 }

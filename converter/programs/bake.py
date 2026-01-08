@@ -1,10 +1,15 @@
 import os
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+if not ROOT in sys.path:
+    sys.path.append(ROOT)
 
 
 import configuration
 
-import scripts_bake
-import scripts_export
+from scripts import bake as scripts_bake
+from scripts import export as scripts_export
 
 
 def convert_to_blend_BAKED(blend_path, top_folder: str, textures_folder: str):
@@ -251,7 +256,7 @@ def get_programs():
         elif folder.name.startswith('SPLIT_'):
             raise NotImplementedError("split into multiple fbx with independent materials")
         else:
-            baked_model = get_baked(last_blend, configuration.Folder.INTERMEDIATE, configuration.Folder.INTERMEDIATE)
+            baked_model = get_baked(last_blend, configuration.Folder.INTERMEDIATE_STATIC, configuration.Folder.INTERMEDIATE_STATIC)
 
 
     return programs
