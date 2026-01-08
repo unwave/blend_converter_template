@@ -71,8 +71,8 @@ def convert_to_blend_BAKED(blend_path, top_folder: str, textures_folder: str):
             image_dir = textures_folder,
             uv_layer_reuse = tool_settings.DEFAULT_UV_LAYER_NAME,
 
-            texel_density = 128,
-            max_resolution = 1024,
+            texel_density = program.config.blend_bake.texel_density,
+            max_resolution = program.config.blend_bake.max_resolution,
             denoise_all=False,
             convert_materials = False,  # converting earlier
         )

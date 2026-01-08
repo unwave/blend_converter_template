@@ -76,15 +76,15 @@ class Blend_Bake:
 
     bake_samples: int = 1
 
-    texel_density: int = 256
-
     uv_packer_pin: bool = False
 
     faster_ao_bake: bool = True
 
-    min_resolution: int = 256
+    texel_density: int = 512
 
-    max_resolution: int = 2048
+    min_resolution: int = 128
+
+    max_resolution: int = 4096
 
 
 class UV_Unwrap:
