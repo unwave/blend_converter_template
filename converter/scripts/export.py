@@ -557,17 +557,41 @@ def rename_all_armatures():
         object.name = 'Armature'
 
 
-def add_gd_import_script(gltf_path: str):
+def set_gd_import_script(gltf_path: str, script_path: str):
 
     import_name = gltf_path + '.import'
 
+    param = f'import_script/path="{script_path}"'
+    re_param = re.compile(r'^import_script\/path=.+')
+
     if os.path.exists(import_name):
-        return
 
-    with open(import_name, 'w') as f:
+        lines = []
 
-        f.write(
-            '[params]'
-            '\n'
-            f'import_script/path="res://converter/test_import_script.gd"'
-        )
+        needs_write = False
+
+        with open(import_name, 'r') as f:
+
+            for line in f.readlines():
+
+                if re_param.match(line):
+
+                    if line.startswith(param):
+                        lines.append(line)
+                    else:
+                        needs_write = True
+                        lines.append(param + '\n')
+                else:
+                    lines.append(line)
+
+        if needs_write:
+
+            with open(import_name + '@', 'w') as f:
+                f.write(''.join(lines))
+
+            os.replace(import_name + '@', import_name)
+
+    else:
+
+        with open(import_name, 'w') as f:
+            f.write('[params]' + '\n' + param + '\n')

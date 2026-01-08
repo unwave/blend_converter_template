@@ -53,7 +53,7 @@ def convert_to_static_mesh(blend_path: str):
 
     program.run(blender, export_gltf, gltf_path, Settings_GLTF(export_format='GLTF_SEPARATE', export_keep_originals=True))
 
-    program.run(blender, scripts_export.add_gd_import_script, gltf_path)
+    program.run(blender, scripts_export.set_gd_import_script, gltf_path, 'res://test_import_script.gd')
 
     return program
 
@@ -100,7 +100,7 @@ def convert_to_skeletal_mesh(blend_path: str):
 
     program.run(blender, export_gltf, gltf_path, Settings_GLTF(export_format='GLTF_SEPARATE', export_keep_originals=True))
 
-    program.run(blender, scripts_export.add_gd_import_script, gltf_path)
+    program.run(blender, scripts_export.set_gd_import_script, gltf_path, 'res://test_import_script.gd')
 
     return program
 
@@ -139,7 +139,7 @@ def convert_to_animation(blend_path, rig_name: str, animation_name: str):
 
     program.run(blender, export_gltf, gltf_path, Settings_GLTF(export_format='GLTF_SEPARATE', export_keep_originals=True))
 
-    program.run(blender, scripts_export.add_gd_import_script, gltf_path)
+    program.run(blender, scripts_export.set_gd_import_script, gltf_path, 'res://test_import_script.gd')
 
     return program
 
