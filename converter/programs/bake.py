@@ -237,6 +237,7 @@ def get_programs():
         dir_name = os.path.basename(os.path.dirname(path))
 
         # can store the textures in the final location to avoid copies
+        # for glTF export_keep_originals=True can be used then
         texture_folder = os.path.join(resources_folder, dir_name, 'textures')
 
         baked_model = convert_to_blend_BAKED(path, folder, texture_folder)
