@@ -135,7 +135,7 @@ class Gltf_Export:
 
 class Quality:
 
-    preset: typing.Literal['manual', 'preview', 'balanced', 'final'] = 'manual'
+    preset: typing.Literal['manual', 'preview'] = 'manual'
 
 
 class Config(common.Config_Base):

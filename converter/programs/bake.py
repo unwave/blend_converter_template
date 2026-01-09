@@ -12,7 +12,159 @@ from scripts import bake as scripts_bake
 from scripts import export as scripts_export
 
 
-def convert_to_blend_BAKED(blend_path, top_folder: str, textures_folder: str):
+def get_unwrap_settings(config: configuration.Config):
+
+
+    from blend_converter import tool_settings
+
+    if config.quality.preset == 'preview':
+
+        return tool_settings.Unwrap_UVs()
+
+    else:
+
+        settings = tool_settings.Unwrap_UVs(
+            use_brute_force_unwrap = True,
+        )
+
+        # unwrap methods
+        bfu_preset = config.uv_unwrap.bfu_preset
+        bfu_method = config.uv_unwrap.bfu_method
+
+        if bfu_method != 'NONE':
+            settings.brute_unwrap_methods = ['NONE']
+        elif bfu_preset == 'active_render':
+            settings.brute_unwrap_methods = ['active_render', 'active_render_minimal_stretch']
+        elif bfu_preset == 'mof_only':
+            settings.brute_unwrap_methods = ['mof_default', 'mof_separate_hard_edges', 'mof_use_normal']
+        elif bfu_preset == 'just_unwrap':
+            settings.brute_unwrap_methods = ['just_minimal_stretch', 'just_conformal']
+
+        return settings
+
+
+def get_uv_pack_settings(config: configuration.Config):
+
+
+    from blend_converter import tool_settings
+
+    if config.quality.preset == 'preview':
+
+        return tool_settings.Pack_UVs(
+            # TODO: add use the efficient packer engine setting
+        )
+
+    else:
+
+        settings = tool_settings.Pack_UVs(
+            use_uv_packer_for_pre_packing = config.blend_bake.uv_packer_pin,
+            uv_packer_addon_pin_largest_island = config.blend_bake.uv_packer_pin,
+        )
+
+        return settings
+
+
+def get_ministry_of_flat_settings(config: configuration.Config):
+
+    from blend_converter import tool_settings
+
+    if config.quality.preset == 'preview':
+
+        return tool_settings.Ministry_Of_Flat(
+            ignore_default_settings = True,
+            timeout = 10,
+        )
+
+    else:
+        return tool_settings.Ministry_Of_Flat(
+            ignore_default_settings = True,
+            timeout = config.uv_unwrap.timeout,
+            use_normal = config.uv_unwrap.use_normal,
+            stretch = config.uv_unwrap.stretch,
+            separate_hard_edges = config.uv_unwrap.separate_hard_edges,
+        )
+
+
+
+def get_texture_bake_settings(config: configuration.Config, texture_name_prefix: str):
+
+    from blend_converter import tool_settings
+
+    if config.quality.preset == 'preview':
+
+        return tool_settings.Bake(
+            samples=1,
+            texture_name_prefix = texture_name_prefix,
+            use_smart_texture_interpolation = False,
+        )
+
+    else:
+
+        return tool_settings.Bake(
+            resolution_multiplier = config.blend_bake.resolution_multiplier,
+            samples = config.blend_bake.bake_samples,
+            texture_name_prefix = texture_name_prefix
+        )
+
+
+def get_bake_settings(config: configuration.Config, textures_folder: str, pre_bake_labels: list):
+
+    from blend_converter import tool_settings
+
+    if config.quality.preset == 'preview':
+
+        return tool_settings.Bake_Materials(
+
+            ignore_default_settings = True,
+            image_dir = textures_folder,
+
+            texel_density = config.blend_bake.texel_density // 2,
+            min_resolution = config.blend_bake.min_resolution // 2,
+            max_resolution = config.blend_bake.max_resolution // 2,
+
+            denoise_all = False,
+            ao_bake_use_normals = False,
+
+            uv_layer_reuse = tool_settings.DEFAULT_UV_LAYER_NAME,
+            convert_materials = False,  # converting earlier
+        )
+
+    else:
+
+        return tool_settings.Bake_Materials(
+
+            ignore_default_settings = True,
+            image_dir = textures_folder,
+
+            texel_density = config.blend_bake.texel_density,
+            min_resolution = config.blend_bake.min_resolution,
+            max_resolution = config.blend_bake.max_resolution,
+
+            denoise_all = True,
+            faster_ao_bake = config.blend_bake.faster_ao_bake,
+
+            pre_bake_labels = pre_bake_labels,
+
+            uv_layer_reuse = tool_settings.DEFAULT_UV_LAYER_NAME,
+            convert_materials = False,  # converting earlier
+        )
+
+
+def get_texture_prefix(folder_name: str):
+    """ TODO: should be a visible warning """
+
+    if folder_name.lower() != configuration.get_ascii_underscored(folder_name):
+        raise Exception(f"Invalid folder name: {repr(folder_name.lower())} != {repr(configuration.get_ascii_underscored(folder_name))}")
+
+    texture_prefix = 'T_' + str(folder_name).removeprefix('GROUP_').removeprefix('SPLIT_')
+
+    if texture_prefix.lower() != configuration.get_ascii_underscored(texture_prefix):
+        raise Exception(f"Invalid texture_prefix: {repr(folder_name.lower())} != {repr(configuration.get_ascii_underscored(texture_prefix))}")
+
+    return texture_prefix
+
+
+def get_bake_program(blend_path, top_folder: str, textures_folder: str):
     """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
 
 
@@ -41,109 +193,6 @@ def convert_to_blend_BAKED(blend_path, top_folder: str, textures_folder: str):
     program.config = configuration.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
 
 
-    # ensure naming conversion
-    folder_name = blend_path.dir_name
-
-    if folder_name.lower() != configuration.get_ascii_underscored(folder_name):
-        raise Exception(f"Invalid folder name: {repr(folder_name.lower())} != {repr(configuration.get_ascii_underscored(folder_name))}")  # TODO: should be a visible warning
-
-    unreal_texture_prefix = 'T_' + str(folder_name).removeprefix('GROUP_').removeprefix('SPLIT_')
-
-    if unreal_texture_prefix.lower() != configuration.get_ascii_underscored(unreal_texture_prefix):
-        raise Exception(f"Invalid unreal_texture_prefix: {repr(folder_name.lower())} != {repr(configuration.get_ascii_underscored(unreal_texture_prefix))}")  # TODO: should be a visible warning
-
-
-    if program.config.quality.preset == 'preview':
-
-        bake_settings = tool_settings.Bake(
-            samples=1,
-            texture_name_prefix = unreal_texture_prefix,
-            use_smart_texture_interpolation = False,
-        )
-
-        pack_settings = tool_settings.Pack_UVs(
-            # TODO: add use the efficient packer engine setting
-        )
-
-        settings = tool_settings.Bake_Materials(
-
-            ignore_default_settings = True,
-            image_dir = textures_folder,
-            uv_layer_reuse = tool_settings.DEFAULT_UV_LAYER_NAME,
-
-            texel_density = program.config.blend_bake.texel_density,
-            max_resolution = program.config.blend_bake.max_resolution,
-            denoise_all=False,
-            convert_materials = False,  # converting earlier
-        )
-
-        ministry_of_flat_settings = tool_settings.Ministry_Of_Flat(
-            ignore_default_settings = True,
-            timeout = 10,
-        )
-
-        unwrap_settings = tool_settings.Unwrap_UVs(
-            use_brute_force_unwrap = True,
-            brute_unwrap_methods = ['mof_default', 'mof_separate_hard_edges', 'mof_use_normal']
-        )
-
-    elif program.config.quality.preset == 'final':
-        raise NotImplementedError()
-
-    elif program.config.quality.preset == 'balanced':
-        raise NotImplementedError()
-
-    else:
-
-        bake_settings = tool_settings.Bake(
-            resolution_multiplier=program.config.blend_bake.resolution_multiplier,
-            samples=program.config.blend_bake.bake_samples,
-            texture_name_prefix = unreal_texture_prefix
-        )
-
-        pack_settings = tool_settings.Pack_UVs(
-            use_uv_packer_for_pre_packing = program.config.blend_bake.uv_packer_pin,
-            uv_packer_addon_pin_largest_island = program.config.blend_bake.uv_packer_pin,
-        )
-
-        settings = tool_settings.Bake_Materials(
-            ignore_default_settings = True,
-            image_dir = textures_folder,
-            texel_density = program.config.blend_bake.texel_density,
-            faster_ao_bake = program.config.blend_bake.faster_ao_bake,
-            min_resolution=program.config.blend_bake.min_resolution,
-            max_resolution=program.config.blend_bake.max_resolution,
-            denoise_all=True,
-            uv_layer_reuse = tool_settings.DEFAULT_UV_LAYER_NAME,
-            convert_materials = False,  # converting earlier
-        )
-
-        ministry_of_flat_settings = tool_settings.Ministry_Of_Flat(
-            ignore_default_settings = True,
-            timeout = program.config.uv_unwrap.timeout,
-            use_normal = program.config.uv_unwrap.use_normal,
-            stretch = program.config.uv_unwrap.stretch,
-            separate_hard_edges = program.config.uv_unwrap.separate_hard_edges,
-        )
-
-        unwrap_settings = tool_settings.Unwrap_UVs(
-            use_brute_force_unwrap = True,
-        )
-
-        # unwrap methods
-        bfu_preset = program.config.uv_unwrap.bfu_preset
-        bfu_method = program.config.uv_unwrap.bfu_method
-
-        if bfu_method != 'NONE':
-            unwrap_settings.brute_unwrap_methods = [bfu_method]
-        elif bfu_preset == 'active_render':
-            unwrap_settings.brute_unwrap_methods = ['active_render', 'active_render_minimal_stretch']
-        elif bfu_preset == 'mof_only':
-            unwrap_settings.brute_unwrap_methods = ['mof_default', 'mof_separate_hard_edges', 'mof_use_normal']
-        elif bfu_preset == 'just_unwrap':
-            unwrap_settings.brute_unwrap_methods = ['just_minimal_stretch', 'just_conformal']
-
-
     program.run(blender, open_mainfile, blend_path)
 
     program.run(blender, scripts_bake.reset_timeline)
@@ -153,34 +202,41 @@ def convert_to_blend_BAKED(blend_path, top_folder: str, textures_folder: str):
     objects = program.run(blender, scripts_bake.get_target_objects)
 
     program.run(blender, scripts_bake.check_for_reserved_uv_layout_name, objects)
+
     program.run(blender, scripts_bake.apply_modifiers)
 
     program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
+    program.run(blender, bc_script.unwrap,
+        objects,
+        uv_layer_reuse = 'REUSE',
+        settings = get_unwrap_settings(program.config),
+        ministry_of_flat_settings = get_ministry_of_flat_settings(program.config)
+    )
 
-    program.run(blender, bc_script.unwrap, objects, uv_layer_reuse = 'REUSE', settings = unwrap_settings, ministry_of_flat_settings = ministry_of_flat_settings)
     program.run(blender, scripts_bake.apply_modifiers, scripts_bake.Modifier_Type.POST_UNWRAP)
 
     program.run(blender, scripts_bake.convert_materials, objects)
 
     pre_bake_labels = program.run(blender, bc_script.label_mix_shader_nodes, objects)
-    settings.pre_bake_labels = pre_bake_labels
 
     program.run(blender, bc_script.bisect_by_mirror_modifiers, objects)
 
     program.run(blender, bc_script.scale_uv_to_world_per_uv_island, objects, tool_settings.DEFAULT_UV_LAYER_NAME)
-
     program.run(blender, bc_script.scale_uv_to_world_per_uv_layout, objects, tool_settings.DEFAULT_UV_LAYER_NAME)
 
-    objects = program.run(blender, bc_script.pack_copy_bake, objects, settings, bake_settings = bake_settings, pack_settings = pack_settings,)
+    objects = program.run(blender, bc_script.pack_copy_bake,
+        objects,
+        get_bake_settings(program.config, textures_folder, pre_bake_labels),
+        bake_settings = get_texture_bake_settings(program.config, get_texture_prefix(blend_path.dir_name)),
+        pack_settings = get_uv_pack_settings(program.config),
+    )
 
     program.run(blender, scripts_bake.apply_modifiers, scripts_bake.Modifier_Type.POST_BAKE)
 
     program.run(blender, bc_script.apply_scale, objects)
-
     program.run(blender, scripts_bake.join_objects)
 
     program.run(blender, scripts_bake.make_paths_relative)
-
     program.run(blender, save_as_mainfile, result_path)
 
 
@@ -240,7 +296,7 @@ def get_programs():
         # for glTF export_keep_originals=True can be used then
         texture_folder = os.path.join(resources_folder, dir_name, 'textures')
 
-        baked_model = convert_to_blend_BAKED(path, folder, texture_folder)
+        baked_model = get_bake_program(path, folder, texture_folder)
         programs.append(baked_model)
         return baked_model
 
