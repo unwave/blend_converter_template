@@ -10,6 +10,7 @@ import configuration
 
 from scripts import bake as scripts_bake
 from scripts import export as scripts_export
+from scripts import rig as scripts_rig
 
 
 def convert_to_blend_SKIN_TEST(blend_path):
@@ -78,7 +79,8 @@ def convert_to_blend_SKIN_PROXY(blend_path):
 
     program.run(blender, open_mainfile, blend_path)
 
-    program.run(blender, scripts_export.convert_rig_proxy)
+    program.run(blender, scripts_rig.convert_rig_proxy)
+    program.run(blender, scripts_export.scene_clean_up)
 
     program.run(blender, export_fbx, result_path, Settings_Fbx(bake_anim = False, object_types = {'MESH'}, use_mesh_modifiers = False, use_selection = True))
 

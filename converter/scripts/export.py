@@ -3,15 +3,12 @@
 import os
 import sys
 import typing
-import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if not ROOT in sys.path:
     sys.path.append(ROOT)
 
 import configuration
-
-from blend_converter import utils as bc_utils
 
 
 if 'bpy' in sys.modules:
@@ -60,25 +57,6 @@ def remove_unused_uv_layouts():
                 object.data.uv_layers.remove(object.data.uv_layers[uv_layer_name])
 
 
-def add_export_timestamp():
-    """
-    To ensure the Godot re-import will be triggered.
-
-    When re-baking textures, the uv repacking is different and the textures are getting re-imported, but not the model, because only `.bin` file is changing, not the `.gltf`.
-
-    #### This requires `export_extras` to be `True`.
-
-    https://github.com/godotengine/godot/issues/90659
-    https://github.com/godotengine/godot/issues/105499
-    """
-
-    import datetime
-    import uuid
-
-    bpy.context.scene['export_datetime_now'] = datetime.datetime.now().astimezone().isoformat(' ', 'seconds')
-    bpy.context.scene['export_uuid'] = str(uuid.uuid1())
-
-
 def scene_clean_up():
     """ Cleaning up the scene from temporal and auxiliary objects before the expert. """
 
@@ -108,44 +86,6 @@ def scene_clean_up():
     traverse(bpy.context.view_layer.layer_collection)
 
     bpy.ops.outliner.orphans_purge()
-
-
-def convert_rig_proxy():
-    """
-    This is used to create a proxy mesh, which is used to create armatures and distribute weights in 3rd party applications to import back into Blender.
-    The target objects should have a `rig_proxy` custom property set to a truthy value.
-    """
-
-    objects = [object for object in bpy_utils.get_view_layer_objects() if object.get('rig_proxy')]
-
-    bpy_context.Focus(objects).__enter__()
-
-    for object in objects:
-        if object.data.shape_keys:
-            for key_block in reversed(object.data.shape_keys.key_blocks):
-                object.shape_key_remove(key_block)
-
-    bpy_utils.apply_modifiers(objects, include_name='.+rig_proxy')
-
-    for object in objects:
-        object.animation_data_clear()
-        object.modifiers.clear()
-        object.vertex_groups.clear()
-        object.data.materials.clear()
-
-        for color_attribute in list(object.data.color_attributes):
-            if color_attribute.is_internal or color_attribute.is_required:
-                continue
-            object.data.color_attributes.remove(color_attribute)
-
-
-    bpy_utils.make_object_data_unique(objects)
-
-    bpy.ops.object.transform_apply(location = True, rotation = True, scale = True)
-
-    bpy.data.batch_remove(set(bpy.data.objects) - set(objects))
-
-    scene_clean_up()
 
 
 def make_local_and_delete_non_armature_objects():
@@ -211,8 +151,6 @@ def export_collections_as_fbx_static_meshes(result_dir: str):
             bpy.context.scene.name = collection.name
 
             export_fbx(model_path, settings)
-
-
 
 
 def triangulate_geometry(objects: typing.Optional[typing.List['bpy.types.Object']] = None):
@@ -448,27 +386,6 @@ def convert_all_collision_shapes():
     return bool(collisions_count)
 
 
-def rename_objects_for_unreal(prefix: str):
-    """
-    Match the recommended FBX naming conventions. In order to make the collision shape recognition to work.
-    https://dev.epicgames.com/documentation/en-us/unreal-engine/fbx-static-mesh-pipeline-in-unreal-engine?application_version=5.5#collision
-    """
-
-    for index, top_layer in enumerate(bpy.context.view_layer.layer_collection.children, start = 1):
-
-        name = prefix + '_' + configuration.get_ascii_underscored(top_layer.name) + f'_{str(index).zfill(2)}'
-
-        collision_index = 1
-
-        for object in top_layer.collection.all_objects:
-
-            if object.get(configuration.UNREAL_COLLISION_PROP_KEY):
-                object.name = f'COL_{top_layer.name}_{str(collision_index).zfill(2)}-convcolonly'
-                collision_index += 1
-            else:
-                object.name = name
-
-
 def convert_collisions_to_convex():
     """
     Convert the Unreal Engine recognizable collision shapes into the convex type collision shapes to resolve the issue with non uniform scale.
@@ -499,50 +416,6 @@ def convert_collisions_to_convex():
             bpy.ops.mesh.quads_convert_to_tris(quad_method='BEAUTY', ngon_method='BEAUTY')
 
 
-def get_material_definitions_for_single_object():
-    """ This is used to recreate the materials inside Unreal. """
-
-    from blend_converter.blender import bpy_node
-
-    object = bpy_utils.get_view_layer_objects()[0]
-
-    material_definitions = []
-
-    for material_slot in object.material_slots:
-
-        assert material_slot.material
-        assert material_slot.material.node_tree
-
-        material_definition = {}
-        material_definition['textures'] = textures = {}
-
-        material = material_slot.material
-
-        tree = bpy_node.Shader_Tree_Wrapper(material.node_tree)
-
-        node = next((node for node in tree.output[0].inputs['Base Color'].descendants if node.be('ShaderNodeTexImage')), None)
-        if node:
-            textures['base_color'] = bpy_utils.get_block_abspath(node.image)
-        else:
-            textures['base_color'] = None
-
-        node = next((node for node in tree.output[0].inputs['Metallic'].descendants if node.be('ShaderNodeTexImage')), None)
-        if node:
-            textures['orm'] = bpy_utils.get_block_abspath(node.image)
-        else:
-            textures['orm'] = None
-
-        node = next((node for node in tree.output[0].inputs['Normal'].descendants if node.be('ShaderNodeTexImage')), None)
-        if node:
-            textures['normal'] = bpy_utils.get_block_abspath(node.image)
-        else:
-            textures['normal'] = None
-
-        material_definitions.append(material_definition)
-
-    return material_definitions
-
-
 def rename_all_armatures():
     """
     Unreal Engine checks if the root bone name is "Armature" and does not created an extra root bone in this case.
@@ -555,43 +428,3 @@ def rename_all_armatures():
             continue
 
         object.name = 'Armature'
-
-
-def set_gd_import_script(gltf_path: str, script_path: str):
-
-    import_name = gltf_path + '.import'
-
-    param = f'import_script/path="{script_path}"'
-    re_param = re.compile(r'^import_script\/path=.+')
-
-    if os.path.exists(import_name):
-
-        lines = []
-
-        needs_write = False
-
-        with open(import_name, 'r') as f:
-
-            for line in f.readlines():
-
-                if re_param.match(line):
-
-                    if line.startswith(param):
-                        lines.append(line)
-                    else:
-                        needs_write = True
-                        lines.append(param + '\n')
-                else:
-                    lines.append(line)
-
-        if needs_write:
-
-            with open(import_name + '@', 'w') as f:
-                f.write(''.join(lines))
-
-            os.replace(import_name + '@', import_name)
-
-    else:
-
-        with open(import_name, 'w') as f:
-            f.write('[params]' + '\n' + param + '\n')
