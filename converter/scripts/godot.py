@@ -73,7 +73,7 @@ def set_gd_import_script(gltf_path: str, script_path: str):
             f.write('[params]' + '\n' + param + '\n')
 
 
-def rename_objects_for_unreal(prefix: str):
+def rename_objects_for_godot(prefix: str):
     """
     Match the recommended FBX naming conventions. In order to make the collision shape recognition to work.
     https://dev.epicgames.com/documentation/en-us/unreal-engine/fbx-static-mesh-pipeline-in-unreal-engine?application_version=5.5#collision

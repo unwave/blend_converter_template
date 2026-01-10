@@ -49,7 +49,7 @@ def convert_to_static_mesh(blend_path: str):
     program.run(blender, scripts_export.remove_animations)
     program.run(blender, bc_script.use_backface_culling)
     program.run(blender, scripts_export.triangulate_geometry)
-    program.run(blender, scripts_godot.rename_objects_for_unreal, 'SM')
+    program.run(blender, scripts_godot.rename_objects_for_godot, 'SM')
     program.run(blender, scripts_godot.add_export_timestamp)
 
     program.run(blender, export_gltf, gltf_path, Settings_GLTF(export_format='GLTF_SEPARATE'))
@@ -95,7 +95,7 @@ def convert_to_skeletal_mesh(blend_path: str):
     program.run(blender, bc_script.use_backface_culling)
     program.run(blender, scripts_export.triangulate_geometry)
     program.run(blender, scripts_bake.create_game_rig_and_bake_actions)
-    program.run(blender, scripts_godot.rename_objects_for_unreal, 'SK')
+    program.run(blender, scripts_godot.rename_objects_for_godot, 'SK')
     program.run(blender, scripts_export.rename_all_armatures)
     program.run(blender, scripts_godot.add_export_timestamp)
 
@@ -132,7 +132,7 @@ def convert_to_animation(blend_path, rig_name: str, animation_name: str):
 
     program.run(blender, open_mainfile, blend_path)
 
-    program.run(blender, scripts_godot.rename_objects_for_unreal, 'SK')
+    program.run(blender, scripts_godot.rename_objects_for_godot, 'SK')
     program.run(blender, scripts_export.make_local_and_delete_non_armature_objects)
     program.run(blender, scripts_godot.add_export_timestamp)
     program.run(blender, scripts_bake.create_game_rig_and_bake_actions)

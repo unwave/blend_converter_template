@@ -57,6 +57,27 @@ else:
         dataclass = lambda x: x
 
 
+def rename_objects_for_unreal(prefix: str):
+    """
+    Match the recommended FBX naming conventions. In order to make the collision shape recognition to work.
+    https://dev.epicgames.com/documentation/en-us/unreal-engine/fbx-static-mesh-pipeline-in-unreal-engine?application_version=5.5#collision
+    """
+
+    for index, top_layer in enumerate(bpy.context.view_layer.layer_collection.children, start = 1):
+
+        name = prefix + '_' + configuration.get_ascii_underscored(top_layer.name) + f'_{str(index).zfill(2)}'
+
+        collision_index = 1
+
+        for object in top_layer.collection.all_objects:
+
+            if object.get(configuration.UNREAL_COLLISION_PROP_KEY):
+                object.name = f'{object[configuration.UNREAL_COLLISION_PROP_KEY]}_{name}_{str(collision_index).zfill(2)}'
+                collision_index += 1
+            else:
+                object.name = name
+
+
 def get_material_definitions_for_single_object():
     """ This is used to recreate the materials inside Unreal. """
 
