@@ -375,8 +375,9 @@ def import_static_mesh(settings: Settings_Unreal_Fbx):
     options.set_editor_property('import_materials', False)
     options.set_editor_property('import_as_skeletal', False)
     options.set_editor_property('import_animations', False)
-    options.set_editor_property('mesh_type_to_import', unreal.FBXImportType.FBXIT_STATIC_MESH)
 
+    options.set_editor_property('automated_import_should_detect_type', False)
+    options.set_editor_property('mesh_type_to_import', unreal.FBXImportType.FBXIT_STATIC_MESH)
 
     import_data = get_static_mesh_import_data(settings._asset_path)
     options.set_editor_property('static_mesh_import_data', import_data)
@@ -408,6 +409,8 @@ def import_skeletal_mesh(settings: Settings_Unreal_Fbx):
     options.set_editor_property('import_materials', False)
     options.set_editor_property('import_as_skeletal', False)
     options.set_editor_property('import_animations', False)
+
+    options.set_editor_property('automated_import_should_detect_type', False)
     options.set_editor_property('mesh_type_to_import', unreal.FBXImportType.FBXIT_SKELETAL_MESH)
 
 
@@ -438,6 +441,8 @@ def import_skeleton(settings: Settings_Unreal_Fbx):
     options.set_editor_property('import_materials', False)
     options.set_editor_property('import_as_skeletal', True)
     options.set_editor_property('import_animations', False)
+
+    options.set_editor_property('automated_import_should_detect_type', False)
     # options.set_editor_property('mesh_type_to_import', unreal.FBXImportType.FBXIT_SKELETAL_MESH)
 
 
@@ -464,6 +469,8 @@ def import_anim_sequence(settings: Settings_Unreal_Fbx):
     options.set_editor_property('import_materials', False)
     options.set_editor_property('import_as_skeletal', False)
     options.set_editor_property('import_animations', True)
+
+    options.set_editor_property('automated_import_should_detect_type', False)
     options.set_editor_property('mesh_type_to_import', unreal.FBXImportType.FBXIT_ANIMATION)
 
     options.set_editor_property('skeleton', unreal.load_asset(settings._asset_path))
