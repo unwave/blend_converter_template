@@ -161,8 +161,8 @@ class Settings_Unreal_Material_Instance(tool_settings.Settings):
 
     # https://forums.unrealengine.com/t/setting-static-switch-parameters-of-a-material-instance-in-python/136415
     # have a problem with child material instances not respecting static switches in ES 3.1
-    PARENT_MATERIAL = '/Game/Materials/M_main_orm'
-    PARENT_MATERIAL_WITHOUT_NORMALS = '/Game/Materials/M_main_orm_no_normal'
+    PARENT_MATERIAL = '/Game/Materials/base/M_main_orm'
+    PARENT_MATERIAL_WITHOUT_NORMALS = '/Game/Materials/base/M_main_orm_no_normal'
 
 
     name: str = ''
