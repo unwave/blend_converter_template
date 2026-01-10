@@ -49,6 +49,10 @@ class Folder:
     GLTF_SKELETAL = os.path.join(ROOT, 'godot', 'gltf', 'skeletal')
     GLTF_ANIMATION = os.path.join(ROOT, 'godot', 'gltf', 'animation')
 
+    INTERMEDIATE_UNREAL_SM = os.path.join(ROOT, 'intermediate', 'unreal', 'SM')
+    INTERMEDIATE_UNREAL_SK = os.path.join(ROOT, 'intermediate', 'unreal', 'SK')
+    INTERMEDIATE_UNREAL_A = os.path.join(ROOT, 'intermediate', 'unreal', 'A')
+
 
 def get_folders(folder: os.PathLike):
     return [file for file in os.scandir(folder) if file.is_dir() and not file.name.startswith('_')]

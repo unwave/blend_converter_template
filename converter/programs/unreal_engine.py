@@ -28,7 +28,7 @@ def convert_to_unreal_static_mesh(blend_path: str):
 
     blend_path: common.File = common.File(blend_path)
 
-    fbx_path = os.path.join(configuration.Folder.FBX_SM, blend_path.dir_name, blend_path.dir_name + '.fbx')
+    fbx_path = os.path.join(configuration.Folder.INTERMEDIATE_UNREAL_SM, blend_path.dir_name, blend_path.dir_name + '.fbx')
 
     unreal = Unreal()
     blender = Blender(configuration.BLENDER_EXECUTABLE)
@@ -89,7 +89,7 @@ def convert_to_unreal_skeletal_mesh(blend_path: str):
 
     blend_path: common.File = common.File(blend_path)
 
-    fbx_path = os.path.join(configuration.Folder.FBX_SK, blend_path.dir_name, blend_path.dir_name + '.fbx')
+    fbx_path = os.path.join(configuration.Folder.INTERMEDIATE_UNREAL_SK, blend_path.dir_name, blend_path.dir_name + '.fbx')
 
     unreal = Unreal()
     blender = Blender(configuration.BLENDER_EXECUTABLE)
@@ -151,7 +151,7 @@ def convert_to_unreal_animation(blend_path, rig_name: str, animation_name: str):
 
     blend_path = common.File(blend_path)
 
-    fbx_path = os.path.join(configuration.Folder.FBX_A, rig_name, animation_name + '.fbx')
+    fbx_path = os.path.join(configuration.Folder.INTERMEDIATE_UNREAL_A, rig_name, animation_name + '.fbx')
 
     unreal = Unreal()
     blender = Blender(configuration.BLENDER_EXECUTABLE)
