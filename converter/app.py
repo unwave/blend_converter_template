@@ -43,6 +43,7 @@ def main(file_and_getter_pairs: typing.List[typing.Tuple[str, str]]):
     app.main_frame.updater.total_max_parallel_executions = 8
     app.main_frame.updater.default_max_parallel_executions = 2
     app.main_frame.updater.set_max_parallel_executions_per_program_tag('gltf', 8)
+    app.main_frame.updater.set_max_parallel_executions_per_program_tag('unreal', 1)
 
     if not is_using_terminal:
         sys.excepthook = sys.__excepthook__
