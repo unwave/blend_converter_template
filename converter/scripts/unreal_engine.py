@@ -235,7 +235,7 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
 
     if settings.orm_filepath:
         orm_texture = import_texture(settings.orm_filepath, settings.dir)
-        base_color_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_DEFAULT)
+        orm_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_MASKS)
         orm_texture.set_editor_property('srgb', False)  # ensuring that the pre/post change notifications are called
         unreal.EditorAssetLibrary.save_asset(orm_texture.get_full_name())
         unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._orm_param_name, orm_texture)
