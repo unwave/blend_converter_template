@@ -315,7 +315,7 @@ def get_programs():
         elif folder.name.startswith('SPLIT_'):
             raise NotImplementedError("split into multiple fbx with independent materials")
         else:
-            baked_model = get_baked(last_blend, configuration.Folder.INTERMEDIATE_STATIC, configuration.Folder.INTERMEDIATE_STATIC)
+            baked_model = get_baked(last_blend, configuration.Folder.INTERMEDIATE_BLEND_STATIC, configuration.Folder.INTERMEDIATE_BLEND_STATIC)
 
 
     return programs

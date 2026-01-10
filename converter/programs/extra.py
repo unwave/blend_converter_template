@@ -23,7 +23,7 @@ def convert_to_blend_SKIN_TEST(blend_path):
 
     blend_path = common.File(blend_path)
 
-    asset_folder = os.path.join(configuration.Folder.INTERMEDIATE_STATIC, 'SKIN_TEST_' + blend_path.dir_name )
+    asset_folder = os.path.join(configuration.Folder.INTERMEDIATE_BLEND_STATIC, 'SKIN_TEST_' + blend_path.dir_name )
 
     result_path = os.path.join(asset_folder, blend_path.dir_name)
 

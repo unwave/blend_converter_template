@@ -169,7 +169,7 @@ def get_programs():
     from blend_converter import utils
     programs = utils.Appendable_Dict()
 
-    asset_folders = [file for file in os.scandir(configuration.Folder.INTERMEDIATE_STATIC) if file.is_dir()]
+    asset_folders = [file for file in os.scandir(configuration.Folder.INTERMEDIATE_BLEND_STATIC) if file.is_dir()]
 
     for folder in asset_folders:
 

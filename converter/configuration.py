@@ -42,8 +42,8 @@ class Folder:
 
     BLEND_PROXY = os.path.join(ROOT, 'blends', 'proxy')
 
-    INTERMEDIATE_STATIC = os.path.join(ROOT, 'intermediate', 'static')
-    INTERMEDIATE_SKELETAL = os.path.join(ROOT, 'intermediate', 'skeletal')
+    INTERMEDIATE_BLEND_STATIC = os.path.join(ROOT, 'intermediate', 'blend', 'static')
+    INTERMEDIATE_BLEND_SKELETAL = os.path.join(ROOT, 'intermediate', 'blend', 'skeletal')
 
     GLTF_STATIC = os.path.join(ROOT, 'godot', 'gltf', 'static')
     GLTF_SKELETAL = os.path.join(ROOT, 'godot', 'gltf', 'skeletal')
