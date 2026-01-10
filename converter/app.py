@@ -25,7 +25,10 @@ def get_func_name(entry: 'updater.Program_Entry'):
 
 def main(file_and_getter_pairs: typing.List[typing.Tuple[str, str]]):
 
-    sys.excepthook = except_hook
+    is_using_terminal = not {'PROMPT', 'TERM_PROGRAM', 'TERM', 'TERMINAL_EMULATOR'}.isdisjoint(os.environ)
+
+    if not is_using_terminal:
+        sys.excepthook = except_hook
 
     from blend_converter.gui import updater_ui
     from blend_converter import updater
@@ -41,7 +44,9 @@ def main(file_and_getter_pairs: typing.List[typing.Tuple[str, str]]):
     app.main_frame.updater.default_max_parallel_executions = 2
     app.main_frame.updater.set_max_parallel_executions_per_program_tag('gltf', 8)
 
-    sys.excepthook = sys.__excepthook__
+    if not is_using_terminal:
+        sys.excepthook = sys.__excepthook__
+
     app.MainLoop()
 
 
