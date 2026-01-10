@@ -192,3 +192,30 @@ def convert_to_unreal_animation(blend_path, rig_name: str, animation_name: str):
     program.run(unreal, scripts_unreal.import_anim_sequence, ue_fbx_settings)
 
     return program
+
+
+def get_programs():
+
+    from blend_converter import utils
+    programs = utils.Appendable_Dict()
+
+    if os.path.exists(configuration.Folder.INTERMEDIATE_BLEND_STATIC):
+        asset_folders = [file for file in os.scandir(configuration.Folder.INTERMEDIATE_BLEND_STATIC) if file.is_dir()]
+    else:
+        asset_folders = []
+
+    for folder in asset_folders:
+
+        last_blend = utils.get_last_blend(folder)
+        if not last_blend:
+            continue
+
+        if folder.name.startswith('GROUP_'):
+            raise NotImplementedError("split into multiple fbx with shared materials")
+        elif folder.name.startswith('SPLIT_'):
+            raise NotImplementedError("split into multiple fbx with independent materials")
+        else:
+            programs.append(convert_to_unreal_static_mesh(last_blend))
+
+
+    return programs
