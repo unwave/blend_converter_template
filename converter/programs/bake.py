@@ -11,7 +11,6 @@ import configuration
 import gui_config
 
 from scripts import bake as scripts_bake
-from scripts import export as scripts_export
 
 
 def get_unwrap_settings(config: gui_config.Config):
@@ -322,43 +321,6 @@ def get_bake_skeletal_program(blend_path, top_folder: str, textures_folder: str)
 
 
     return program
-
-
-def convert_to_blend_RIG(blend_path):
-    """ for use a linked rig + mesh for creating animations """
-
-    from blend_converter.blender import Blender, bc_script
-    from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
-    from blend_converter import common
-
-    blend_path = common.File(blend_path)
-
-    asset_folder = os.path.join(configuration.Folder.BLEND_RIG, blend_path.dir_name)
-
-    result_path = os.path.join(asset_folder, blend_path.dir_name + '.blend')
-
-    blender = Blender(configuration.BLENDER_EXECUTABLE)
-
-    program = common.Program(
-        blend_path = blend_path,
-        result_path = result_path,
-        blender_executable = blender.binary_path,
-    )
-
-    program._prog_type = 'RIG 🦴'
-
-    program.run(blender, open_mainfile, blend_path)
-
-    # program.run(blender, script.scene_clean_up)
-    program.run(blender, scripts_export.remove_unused_uv_layouts)
-    program.run(blender, bc_script.remove_all_node_groups_from_materials)
-    # program.run(blender, script.remove_animations)
-    program.run(blender, bc_script.use_backface_culling)
-
-    program.run(blender, save_as_mainfile, result_path)
-
-    return program
-
 
 
 def get_static_programs():

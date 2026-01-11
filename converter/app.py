@@ -63,6 +63,7 @@ if __name__ == '__main__':
         skin_test = (os.path.join(ROOT, 'programs', 'skin_test.py'), 'get_programs'),
         skin_proxy = (os.path.join(ROOT, 'programs', 'skin_proxy.py'), 'get_programs'),
         prebake = (os.path.join(ROOT, 'programs', 'prebake.py'), 'get_programs'),
+        rig = (os.path.join(ROOT, 'programs', 'rig.py'), 'get_programs'),
     )
 
     print(sys.argv)
