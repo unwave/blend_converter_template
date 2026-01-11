@@ -428,3 +428,34 @@ def rename_all_armatures():
             continue
 
         object.name = 'Armature'
+
+
+def save_blend_with_repack(filepath: str):
+
+    if bpy.app.version >= (2, 80):
+        bpy.context.preferences.use_preferences_save = False
+        bpy.context.preferences.filepaths.save_version = 0
+    else:
+        bpy.context.user_preferences.filepaths.save_version = 0
+
+    if bpy.data.filepath and os.path.exists(filepath) and os.path.samefile(filepath, bpy.data.filepath):
+        raise Exception(f"Must not save the blend file in the same location: {filepath}")
+
+    os.makedirs(os.path.dirname(filepath), exist_ok = True)
+
+    bpy.ops.outliner.orphans_purge()
+    bpy.ops.file.pack_all()
+
+    try:
+        bpy.ops.wm.save_as_mainfile(filepath=filepath, compress=True, copy=False)
+    except RuntimeError as e:
+        print(e)
+
+    bpy.ops.file.unpack_all(method='WRITE_LOCAL')
+
+    try:
+        bpy.ops.wm.save_mainfile()
+    except RuntimeError as e:
+        print(e)
+
+    print(f"Blend is saved in path: {filepath}")
