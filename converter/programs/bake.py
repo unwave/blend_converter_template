@@ -166,7 +166,7 @@ def get_texture_prefix(folder_name: str):
     return texture_prefix
 
 
-def get_bake_program(blend_path, top_folder: str, textures_folder: str):
+def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
     """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
 
 
@@ -190,14 +190,13 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str):
         blender_executable = blender.binary_path,
     )
 
-    program._prog_type = 'BAKE 🍪'
+    program._prog_type = 'BAKE STATIC 🍪'
 
     program.config = gui_config.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
 
 
     program.run(blender, open_mainfile, blend_path)
 
-    program.run(blender, scripts_bake.reset_timeline)
     program.run(blender, scripts_bake.find_missing)
     program.run(blender, scripts_bake.reveal_collections)
 
@@ -205,7 +204,8 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str):
 
     program.run(blender, scripts_bake.check_for_reserved_uv_layout_name, objects)
 
-    program.run(blender, scripts_bake.apply_modifiers)
+    program.run(blender, scripts_bake.apply_shape_keys, objects)
+    program.run(blender, scripts_bake.apply_modifiers, objects)
 
     program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
     program.run(blender, bc_script.unwrap,
@@ -215,7 +215,7 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str):
         ministry_of_flat_settings = get_ministry_of_flat_settings(program.config)
     )
 
-    program.run(blender, scripts_bake.apply_modifiers, scripts_bake.Modifier_Type.POST_UNWRAP)
+    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_UNWRAP)
 
     program.run(blender, scripts_bake.convert_materials, objects)
 
@@ -233,7 +233,7 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str):
         pack_settings = get_uv_pack_settings(program.config),
     )
 
-    program.run(blender, scripts_bake.apply_modifiers, scripts_bake.Modifier_Type.POST_BAKE)
+    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE)
 
     program.run(blender, bc_script.apply_scale, objects)
     program.run(blender, scripts_bake.join_objects)
@@ -298,7 +298,7 @@ def get_programs():
         # for glTF export_keep_originals=True can be used then
         texture_folder = os.path.join(resources_folder, dir_name, 'textures')
 
-        baked_model = get_bake_program(path, folder, texture_folder)
+        baked_model = get_bake_static_program(path, folder, texture_folder)
         programs.append(baked_model)
         return baked_model
 

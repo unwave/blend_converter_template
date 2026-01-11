@@ -193,12 +193,12 @@ class Modifier_Type:
     POST_BAKE = 'PB'
 
 
-def apply_modifiers(modifier_type_prefix: str = ''):
+def apply_modifiers(objects: typing.List['bpy.types.Object'], modifier_type_prefix: str = '', ignore_type = set()):
     if not modifier_type_prefix:
         pattern = '|'.join([Modifier_Type.POST_UNWRAP, Modifier_Type.POST_BAKE])
-        bpy_utils.apply_modifiers(bpy_utils.get_view_layer_objects(), ignore_name=pattern, ignore_type = ('ARMATURE',))
+        bpy_utils.apply_modifiers(objects, ignore_name = pattern, ignore_type = ignore_type)
     else:
-        bpy_utils.apply_modifiers(bpy_utils.get_view_layer_objects(), include_name = modifier_type_prefix, ignore_type = ('ARMATURE',))
+        bpy_utils.apply_modifiers(objects, include_name = modifier_type_prefix, ignore_type = ignore_type)
 
 
 def convert_materials(objects):
@@ -310,3 +310,13 @@ def create_game_rig_and_bake_actions():
 def make_paths_relative():
 
     bpy.ops.file.make_paths_relative()
+
+
+def apply_shape_keys(objects: typing.List['bpy.types.Object']):
+
+    for object in objects:
+
+        if not object.data.shape_keys:
+            continue
+
+        bpy_context.call_for_object(object, bpy.ops.object.shape_key_remove, all=True, apply_mix=True)
