@@ -56,7 +56,10 @@ class Folder:
 
 
 def get_folders(folder: os.PathLike):
-    return [file for file in os.scandir(folder) if file.is_dir() and not file.name.startswith('_')]
+    if os.path.exists(folder):
+        return [file for file in os.scandir(folder) if file.is_dir() and not file.name.startswith('_')]
+    else:
+        return []
 
 
 def get_blends(folder: os.PathLike):
