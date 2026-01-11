@@ -55,35 +55,37 @@ if __name__ == '__main__':
 
     ROOT = os.path.join(os.path.dirname(__file__))
 
-    names = [
-        (os.path.join(ROOT, 'programs', 'bake.py'), 'get_static_programs'),
-        (os.path.join(ROOT, 'programs', 'bake.py'), 'get_skeletal_programs'),
-        (os.path.join(ROOT, 'programs', 'godot.py'), 'get_programs'),
-        (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'get_programs'),
-        (os.path.join(ROOT, 'programs', 'skin_test.py'), 'get_programs'),
-        (os.path.join(ROOT, 'programs', 'skin_proxy.py'), 'get_programs'),
-        (os.path.join(ROOT, 'programs', 'prebake.py'), 'get_programs'),
-    ]
+    programs = dict(
+        static = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_static_programs'),
+        skeletal = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_skeletal_programs'),
+        godot = (os.path.join(ROOT, 'programs', 'godot.py'), 'get_programs'),
+        unreal = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'get_programs'),
+        skin_test = (os.path.join(ROOT, 'programs', 'skin_test.py'), 'get_programs'),
+        skin_proxy = (os.path.join(ROOT, 'programs', 'skin_proxy.py'), 'get_programs'),
+        prebake = (os.path.join(ROOT, 'programs', 'prebake.py'), 'get_programs'),
+    )
 
     print(sys.argv)
+    print()
 
-    numbers = []
+    names = []
 
     for arg in sys.argv[1:]:
 
-        try:
-            n = int(arg)
-            assert len(names) >= n > 0
-            numbers.append(n)
-        except (ValueError, AssertionError):
+        if arg.startswith('_'):
             break
 
-    if not numbers:
+        names.append(arg)
 
-        for i, name in enumerate(names, start=1):
-            print(f"{i}) {name}")
+    if not names:
 
-        print("Enter the numbers, e.g.: 1 2 3.")
+        for name, path in programs.items():
+            print(name + "\n\t" + str(path))
+
+        print()
+        print("Must enter the names as the command line arguments. E.g.: static skeletal godot.")
+        print()
+        input("Press Enter to exit.")
 
     else:
-        main([names[int(n) - 1] for n in numbers])
+        main([programs[n] for n in names])
