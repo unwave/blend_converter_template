@@ -245,7 +245,7 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
     return program
 
 
-def get_bake_program(blend_path, top_folder: str, textures_folder: str):
+def get_bake_skeletal_program(blend_path, top_folder: str, textures_folder: str):
     """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
 
 
@@ -269,7 +269,7 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str):
         blender_executable = blender.binary_path,
     )
 
-    program._prog_type = 'BAKE 🍪'
+    program._prog_type = 'BAKE SKELETAL 🍪'
 
     program.config = gui_config.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
 
@@ -284,7 +284,7 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str):
 
     program.run(blender, scripts_bake.check_for_reserved_uv_layout_name, objects)
 
-    program.run(blender, scripts_bake.apply_modifiers, objects)
+    program.run(blender, scripts_bake.apply_modifiers, objects, ignore_type = ['ARMATURE'])
 
     program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
     program.run(blender, bc_script.unwrap,
@@ -294,7 +294,7 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str):
         ministry_of_flat_settings = get_ministry_of_flat_settings(program.config)
     )
 
-    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_UNWRAP)
+    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_UNWRAP, ignore_type = ['ARMATURE'])
 
     program.run(blender, scripts_bake.convert_materials, objects)
 
@@ -312,7 +312,7 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str):
         pack_settings = get_uv_pack_settings(program.config),
     )
 
-    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE)
+    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE, ignore_type = ['ARMATURE'])
 
     program.run(blender, bc_script.apply_scale, objects)
     program.run(blender, scripts_bake.join_objects)
@@ -361,9 +361,9 @@ def convert_to_blend_RIG(blend_path):
 
 
 
-def get_programs():
+def get_static_programs():
 
-    from blend_converter import utils, common
+    from blend_converter import utils
     programs = utils.Appendable_Dict()
 
     asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_STATIC) if file.is_dir()]
@@ -398,5 +398,40 @@ def get_programs():
         else:
             baked_model = get_baked(last_blend, configuration.Folder.INTERMEDIATE_BLEND_STATIC, configuration.Folder.INTERMEDIATE_BLEND_STATIC)
 
+
+    return programs
+
+
+def get_skeletal_programs():
+
+    from blend_converter import utils
+    programs = utils.Appendable_Dict()
+
+    asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_SKELETAL) if file.is_dir()]
+
+
+    def get_baked(path: os.PathLike, folder: str, resources_folder: str):
+
+        dir_name = os.path.basename(os.path.dirname(path))
+
+        # can store the textures in the final location to avoid copies
+        # for glTF export_keep_originals=True can be used then
+        texture_folder = os.path.join(resources_folder, dir_name, 'textures')
+
+        baked_model = get_bake_skeletal_program(path, folder, texture_folder)
+        programs.append(baked_model)
+        return baked_model
+
+
+    for folder in asset_folders:
+
+        if folder.name.startswith('_'):  # temp or WIP assets to ignore
+            continue
+
+        last_blend = utils.get_last_blend(folder)
+        if not last_blend:
+            continue
+
+        get_baked(last_blend, configuration.Folder.INTERMEDIATE_BLEND_SKELETAL, configuration.Folder.INTERMEDIATE_BLEND_SKELETAL)
 
     return programs

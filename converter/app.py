@@ -56,7 +56,8 @@ if __name__ == '__main__':
     ROOT = os.path.join(os.path.dirname(__file__))
 
     names = [
-        (os.path.join(ROOT, 'programs', 'bake.py'), 'get_programs'),
+        (os.path.join(ROOT, 'programs', 'bake.py'), 'get_static_programs'),
+        (os.path.join(ROOT, 'programs', 'bake.py'), 'get_skeletal_programs'),
         (os.path.join(ROOT, 'programs', 'godot.py'), 'get_programs'),
         (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'get_programs'),
         (os.path.join(ROOT, 'programs', 'extra.py'), 'get_programs'),
