@@ -60,7 +60,7 @@ if __name__ == '__main__':
         (os.path.join(ROOT, 'programs', 'bake.py'), 'get_skeletal_programs'),
         (os.path.join(ROOT, 'programs', 'godot.py'), 'get_programs'),
         (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'get_programs'),
-        (os.path.join(ROOT, 'programs', 'extra.py'), 'get_programs'),
+        (os.path.join(ROOT, 'programs', 'skin_test.py'), 'get_programs'),
         (os.path.join(ROOT, 'programs', 'skin_proxy.py'), 'get_programs'),
         (os.path.join(ROOT, 'programs', 'prebake.py'), 'get_programs'),
     ]
