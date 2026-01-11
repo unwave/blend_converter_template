@@ -8,11 +8,13 @@ if not ROOT in sys.path:
 
 import configuration
 
+import gui_config
+
 from scripts import bake as scripts_bake
 from scripts import export as scripts_export
 
 
-def get_unwrap_settings(config: configuration.Config):
+def get_unwrap_settings(config: gui_config.Config):
 
 
     from blend_converter import tool_settings
@@ -43,7 +45,7 @@ def get_unwrap_settings(config: configuration.Config):
         return settings
 
 
-def get_uv_pack_settings(config: configuration.Config):
+def get_uv_pack_settings(config: gui_config.Config):
 
 
     from blend_converter import tool_settings
@@ -64,7 +66,7 @@ def get_uv_pack_settings(config: configuration.Config):
         return settings
 
 
-def get_ministry_of_flat_settings(config: configuration.Config):
+def get_ministry_of_flat_settings(config: gui_config.Config):
 
     from blend_converter import tool_settings
 
@@ -86,7 +88,7 @@ def get_ministry_of_flat_settings(config: configuration.Config):
 
 
 
-def get_texture_bake_settings(config: configuration.Config, texture_name_prefix: str):
+def get_texture_bake_settings(config: gui_config.Config, texture_name_prefix: str):
 
     from blend_converter import tool_settings
 
@@ -107,7 +109,7 @@ def get_texture_bake_settings(config: configuration.Config, texture_name_prefix:
         )
 
 
-def get_bake_settings(config: configuration.Config, textures_folder: str, pre_bake_labels: list):
+def get_bake_settings(config: gui_config.Config, textures_folder: str, pre_bake_labels: list):
 
     from blend_converter import tool_settings
 
@@ -190,7 +192,7 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str):
 
     program._prog_type = 'BAKE 🍪'
 
-    program.config = configuration.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
+    program.config = gui_config.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
 
 
     program.run(blender, open_mainfile, blend_path)
