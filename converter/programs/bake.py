@@ -245,6 +245,85 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
     return program
 
 
+def get_bake_program(blend_path, top_folder: str, textures_folder: str):
+    """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
+
+
+    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
+    from blend_converter import common
+    from blend_converter import tool_settings
+
+
+    blend_path = common.File(blend_path)
+
+    result_path = os.path.join(top_folder, blend_path.dir_name, blend_path.dir_name + '.blend')
+
+    print(result_path)
+
+    blender = Blender(configuration.BLENDER_EXECUTABLE)
+
+    program = common.Program(
+        blend_path = blend_path,
+        result_path = result_path,
+        blender_executable = blender.binary_path,
+    )
+
+    program._prog_type = 'BAKE 🍪'
+
+    program.config = gui_config.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
+
+
+    program.run(blender, open_mainfile, blend_path)
+
+    program.run(blender, scripts_bake.reset_timeline)
+    program.run(blender, scripts_bake.find_missing)
+    program.run(blender, scripts_bake.reveal_collections)
+
+    objects = program.run(blender, scripts_bake.get_target_objects)
+
+    program.run(blender, scripts_bake.check_for_reserved_uv_layout_name, objects)
+
+    program.run(blender, scripts_bake.apply_modifiers, objects)
+
+    program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
+    program.run(blender, bc_script.unwrap,
+        objects,
+        uv_layer_reuse = 'REUSE',
+        settings = get_unwrap_settings(program.config),
+        ministry_of_flat_settings = get_ministry_of_flat_settings(program.config)
+    )
+
+    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_UNWRAP)
+
+    program.run(blender, scripts_bake.convert_materials, objects)
+
+    pre_bake_labels = program.run(blender, bc_script.label_mix_shader_nodes, objects)
+
+    program.run(blender, bc_script.bisect_by_mirror_modifiers, objects)
+
+    program.run(blender, bc_script.scale_uv_to_world_per_uv_island, objects, tool_settings.DEFAULT_UV_LAYER_NAME)
+    program.run(blender, bc_script.scale_uv_to_world_per_uv_layout, objects, tool_settings.DEFAULT_UV_LAYER_NAME)
+
+    objects = program.run(blender, bc_script.pack_copy_bake,
+        objects,
+        get_bake_settings(program.config, textures_folder, pre_bake_labels),
+        bake_settings = get_texture_bake_settings(program.config, get_texture_prefix(blend_path.dir_name)),
+        pack_settings = get_uv_pack_settings(program.config),
+    )
+
+    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE)
+
+    program.run(blender, bc_script.apply_scale, objects)
+    program.run(blender, scripts_bake.join_objects)
+
+    program.run(blender, scripts_bake.make_paths_relative)
+    program.run(blender, save_as_mainfile, result_path)
+
+
+    return program
+
+
 def convert_to_blend_RIG(blend_path):
     """ for use a linked rig + mesh for creating animations """
 
