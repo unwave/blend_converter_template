@@ -33,7 +33,7 @@ def get_unwrap_settings(config: gui_config.Config):
         bfu_method = config.uv_unwrap.bfu_method
 
         if bfu_method != 'NONE':
-            settings.brute_unwrap_methods = ['NONE']
+            settings.brute_unwrap_methods = [bfu_method]
         elif bfu_preset == 'active_render':
             settings.brute_unwrap_methods = ['active_render', 'active_render_minimal_stretch']
         elif bfu_preset == 'mof_only':
