@@ -24,7 +24,7 @@ def convert_to_static_mesh(blend_path: str):
 
     blend_path: common.File = common.File(blend_path)
 
-    gltf_path = os.path.join(configuration.Folder.GLTF_STATIC, blend_path.dir_name, blend_path.dir_name + '.gltf')
+    gltf_path = os.path.join(configuration.Folder.GODOT_GLTF_STATIC, blend_path.dir_name, blend_path.dir_name + '.gltf')
 
     blender = Blender(configuration.BLENDER_EXECUTABLE)
 
@@ -71,7 +71,7 @@ def convert_to_skeletal_mesh(blend_path: str):
 
     blend_path: common.File = common.File(blend_path)
 
-    gltf_path = os.path.join(configuration.Folder.GLTF_SKELETAL, blend_path.dir_name, blend_path.dir_name + '.gltf')
+    gltf_path = os.path.join(configuration.Folder.GODOT_GLTF_SKELETAL, blend_path.dir_name, blend_path.dir_name + '.gltf')
 
     blender = Blender(configuration.BLENDER_EXECUTABLE)
 
@@ -116,7 +116,7 @@ def convert_to_animation(blend_path, rig_name: str, animation_name: str):
 
     blend_path = common.File(blend_path)
 
-    gltf_path = os.path.join(configuration.Folder.GLTF_ANIMATION, blend_path.dir_name, blend_path.dir_name + '.gltf')
+    gltf_path = os.path.join(configuration.Folder.GODOT_GLTF_ANIMATION, blend_path.dir_name, blend_path.dir_name + '.gltf')
 
     blender = Blender(configuration.BLENDER_EXECUTABLE)
 

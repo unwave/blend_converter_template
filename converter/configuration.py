@@ -46,9 +46,9 @@ class Folder:
     INTERMEDIATE_BLEND_SKIN_TEST = os.path.join(ROOT, 'intermediate', 'blend', 'skin_test')
     INTERMEDIATE_BLEND_SKIN_PROXY = os.path.join(ROOT, 'intermediate', 'blend', 'skin_proxy')
 
-    GLTF_STATIC = os.path.join(ROOT, 'godot', 'gltf', 'static')
-    GLTF_SKELETAL = os.path.join(ROOT, 'godot', 'gltf', 'skeletal')
-    GLTF_ANIMATION = os.path.join(ROOT, 'godot', 'gltf', 'animation')
+    GODOT_GLTF_STATIC = os.path.join(ROOT, 'godot', 'gltf', 'static')
+    GODOT_GLTF_SKELETAL = os.path.join(ROOT, 'godot', 'gltf', 'skeletal')
+    GODOT_GLTF_ANIMATION = os.path.join(ROOT, 'godot', 'gltf', 'animation')
 
     INTERMEDIATE_UNREAL_SM = os.path.join(ROOT, 'intermediate', 'unreal', 'SM')
     INTERMEDIATE_UNREAL_SK = os.path.join(ROOT, 'intermediate', 'unreal', 'SK')
