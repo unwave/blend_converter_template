@@ -462,3 +462,17 @@ def save_blend_with_repack(filepath: str):
         print(e)
 
     print(f"Blend is saved in path: {filepath}")
+
+
+def delete_unused_materials():
+
+    for object in bpy.data.objects:
+
+        if not hasattr(object, 'material_slots'):
+            continue
+
+        if not object.material_slots:
+            continue
+
+        with bpy_context.Focus(object):
+            bpy.ops.object.material_slot_remove_unused()

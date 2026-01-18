@@ -54,6 +54,7 @@ def convert_to_unreal_static_mesh(blend_path: str):
     program.run(blender, scripts_export.remove_animations)
     program.run(blender, bc_script.use_backface_culling)
     program.run(blender, scripts_export.triangulate_geometry)
+    program.run(blender, scripts_export.delete_unused_materials)
 
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SM')
 
@@ -113,6 +114,7 @@ def convert_to_unreal_skeletal_mesh(blend_path: str):
     program.run(blender, scripts_export.remove_animations)
     program.run(blender, bc_script.use_backface_culling)
     program.run(blender, scripts_export.triangulate_geometry)
+    program.run(blender, scripts_export.delete_unused_materials)
     program.run(blender, scripts_bake.create_game_rig_and_bake_actions)
     program.run(blender, bc_script.create_default_root_bone)
 
