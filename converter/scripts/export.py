@@ -112,6 +112,9 @@ def remove_animations():
             bone.rotation_euler = (0, 0, 0)
             bone.scale = (1, 1, 1)
 
+    for object in bpy.data.objects:
+        object.animation_data_clear()
+
 
 def export_collections_as_fbx_static_meshes(result_dir: str):
 
