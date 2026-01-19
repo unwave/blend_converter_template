@@ -320,3 +320,24 @@ def apply_shape_keys(objects: typing.List['bpy.types.Object']):
             continue
 
         bpy_context.call_for_object(object, bpy.ops.object.shape_key_remove, all=True, apply_mix=True)
+
+
+def delete_undefined_nodes():
+    """
+    This can stop the `Dependency cycle detected` spam in materials.
+
+    `NTShader Nodetree/NTREE_OUTPUT() depends on`
+    `MA<MATERIAL_NAME>/MATERIAL_UPDATE() via 'Material -> Node'`
+    `NTShader Nodetree/NTREE_OUTPUT() via 'Material's NTree'`
+
+    """
+
+    from blend_converter.blender import bpy_node
+
+    for material in bpy.data.materials:
+
+        if not material.node_tree:
+            continue
+
+        tree = bpy_node.Shader_Tree_Wrapper(material.node_tree)
+        tree.delete_nodes_with_reconnect(tree.get_by_bl_idname('NodeUndefined'))

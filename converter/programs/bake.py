@@ -196,6 +196,7 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
 
     program.run(blender, open_mainfile, blend_path)
 
+    program.run(blender, scripts_bake.delete_undefined_nodes)
     program.run(blender, scripts_bake.find_missing)
     program.run(blender, scripts_bake.reveal_collections)
 
