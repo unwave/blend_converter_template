@@ -196,10 +196,11 @@ def convert_to_unreal_animation(blend_path, rig_name: str, animation_name: str):
     return program
 
 
-def get_programs():
+def get_unreal_kwargs():
 
     from blend_converter import utils
-    programs = utils.Appendable_Dict()
+
+    arguments = []
 
     if os.path.exists(configuration.Folder.INTERMEDIATE_BLEND_STATIC):
         asset_folders = [file for file in os.scandir(configuration.Folder.INTERMEDIATE_BLEND_STATIC) if file.is_dir()]
@@ -217,7 +218,7 @@ def get_programs():
         elif folder.name.startswith('SPLIT_'):
             raise NotImplementedError("split into multiple fbx with independent materials")
         else:
-            programs.append(convert_to_unreal_static_mesh(last_blend))
+            arguments.append(dict(blend_path = last_blend))
 
 
-    return programs
+    return arguments

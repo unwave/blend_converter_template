@@ -49,10 +49,11 @@ def get_skin_test(blend_path):
     return program
 
 
-def get_programs():
+def get_skin_test_kwargs():
 
     from blend_converter import utils
-    programs = utils.Appendable_Dict()
+
+    arguments = []
 
     asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_SKELETAL) if file.is_dir()]
 
@@ -65,6 +66,6 @@ def get_programs():
         if not last_blend:
             continue
 
-        programs.append(get_skin_test(last_blend))
+        arguments.append(dict(blend_path = last_blend))
 
-    return programs
+    return arguments

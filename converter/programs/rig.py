@@ -45,11 +45,11 @@ def get_rig(blend_path):
     return program
 
 
-def get_programs():
+def get_rig_kwargs():
 
     from blend_converter import utils
-    programs = utils.Appendable_Dict()
 
+    arguments = []
 
     for folder in configuration.get_folders(configuration.Folder.INTERMEDIATE_BLEND_SKELETAL):
 
@@ -57,7 +57,7 @@ def get_programs():
         if not last_blend:
             continue
 
-        programs.append(get_rig(last_blend))
+        arguments.append(dict(blend_path = last_blend))
 
 
-    return programs
+    return arguments

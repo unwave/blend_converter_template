@@ -324,10 +324,11 @@ def get_bake_skeletal_program(blend_path, top_folder: str, textures_folder: str)
     return program
 
 
-def get_static_programs():
+def get_static_kwargs():
 
     from blend_converter import utils
-    programs = utils.Appendable_Dict()
+
+    arguments = []
 
     asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_STATIC) if file.is_dir()]
 
@@ -340,9 +341,11 @@ def get_static_programs():
         # for glTF export_keep_originals=True can be used then
         texture_folder = os.path.join(resources_folder, dir_name, 'textures')
 
-        baked_model = get_bake_static_program(path, folder, texture_folder)
-        programs.append(baked_model)
-        return baked_model
+        return dict(
+            blend_path = path,
+            top_folder = folder,
+            textures_folder = texture_folder,
+        )
 
 
     for folder in asset_folders:
@@ -359,16 +362,17 @@ def get_static_programs():
         elif folder.name.startswith('SPLIT_'):
             raise NotImplementedError("split into multiple fbx with independent materials")
         else:
-            baked_model = get_baked(last_blend, configuration.Folder.INTERMEDIATE_BLEND_STATIC, configuration.Folder.INTERMEDIATE_BLEND_STATIC)
+            arguments.append(get_baked(last_blend, configuration.Folder.INTERMEDIATE_BLEND_STATIC, configuration.Folder.INTERMEDIATE_BLEND_STATIC))
 
 
-    return programs
+    return arguments
 
 
-def get_skeletal_programs():
+def get_skeletal_kwargs():
 
     from blend_converter import utils
-    programs = utils.Appendable_Dict()
+
+    arguments = []
 
     asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_SKELETAL) if file.is_dir()]
 
@@ -381,9 +385,11 @@ def get_skeletal_programs():
         # for glTF export_keep_originals=True can be used then
         texture_folder = os.path.join(resources_folder, dir_name, 'textures')
 
-        baked_model = get_bake_skeletal_program(path, folder, texture_folder)
-        programs.append(baked_model)
-        return baked_model
+        return dict(
+            blend_path = path,
+            top_folder = folder,
+            textures_folder = texture_folder,
+        )
 
 
     for folder in asset_folders:
@@ -395,6 +401,7 @@ def get_skeletal_programs():
         if not last_blend:
             continue
 
-        get_baked(last_blend, configuration.Folder.INTERMEDIATE_BLEND_SKELETAL, configuration.Folder.INTERMEDIATE_BLEND_SKELETAL)
+        arguments.append(get_baked(last_blend, configuration.Folder.INTERMEDIATE_BLEND_SKELETAL, configuration.Folder.INTERMEDIATE_BLEND_SKELETAL))
 
-    return programs
+
+    return arguments

@@ -56,14 +56,14 @@ if __name__ == '__main__':
     ROOT = os.path.join(os.path.dirname(__file__))
 
     programs = dict(
-        static = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_static_programs'),
-        skeletal = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_skeletal_programs'),
-        godot = (os.path.join(ROOT, 'programs', 'godot.py'), 'get_programs'),
-        unreal = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'get_programs'),
-        skin_test = (os.path.join(ROOT, 'programs', 'skin_test.py'), 'get_programs'),
-        skin_proxy = (os.path.join(ROOT, 'programs', 'skin_proxy.py'), 'get_programs'),
-        prebake = (os.path.join(ROOT, 'programs', 'prebake.py'), 'get_programs'),
-        rig = (os.path.join(ROOT, 'programs', 'rig.py'), 'get_programs'),
+        static = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_static_program', 'get_static_kwargs'),
+        skeletal = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_skeletal_program', 'get_skeletal_kwargs'),
+        godot = (os.path.join(ROOT, 'programs', 'godot.py'), 'convert_to_static_mesh', 'get_godot_kwargs'),
+        unreal = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'convert_to_unreal_static_mesh', 'get_unreal_kwargs'),
+        skin_test = (os.path.join(ROOT, 'programs', 'skin_test.py'), 'get_skin_test', 'get_skin_test_kwargs'),
+        skin_proxy = (os.path.join(ROOT, 'programs', 'skin_proxy.py'), 'get_skin_proxy', 'get_skin_proxy_kwargs'),
+        prebake = (os.path.join(ROOT, 'programs', 'prebake.py'), 'get_scan_program', 'get_prebake_kwargs'),
+        rig = (os.path.join(ROOT, 'programs', 'rig.py'), 'get_rig', 'get_rig_kwargs'),
     )
 
     print(sys.argv)

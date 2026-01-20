@@ -42,10 +42,11 @@ def get_scan_program(blend_path, result_dir):
     return program
 
 
-def get_programs():
+def get_prebake_kwargs():
 
     from blend_converter import utils
-    programs = utils.Appendable_Dict()
+
+    arguments = []
 
     asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_MAIN) if file.is_dir()]
 
@@ -71,7 +72,7 @@ def get_programs():
 
             result_dir = os.path.join(low_poly_folder, file.name)
 
-            programs.append(get_scan_program(last_blend, result_dir))
+            arguments.append(dict(blend_path = last_blend, result_dir = result_dir))
 
 
-    return programs
+    return arguments
