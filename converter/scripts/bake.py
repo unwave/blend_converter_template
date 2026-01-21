@@ -360,3 +360,15 @@ def delete_undefined_nodes():
 
         tree = bpy_node.Shader_Tree_Wrapper(material.node_tree)
         tree.delete_nodes_with_reconnect(tree.get_by_bl_idname('NodeUndefined'))
+
+
+def make_data_local():
+    """ To be able to enter the EDIT mode. """
+
+    if bpy.context.active_object:
+        # RuntimeError: Operator bpy.ops.object.make_local.poll() failed, context is incorrect
+        # if the object is in EDIT mode
+        with bpy_context.Focus(bpy.context.active_object):
+            bpy.ops.object.make_local(type='ALL')
+    else:
+        bpy.ops.object.make_local(type='ALL')
