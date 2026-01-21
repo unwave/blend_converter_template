@@ -316,6 +316,9 @@ def apply_shape_keys(objects: typing.List['bpy.types.Object']):
 
     for object in objects:
 
+        if not hasattr(object.data, 'shape_keys'):
+            continue
+
         if not object.data.shape_keys:
             continue
 
