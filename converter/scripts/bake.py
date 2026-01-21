@@ -26,6 +26,19 @@ def get_target_objects():
 
     objects: typing.List[bpy.types.Object] = []
 
+
+    custom_shapes = set()
+
+    for o in bpy.data.objects:
+
+        if o.type != 'ARMATURE':
+            continue
+
+        for bone in o.pose.bones:
+            if bone.custom_shape:
+                custom_shapes.add(bone.custom_shape)
+
+
     for o in bpy_utils.get_meshable_objects(bpy_utils.get_view_layer_objects()):
 
         if o.name.startswith('#'):
@@ -35,6 +48,9 @@ def get_target_objects():
             continue
 
         if o.get(configuration.ATOOL_COLLISION_OBJECT_PROP_KEY) is not None:
+            continue
+
+        if o in custom_shapes:
             continue
 
         objects.append(o)
