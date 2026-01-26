@@ -40,8 +40,8 @@ def main(file_and_getter_pairs: typing.List[typing.Tuple[str, str]]):
     ]
     app = updater_ui.Main_Frame.get_app(file_and_getter_pairs, columns)
 
-    app.main_frame.updater.total_max_parallel_executions = 8
-    app.main_frame.updater.default_max_parallel_executions = 2
+    app.main_frame.updater.total_max_parallel_executions = os.cpu_count()
+    app.main_frame.updater.default_max_parallel_executions = os.cpu_count()
     app.main_frame.updater.set_max_parallel_executions_per_program_tag('gltf', 8)
     app.main_frame.updater.set_max_parallel_executions_per_program_tag('unreal', 1)
 
