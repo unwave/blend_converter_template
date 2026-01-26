@@ -16,7 +16,8 @@ from scripts import godot as scripts_godot
 def convert_to_static_mesh(blend_path: str):
     """ export as a fbx static mesh """
 
-    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.executor import Blender
+    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter.blender.formats.gltf import export_gltf, Settings_GLTF
     from blend_converter import common
@@ -63,7 +64,8 @@ def convert_to_static_mesh(blend_path: str):
 def convert_to_skeletal_mesh(blend_path: str):
     """ export as a fbx skeletal mesh """
 
-    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.executor import Blender
+    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter.blender.formats.gltf import export_gltf, Settings_GLTF
     from blend_converter import common
@@ -111,7 +113,8 @@ def convert_to_skeletal_mesh(blend_path: str):
 def convert_to_animation(blend_path, rig_name: str, animation_name: str):
     """ export as an animation only fbx file """
 
-    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.executor import Blender
+    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter.blender.formats.gltf import export_gltf, Settings_GLTF
     from blend_converter import common

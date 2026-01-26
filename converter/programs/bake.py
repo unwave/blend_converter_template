@@ -168,8 +168,8 @@ def get_texture_prefix(folder_name: str):
 def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
     """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
 
-
-    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.executor import Blender
+    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
     from blend_converter import common
     from blend_converter import tool_settings
@@ -249,8 +249,8 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
 def get_bake_skeletal_program(blend_path, top_folder: str, textures_folder: str):
     """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
 
-
-    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.executor import Blender
+    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
     from blend_converter import common
     from blend_converter import tool_settings

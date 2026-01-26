@@ -14,7 +14,7 @@ from scripts import scan as scripts_scan
 def get_scan_program(blend_path, result_dir):
 
     from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
-    from blend_converter.blender import Blender
+    from blend_converter.blender.executor import Blender
     from blend_converter import common
 
     import os

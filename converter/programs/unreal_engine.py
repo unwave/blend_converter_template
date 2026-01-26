@@ -19,7 +19,8 @@ def convert_to_unreal_static_mesh(blend_path: str):
     """ export as a fbx static mesh """
 
     from blend_converter.unreal import Unreal
-    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.executor import Blender
+    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter.blender.formats.fbx import export_fbx, Settings_Fbx
     from blend_converter import common
@@ -81,7 +82,8 @@ def convert_to_unreal_skeletal_mesh(blend_path: str):
     """ export as a fbx skeletal mesh """
 
     from blend_converter.unreal import Unreal
-    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.executor import Blender
+    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter.blender.formats.fbx import export_fbx, Settings_Fbx
     from blend_converter import common
@@ -146,7 +148,8 @@ def convert_to_unreal_animation(blend_path, rig_name: str, animation_name: str):
     """ export as an animation only fbx file """
 
     from blend_converter.unreal import Unreal
-    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.executor import Blender
+    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter.blender.formats.fbx import export_fbx, Settings_Fbx
     from blend_converter import common

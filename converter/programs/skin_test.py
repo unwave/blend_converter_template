@@ -14,7 +14,8 @@ from scripts import bake as scripts_bake
 def get_skin_test(blend_path):
     """ For iterative testing of skinning and weight panting quality, same as the baking but simplified and faster by disregarding materials """
 
-    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.executor import Blender
+    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
     from blend_converter import common
     from blend_converter import utils

@@ -14,7 +14,8 @@ from scripts import export as scripts_export
 def get_rig(blend_path):
     """ for use a linked rig + mesh for creating animations """
 
-    from blend_converter.blender import Blender, bc_script
+    from blend_converter.blender.executor import Blender
+    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter import common
 

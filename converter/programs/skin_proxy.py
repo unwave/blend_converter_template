@@ -15,7 +15,7 @@ from scripts import rig as scripts_rig
 def get_skin_proxy(blend_path):
     """ a proxy to use in external tools like Mixamo and further re-integration, prioritizing a base clean topology """
 
-    from blend_converter.blender import Blender
+    from blend_converter.blender.executor import Blender
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter.blender.formats.fbx import export_fbx, Settings_Fbx
     from blend_converter import common
