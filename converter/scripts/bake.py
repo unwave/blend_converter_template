@@ -217,6 +217,14 @@ def apply_modifiers(objects: typing.List['bpy.types.Object'], modifier_type_pref
         bpy_utils.apply_modifiers(objects, include_name = modifier_type_prefix, ignore_type = ignore_type)
 
 
+def delete_hidden_modifiers(objects: typing.List['bpy.types.Object']):
+
+    for object in objects:
+        for modifier in list(object.modifiers):
+            if not modifier.show_viewport:
+                object.modifiers.remove(modifier)
+
+
 def convert_materials(objects):
 
     bpy_utils.convert_materials_to_principled(objects)

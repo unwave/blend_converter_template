@@ -208,6 +208,7 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
     program.run(blender, scripts_bake.check_for_reserved_uv_layout_name, objects)
 
     program.run(blender, scripts_bake.apply_shape_keys, objects)
+    program.run(blender, scripts_bake.delete_hidden_modifiers, objects)
     program.run(blender, scripts_bake.apply_modifiers, objects)
 
     program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
