@@ -146,10 +146,10 @@ def join_objects():
 
     def traverse(layer_collection: bpy.types.LayerCollection):
 
-        merged_objects = []
+        result = []
 
         if layer_collection.collection.name.startswith(configuration.IGNORE_PREFIX):
-            return merged_objects
+            return result
 
         objects = list(layer_collection.collection.objects)
 
@@ -160,7 +160,7 @@ def join_objects():
 
 
         if layer_collection.name.startswith('!'):
-            merged_objects.extend(meshable_objects)
+            result.extend(meshable_objects)
         elif meshable_objects:
             empty_origin = next((o for o in layer_collection.collection.objects if o.type == 'EMPTY' and o.name.startswith(configuration.ORIGIN_PREFIX)), None)
 
@@ -180,24 +180,24 @@ def join_objects():
 
             if empty_origin:
                 origin = convert_empty_to_mesh(empty_origin)
-                merged_object = bpy_utils.merge_objects(meshable_objects, merge_into=origin, name=layer_collection.name)
+                joined_object = bpy_utils.join_objects(meshable_objects, join_into=origin, name=layer_collection.name)
             else:
-                merged_object = bpy_utils.merge_objects(meshable_objects, name=layer_collection.name)
+                joined_object = bpy_utils.join_objects(meshable_objects, name=layer_collection.name)
 
             if armature:
-                merged_object.modifiers.new(name = 'Armature', type = 'ARMATURE').object = armature
+                joined_object.modifiers.new(name = 'Armature', type = 'ARMATURE').object = armature
 
-            merged_objects.append(merged_object)
+            result.append(joined_object)
 
         for child_layer in layer_collection.children:
 
             if child_layer.name.startswith('-'):
                 continue
 
-            merged_objects.extend(traverse(child_layer))
+            result.extend(traverse(child_layer))
 
 
-        return merged_objects
+        return result
 
 
     return traverse(bpy.context.view_layer.layer_collection)

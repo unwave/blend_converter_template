@@ -332,7 +332,7 @@ def convert_collision_shape(object: 'bpy.types.Object', collision_type: str):
         capsule.location = object.location
         capsule.rotation_euler = object.rotation_euler
 
-        bpy_utils.merge_objects([sphere1, sphere2], merge_into=capsule)
+        bpy_utils.join_objects([sphere1, sphere2], join_into=capsule)
 
         bpy.context.view_layer.active_layer_collection.collection.objects.link(capsule)
 
