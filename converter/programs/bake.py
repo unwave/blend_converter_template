@@ -181,7 +181,7 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
 
     print(result_path)
 
-    blender = Blender(configuration.BLENDER_EXECUTABLE)
+    blender = Blender(configuration.BLENDER_EXECUTABLE, timeout = 30 * 60)
 
     program = common.Program(
         blend_path = blend_path,
@@ -192,9 +192,6 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
     program._prog_type = 'BAKE STATIC 🍪'
 
     program.config = gui_config.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
-
-    program.timeout = 30 * 60
-
 
     program.run(blender, open_mainfile, blend_path)
 
