@@ -193,6 +193,8 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
 
     program.config = gui_config.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
 
+    program.timeout = 30 * 60
+
 
     program.run(blender, open_mainfile, blend_path)
 
