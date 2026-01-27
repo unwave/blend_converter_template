@@ -108,7 +108,7 @@ def get_texture_bake_settings(config: gui_config.Config, texture_name_prefix: st
         )
 
 
-def get_bake_settings(config: gui_config.Config, textures_folder: str, pre_bake_labels: list):
+def get_bake_settings(config: gui_config.Config, uv_layer_name: str, textures_folder: str, pre_bake_labels: list):
 
     from blend_converter import tool_settings
 
@@ -126,7 +126,7 @@ def get_bake_settings(config: gui_config.Config, textures_folder: str, pre_bake_
             denoise_all = False,
             ao_bake_use_normals = False,
 
-            uv_layer_reuse = tool_settings.DEFAULT_UV_LAYER_NAME,
+            uv_layer_bake = uv_layer_name,
             convert_materials = False,  # converting earlier
         )
 
@@ -146,7 +146,7 @@ def get_bake_settings(config: gui_config.Config, textures_folder: str, pre_bake_
 
             pre_bake_labels = pre_bake_labels,
 
-            uv_layer_reuse = tool_settings.DEFAULT_UV_LAYER_NAME,
+            uv_layer_bake = uv_layer_name,
             convert_materials = False,  # converting earlier
         )
 
@@ -202,14 +202,14 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
 
     objects = program.run(blender, scripts_bake.get_target_objects)
 
-    program.run(blender, scripts_bake.check_for_reserved_uv_layout_name, objects)
 
     program.run(blender, scripts_bake.apply_shape_keys, objects)
     program.run(blender, scripts_bake.delete_hidden_modifiers, objects)
     program.run(blender, scripts_bake.apply_modifiers, objects)
 
     program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
-    program.run(blender, bc_script.unwrap,
+
+    uv_layer_name = program.run(blender, bc_script.unwrap,
         objects,
         uv_layer_reuse = 'REUSE',
         settings = get_unwrap_settings(program.config),
@@ -224,12 +224,12 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
 
     program.run(blender, bc_script.bisect_by_mirror_modifiers, objects)
 
-    program.run(blender, bc_script.scale_uv_to_world_per_uv_island, objects, tool_settings.DEFAULT_UV_LAYER_NAME)
-    program.run(blender, bc_script.scale_uv_to_world_per_uv_layout, objects, tool_settings.DEFAULT_UV_LAYER_NAME)
+    program.run(blender, bc_script.scale_uv_to_world_per_uv_island, objects, uv_layer_name)
+    program.run(blender, bc_script.scale_uv_to_world_per_uv_layout, objects, uv_layer_name)
 
     objects = program.run(blender, bc_script.pack_copy_bake,
         objects,
-        get_bake_settings(program.config, textures_folder, pre_bake_labels),
+        get_bake_settings(program.config, uv_layer_name, textures_folder, pre_bake_labels),
         bake_settings = get_texture_bake_settings(program.config, get_texture_prefix(blend_path.dir_name)),
         pack_settings = get_uv_pack_settings(program.config),
     )
@@ -283,12 +283,11 @@ def get_bake_skeletal_program(blend_path, top_folder: str, textures_folder: str)
 
     objects = program.run(blender, scripts_bake.get_target_objects)
 
-    program.run(blender, scripts_bake.check_for_reserved_uv_layout_name, objects)
 
     program.run(blender, scripts_bake.apply_modifiers, objects, ignore_type = ['ARMATURE'])
 
     program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
-    program.run(blender, bc_script.unwrap,
+    uv_layer_name = program.run(blender, bc_script.unwrap,
         objects,
         uv_layer_reuse = 'REUSE',
         settings = get_unwrap_settings(program.config),
@@ -303,12 +302,12 @@ def get_bake_skeletal_program(blend_path, top_folder: str, textures_folder: str)
 
     program.run(blender, bc_script.bisect_by_mirror_modifiers, objects)
 
-    program.run(blender, bc_script.scale_uv_to_world_per_uv_island, objects, tool_settings.DEFAULT_UV_LAYER_NAME)
-    program.run(blender, bc_script.scale_uv_to_world_per_uv_layout, objects, tool_settings.DEFAULT_UV_LAYER_NAME)
+    program.run(blender, bc_script.scale_uv_to_world_per_uv_island, objects, uv_layer_name)
+    program.run(blender, bc_script.scale_uv_to_world_per_uv_layout, objects, uv_layer_name)
 
     objects = program.run(blender, bc_script.pack_copy_bake,
         objects,
-        get_bake_settings(program.config, textures_folder, pre_bake_labels),
+        get_bake_settings(program.config, uv_layer_name, textures_folder, pre_bake_labels),
         bake_settings = get_texture_bake_settings(program.config, get_texture_prefix(blend_path.dir_name)),
         pack_settings = get_uv_pack_settings(program.config),
     )

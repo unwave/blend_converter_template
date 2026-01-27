@@ -231,25 +231,6 @@ def convert_materials(objects):
     bpy_utils.make_material_independent_from_object(objects)
 
 
-def check_for_reserved_uv_layout_name(objects: typing.Optional[typing.List['bpy.types.Object']] = None):
-    """
-    The reserved `tool_settings.DEFAULT_UV_LAYER_NAME` name makes `bc_script.copy_and_bake_materials` to reuse the `bc_script.unwrap` created layout.
-    The layout with the name will be modified for packing which will break the materials that use it.
-    """
-
-    if objects is None:
-        objects = bpy_utils.get_view_layer_objects()
-
-    for object in bpy_utils.get_unique_data_objects(objects):
-
-        if not hasattr(object.data, 'uv_layers'):
-            continue
-
-        for name in object.data.uv_layers.keys():
-            if name == tool_settings.DEFAULT_UV_LAYER_NAME:
-                raise ValueError(f"Restricted uv layer name '{name}' in object: {object.name_full}\n{check_for_reserved_uv_layout_name.__doc__}")
-
-
 def reveal_collections():
     """
     Recursively traverse and unhide collections according to the ignore prefix.
