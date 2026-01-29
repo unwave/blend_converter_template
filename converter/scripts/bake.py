@@ -361,3 +361,25 @@ def make_data_local():
             bpy.ops.object.make_local(type='ALL')
     else:
         bpy.ops.object.make_local(type='ALL')
+
+
+def set_legacy_ik_solver():
+    """
+    This can reduce `Dependency cycle detected` spam in rigs.
+
+    Specifically the Tears of Steel Quad Bot rig prints millions of lines of spam.
+    It costs hundreds of megabytes of RAM and the log file size.
+
+    NOTE: this can undesirably change the result of the armature modifier
+    """
+
+    if bpy.data.version >= (2, 80):
+        return
+
+    state = bpy_context.State().__enter__()
+
+    for object in bpy.data.objects:
+        if object.type == 'ARMATURE':
+            state.set(object.pose, 'ik_solver', 'LEGACY')
+
+    return state
