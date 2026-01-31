@@ -56,8 +56,8 @@ if __name__ == '__main__':
     ROOT = os.path.join(os.path.dirname(__file__))
 
     programs = dict(
-        static = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_static_program', 'get_static_kwargs'),
-        skeletal = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_skeletal_program', 'get_skeletal_kwargs'),
+        static = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_program', 'get_static_kwargs'),
+        skeletal = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_program', 'get_skeletal_kwargs'),
         godot = (os.path.join(ROOT, 'programs', 'godot.py'), 'convert_to_static_mesh', 'get_godot_kwargs'),
         unreal = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'convert_to_unreal_static_mesh', 'get_unreal_kwargs'),
         skin_test = (os.path.join(ROOT, 'programs', 'skin_test.py'), 'get_skin_test', 'get_skin_test_kwargs'),

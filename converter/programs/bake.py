@@ -166,7 +166,7 @@ def get_texture_prefix(folder_name: str):
     return texture_prefix
 
 
-def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
+def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skeletal: bool):
     """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
 
     from blend_converter.blender.executor import Blender
@@ -190,7 +190,10 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
         blender_executable = blender.binary_path,
     )
 
-    program._prog_type = 'BAKE STATIC 🍪'
+    if is_skeletal:
+        program._prog_type = 'BAKE SKELETAL 🍪'
+    else:
+        program._prog_type = 'BAKE STATIC 🍪'
 
     program.config = gui_config.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
 
@@ -201,15 +204,24 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
     program.run(blender, scripts_bake.set_legacy_ik_solver)
     program.run(blender, scripts_bake.delete_undefined_nodes)
 
+    if is_skeletal:
+        program.run(blender, scripts_bake.reset_timeline)
+
     program.run(blender, scripts_bake.find_missing)
     program.run(blender, scripts_bake.reveal_collections)
 
     objects = program.run(blender, scripts_bake.get_target_objects)
 
 
-    program.run(blender, scripts_bake.apply_shape_keys, objects)
     program.run(blender, scripts_bake.delete_hidden_modifiers, objects)
-    program.run(blender, scripts_bake.apply_modifiers, objects)
+
+    ignore_type = ['ARMATURE'] if is_skeletal else []
+
+    if not is_skeletal:
+        program.run(blender, scripts_bake.apply_shape_keys, objects)
+
+    program.run(blender, scripts_bake.apply_modifiers, objects, ignore_type = ignore_type)
+
 
     program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
 
@@ -223,7 +235,7 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
         ministry_of_flat_settings = get_ministry_of_flat_settings(program.config)
     )
 
-    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_UNWRAP)
+    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_UNWRAP, ignore_type = ignore_type)
 
     program.run(blender, scripts_bake.convert_materials, objects)
 
@@ -241,91 +253,13 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
         pack_settings = get_uv_pack_settings(program.config),
     )
 
-    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE)
+    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE, ignore_type = ignore_type)
 
     program.run(blender, bc_script.apply_scale, objects)
     program.run(blender, scripts_bake.join_objects)
 
     program.run(blender, bc_script.select_uv_layer, objects, uv_layer_name)
     program.run(blender, scripts_bake.hid_non_target_objects)
-
-    program.run(blender, scripts_bake.make_paths_relative)
-    program.run(blender, save_as_mainfile, result_path)
-
-
-    return program
-
-
-def get_bake_skeletal_program(blend_path, top_folder: str, textures_folder: str):
-    """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
-
-    from blend_converter.blender.executor import Blender
-    from blend_converter.blender import bc_script
-    from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
-    from blend_converter import common
-    from blend_converter import tool_settings
-
-
-    blend_path = common.File(blend_path)
-
-    result_path = os.path.join(top_folder, blend_path.dir_name, blend_path.dir_name + '.blend')
-
-    print(result_path)
-
-    blender = Blender(configuration.BLENDER_EXECUTABLE)
-
-    program = common.Program(
-        blend_path = blend_path,
-        result_path = result_path,
-        blender_executable = blender.binary_path,
-    )
-
-    program._prog_type = 'BAKE SKELETAL 🍪'
-
-    program.config = gui_config.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
-
-
-    program.run(blender, open_mainfile, blend_path)
-
-    program.run(blender, scripts_bake.reset_timeline)
-    program.run(blender, scripts_bake.find_missing)
-    program.run(blender, scripts_bake.reveal_collections)
-
-    objects = program.run(blender, scripts_bake.get_target_objects)
-
-
-    program.run(blender, scripts_bake.apply_modifiers, objects, ignore_type = ['ARMATURE'])
-
-    program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
-    uv_layer_name = program.run(blender, bc_script.unwrap,
-        objects,
-        uv_layer_reuse = 'REUSE',
-        settings = get_unwrap_settings(program.config),
-        ministry_of_flat_settings = get_ministry_of_flat_settings(program.config)
-    )
-
-    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_UNWRAP, ignore_type = ['ARMATURE'])
-
-    program.run(blender, scripts_bake.convert_materials, objects)
-
-    pre_bake_labels = program.run(blender, bc_script.label_mix_shader_nodes, objects)
-
-    program.run(blender, bc_script.bisect_by_mirror_modifiers, objects)
-
-    program.run(blender, bc_script.scale_uv_to_world_per_uv_island, objects, uv_layer_name)
-    program.run(blender, bc_script.scale_uv_to_world_per_uv_layout, objects, uv_layer_name)
-
-    objects = program.run(blender, bc_script.pack_copy_bake,
-        objects,
-        get_bake_settings(program.config, uv_layer_name, textures_folder, pre_bake_labels),
-        bake_settings = get_texture_bake_settings(program.config, get_texture_prefix(blend_path.dir_name)),
-        pack_settings = get_uv_pack_settings(program.config),
-    )
-
-    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE, ignore_type = ['ARMATURE'])
-
-    program.run(blender, bc_script.apply_scale, objects)
-    program.run(blender, scripts_bake.join_objects)
 
     program.run(blender, scripts_bake.make_paths_relative)
     program.run(blender, save_as_mainfile, result_path)
@@ -355,6 +289,7 @@ def get_static_kwargs():
             blend_path = path,
             top_folder = folder,
             textures_folder = texture_folder,
+            is_skeletal = False,
         )
 
 
@@ -399,6 +334,7 @@ def get_skeletal_kwargs():
             blend_path = path,
             top_folder = folder,
             textures_folder = texture_folder,
+            is_skeletal = True,
         )
 
 
