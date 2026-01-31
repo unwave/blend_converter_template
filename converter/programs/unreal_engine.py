@@ -199,14 +199,14 @@ def convert_to_unreal_animation(blend_path, rig_name: str, animation_name: str):
     return program
 
 
-def get_unreal_kwargs():
+def get_unreal_kwargs(root: str):
 
     from blend_converter import utils
 
     arguments = []
 
-    if os.path.exists(configuration.Folder.INTERMEDIATE_BLEND_STATIC):
-        asset_folders = [file for file in os.scandir(configuration.Folder.INTERMEDIATE_BLEND_STATIC) if file.is_dir()]
+    if os.path.exists(root):
+        asset_folders = [file for file in os.scandir(root) if file.is_dir()]
     else:
         asset_folders = []
 
@@ -225,3 +225,11 @@ def get_unreal_kwargs():
 
 
     return arguments
+
+
+def get_static_unreal_kwargs():
+    return get_unreal_kwargs(configuration.Folder.INTERMEDIATE_BLEND_STATIC)
+
+
+def get_skeletal_unreal_kwargs():
+    return get_unreal_kwargs(configuration.Folder.INTERMEDIATE_BLEND_SKELETAL)
