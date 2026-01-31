@@ -314,6 +314,25 @@ def get_objects_for_armature(armature: 'bpy.types.Object'):
     return objects
 
 
+def get_root_bones(armature: 'bpy.types.Object'):
+
+    names = set(b.name for b in armature.data.bones)
+
+    if (
+            'Hips' in names
+            and
+            'Ctrl_Master' in names
+            and
+            armature.data.bones['Hips'].parent is None
+            and
+            armature.data.bones['Ctrl_Master'].parent is None
+        ):
+
+        print(f"Mixamo rig detected: {armature.name_full}")
+        return 'Hips', 'Ctrl_Master'
+
+
+
 def create_game_rig_and_bake_actions():
 
 
@@ -323,8 +342,12 @@ def create_game_rig_and_bake_actions():
 
         # bpy_action.unassign_deform_bones_with_missing_weights(armature, meshes)
 
-        deform_root = armature['BC_deform_root']
-        control_root = armature['BC_control_root']
+        deform_root = armature.get('BC_deform_root')
+        control_root =  armature.get('BC_control_root')
+
+        if not deform_root or not control_root:
+            deform_root, control_root = get_root_bones(armature)
+
 
         new = bpy_action.create_simplified_armature_and_constrain(armature, deform_root, control_root, meshes)
 
