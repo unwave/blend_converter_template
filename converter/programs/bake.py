@@ -247,6 +247,7 @@ def get_bake_static_program(blend_path, top_folder: str, textures_folder: str):
     program.run(blender, scripts_bake.join_objects)
 
     program.run(blender, bc_script.select_uv_layer, objects, uv_layer_name)
+    program.run(blender, scripts_bake.hid_non_target_objects)
 
     program.run(blender, scripts_bake.make_paths_relative)
     program.run(blender, save_as_mainfile, result_path)

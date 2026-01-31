@@ -22,12 +22,10 @@ if 'bpy' in sys.modules:
     from blend_converter.blender import bpy_action
 
 
-def get_target_objects():
 
-    objects: typing.List[bpy.types.Object] = []
+def get_bone_custom_shapes():
 
-
-    custom_shapes = set()
+    shapes: typing.Set[bpy.types.Object] = set()
 
     for o in bpy.data.objects:
 
@@ -36,7 +34,17 @@ def get_target_objects():
 
         for bone in o.pose.bones:
             if bone.custom_shape:
-                custom_shapes.add(bone.custom_shape)
+                shapes.add(bone.custom_shape)
+
+    return shapes
+
+
+def get_target_objects():
+
+
+    objects: typing.List[bpy.types.Object] = []
+
+    custom_shapes = get_bone_custom_shapes()
 
 
     for o in bpy_utils.get_meshable_objects(bpy_utils.get_view_layer_objects()):
@@ -56,6 +64,32 @@ def get_target_objects():
         objects.append(o)
 
     return objects
+
+
+def hid_non_target_objects():
+
+
+    custom_shapes = get_bone_custom_shapes()
+    for object in custom_shapes:
+        object.hide_set(True)
+
+
+    for object in bpy.data.objects:
+        if object.name.startswith('#'):
+            object.hide_set(True)
+
+
+    def traverse(layer_collection: bpy.types.LayerCollection):
+
+        for layer in layer_collection.children:
+
+            if layer.name.startswith('#'):
+                layer.hide_viewport = True
+
+            traverse(layer)
+
+    traverse(bpy.context.view_layer.layer_collection)
+
 
 
 def find_missing():
