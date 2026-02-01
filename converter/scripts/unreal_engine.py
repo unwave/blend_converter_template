@@ -87,6 +87,21 @@ def get_material_definitions_for_single_object():
 
     definitions = []
 
+    used_names = set()
+
+    def ensure_unique_name(name: str):
+
+        orig_name = name
+        index = 2
+        while name in used_names:
+            name = orig_name + '_' + str(index).zfill(2)
+            index += 1
+
+        used_names.add(name)
+
+        return name
+
+
     for material_slot in object.material_slots:
 
         assert material_slot.material
@@ -96,6 +111,9 @@ def get_material_definitions_for_single_object():
         definition['textures'] = textures = {}
 
         material = material_slot.material
+
+        name = ensure_unique_name(configuration.get_ascii_underscored(material.name))
+        definition['name'] = name
 
         tree = bpy_node.Shader_Tree_Wrapper(material.node_tree)
 
@@ -282,7 +300,7 @@ def set_materials(asset, material_definitions, material_name: str, result_dir: s
 
         materials_settings.append(
             Settings_Unreal_Material_Instance(
-                name = f'MI_{material_name}',
+                name = 'MI_' + definition['name'],
                 dir = result_dir,
                 base_color_filepath = definition['textures']['base_color'],
                 orm_filepath = definition['textures']['orm'],
