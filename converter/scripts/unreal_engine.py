@@ -295,9 +295,9 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
     return material_instance
 
 
-def set_materials(asset, material_definitions, material_name: str, result_dir: str):
+def create_materials(material_definitions: typing.List[dict], result_dir: str):
 
-    materials_settings = []
+    materials_settings: typing.List[unreal.MaterialInstanceConstant] = []
 
     for definition in material_definitions:
 
@@ -312,15 +312,38 @@ def set_materials(asset, material_definitions, material_name: str, result_dir: s
             )
         )
 
-    materials = [create_material_instance(material_settings) for material_settings in materials_settings]
+    return [create_material_instance(material_settings) for material_settings in materials_settings]
 
-    if isinstance(asset, unreal.StaticMesh):
-        for index, material in enumerate(materials):
-            unreal.StaticMesh.set_material(asset, index, material)
 
-    elif isinstance(asset, unreal.SkeletalMesh):
-        raise NotImplementedError()
+def set_static_mesh_materials(asset: unreal.StaticMesh, materials: typing.List[unreal.MaterialInstanceConstant]):
 
+    for index, material in enumerate(materials):
+        unreal.StaticMesh.set_material(asset, index, material)
+
+
+def set_skeletal_mesh_materials(asset: unreal.SkeletalMesh, materials: typing.List[unreal.MaterialInstanceConstant]):
+
+    array = unreal.Array(unreal.SkeletalMaterial)
+
+    skeletal_material: unreal.SkeletalMaterial
+    for skeletal_material in asset.get_editor_property('materials'):
+
+        # to preserve imported_material_slot_name
+        copy: unreal.SkeletalMaterial = skeletal_material.copy()
+
+        material_slot_name = str(skeletal_material.get_editor_property('material_slot_name'))
+
+        for new_material in materials:
+
+            material_name = str(new_material.get_name()).split('_', maxsplit=1)[1]
+
+            if material_name == material_slot_name:
+                copy.set_editor_property('material_interface', new_material)
+                break
+
+        array.append(copy)
+
+    asset.set_editor_property('materials', array)
 
 
 def get_import_task(options, filename: str, destination_path: str, destination_name: str):
@@ -418,7 +441,8 @@ def import_static_mesh(settings: Settings_Unreal_Fbx):
 
     asset: unreal.StaticMesh = unreal.load_asset(settings._asset_path)
 
-    set_materials(asset, settings.material_definitions, settings.dist_name, settings.dist_dir)
+    materials = create_materials(settings.material_definitions, settings.dist_dir)
+    set_static_mesh_materials(asset, materials)
 
     unreal.EditorAssetLibrary.save_asset(asset.get_full_name())
 
@@ -450,9 +474,10 @@ def import_skeletal_mesh(settings: Settings_Unreal_Fbx):
 
     asset: unreal.SkeletalMesh = unreal.load_asset(settings._asset_path)
 
-    set_materials(asset, settings.material_definitions, settings.dist_name, settings.dist_dir)
+    materials = create_materials(settings.material_definitions, settings.dist_dir)
+    set_skeletal_mesh_materials(asset, materials)
 
-    unreal.EditorAssetLibrary.save_asset(asset.get_full_name())
+    unreal.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty = False)
 
     unreal.log(f"Skeletal Mesh imported: {settings}")
 
