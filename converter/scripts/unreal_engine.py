@@ -114,6 +114,7 @@ def get_material_definitions_for_single_object():
 
         name = ensure_unique_name(configuration.get_ascii_underscored(material.name))
         definition['name'] = name
+        material.name = name
 
         tree = bpy_node.Shader_Tree_Wrapper(material.node_tree)
 
