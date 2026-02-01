@@ -85,41 +85,46 @@ def get_material_definitions_for_single_object():
 
     object = bpy_utils.get_view_layer_objects()[0]
 
-    material_definitions = []
+    definitions = []
 
     for material_slot in object.material_slots:
 
         assert material_slot.material
         assert material_slot.material.node_tree
 
-        material_definition = {}
-        material_definition['textures'] = textures = {}
+        definition = {}
+        definition['textures'] = textures = {}
 
         material = material_slot.material
 
         tree = bpy_node.Shader_Tree_Wrapper(material.node_tree)
 
-        node = next((node for node in tree.output[0].inputs['Base Color'].descendants if node.be('ShaderNodeTexImage')), None)
+        principled =  tree.output[0]
+
+        node = next((node for node in principled.inputs['Base Color'].descendants if node.be('ShaderNodeTexImage')), None)
         if node:
             textures['base_color'] = bpy_utils.get_block_abspath(node.image)
         else:
             textures['base_color'] = None
 
-        node = next((node for node in tree.output[0].inputs['Metallic'].descendants if node.be('ShaderNodeTexImage')), None)
+        node = next((node for node in principled.inputs['Metallic'].descendants if node.be('ShaderNodeTexImage')), None)
         if node:
             textures['orm'] = bpy_utils.get_block_abspath(node.image)
         else:
             textures['orm'] = None
 
-        node = next((node for node in tree.output[0].inputs['Normal'].descendants if node.be('ShaderNodeTexImage')), None)
+        node = next((node for node in principled.inputs['Normal'].descendants if node.be('ShaderNodeTexImage')), None)
         if node:
             textures['normal'] = bpy_utils.get_block_abspath(node.image)
         else:
             textures['normal'] = None
 
-        material_definitions.append(material_definition)
 
-    return material_definitions
+        definition['is_alpha'] = bool(principled['Alpha'] or principled.inputs['Alpha'].default_value != 1)
+
+        definitions.append(definition)
+
+    return definitions
 
 
 def import_texture(os_path: str, ue_dir: str, name: typing.Optional[str] = None) -> 'unreal.Texture':
