@@ -204,6 +204,8 @@ class Settings_Unreal_Material_Instance(tool_settings.Settings):
     # emission_filepath: str = ''
     # _emission_param_name: str = 'Emission'
 
+    is_alpha: bool = False
+
 
     @property
     def _asset_path(self):
@@ -305,6 +307,7 @@ def set_materials(asset, material_definitions, material_name: str, result_dir: s
                 base_color_filepath = definition['textures']['base_color'],
                 orm_filepath = definition['textures']['orm'],
                 normal_filepath =  definition['textures']['normal'],
+                is_alpha = definition['is_alpha'],
             )
         )
 
