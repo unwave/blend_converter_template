@@ -1,8 +1,7 @@
 import os
 import sys
 import typing
-import time
-
+import uuid
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if not ROOT in sys.path:
@@ -223,7 +222,7 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
 
     do_replace = unreal.EditorAssetLibrary.does_asset_exist(settings._asset_path)
     if do_replace:
-        asset_name = settings.name + f"_TEMP_{time.strftime('%Y%m%d_%H%M%S')}"
+        asset_name = settings.name + f"_TEMP_{uuid.uuid1().hex}"
     else:
         asset_name = settings.name
 
@@ -248,7 +247,7 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
         normal_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_NORMALMAP)
         normal_texture.set_editor_property('flip_green_channel', True)
         normal_texture.set_editor_property('srgb', False)  # ensuring that the pre/post change notifications are called
-        unreal.EditorAssetLibrary.save_asset(normal_texture.get_full_name())
+        unreal.EditorAssetLibrary.save_loaded_asset(normal_texture, only_if_is_dirty = False)
         unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._normal_param_name, normal_texture)
     else:
         material_instance.set_editor_property('parent', unreal.load_asset(settings.PARENT_MATERIAL_WITHOUT_NORMALS))
@@ -256,14 +255,14 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
     if settings.base_color_filepath:
         base_color_texture = import_texture(settings.base_color_filepath, settings.dir)
         base_color_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_DEFAULT)
-        unreal.EditorAssetLibrary.save_asset(base_color_texture.get_full_name())
+        unreal.EditorAssetLibrary.save_loaded_asset(base_color_texture, only_if_is_dirty = False)
         unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._base_color_param_name, base_color_texture)
 
     if settings.orm_filepath:
         orm_texture = import_texture(settings.orm_filepath, settings.dir)
         orm_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_MASKS)
         orm_texture.set_editor_property('srgb', False)  # ensuring that the pre/post change notifications are called
-        unreal.EditorAssetLibrary.save_asset(orm_texture.get_full_name())
+        unreal.EditorAssetLibrary.save_loaded_asset(orm_texture, only_if_is_dirty = False)
         unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._orm_param_name, orm_texture)
 
 
@@ -275,7 +274,7 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
     #     unreal.MaterialEditingLibrary.set_material_instance_static_switch_parameter_value(material_instance, settings.use_emission_param_name, False)
 
 
-    unreal.EditorAssetLibrary.save_asset(material_instance.get_full_name())
+    unreal.EditorAssetLibrary.save_loaded_asset(material_instance, only_if_is_dirty = False)
 
     if do_replace:
         old_asset = unreal.load_asset(settings._asset_path)
@@ -444,7 +443,7 @@ def import_static_mesh(settings: Settings_Unreal_Fbx):
     materials = create_materials(settings.material_definitions, settings.dist_dir)
     set_static_mesh_materials(asset, materials)
 
-    unreal.EditorAssetLibrary.save_asset(asset.get_full_name())
+    unreal.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty = False)
 
     unreal.log(f"Static Mesh imported: {settings}")
 
