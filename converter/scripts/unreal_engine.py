@@ -176,7 +176,9 @@ def import_texture(os_path: str, ue_dir: str, name: typing.Optional[str] = None)
     task.factory = factory
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
-    return unreal.load_asset(unreal.Paths.combine([ue_dir, dest_ue_name]))
+    assert len(task.imported_object_paths) == 1
+
+    return unreal.load_asset(task.imported_object_paths[0])
 
 
 def is_in_memory_asset(asset_path: str):
