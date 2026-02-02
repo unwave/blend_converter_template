@@ -26,7 +26,7 @@ def get_unwrap_settings(config: gui_config.Config):
     else:
 
         settings = tool_settings.Unwrap_UVs(
-            use_brute_force_unwrap = True,
+            use_brute_force_unwrap = False,
         )
 
         # unwrap methods
