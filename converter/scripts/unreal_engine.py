@@ -127,15 +127,21 @@ def get_material_definitions_for_single_object():
 
         node = next((node for node in principled.inputs['Metallic'].descendants if node.be('ShaderNodeTexImage')), None)
         if node:
-            textures['orm'] = bpy_utils.get_block_abspath(node.image)
+            textures['orma'] = bpy_utils.get_block_abspath(node.image)
         else:
-            textures['orm'] = None
+            textures['orma'] = None
 
         node = next((node for node in principled.inputs['Normal'].descendants if node.be('ShaderNodeTexImage')), None)
         if node:
             textures['normal'] = bpy_utils.get_block_abspath(node.image)
         else:
             textures['normal'] = None
+
+        node = next((node for node in principled.inputs[bpy_node.Socket_Identifier.EMISSION].descendants if node.be('ShaderNodeTexImage')), None)
+        if node:
+            textures['emission'] = bpy_utils.get_block_abspath(node.image)
+        else:
+            textures['emission'] = None
 
 
         definition['is_alpha'] = bool(principled['Alpha'] or principled.inputs['Alpha'].default_value != 1)
@@ -178,31 +184,43 @@ def is_in_memory_asset(asset_path: str):
     return asset_registry.get_asset_by_object_path(asset_path, include_only_on_disk_assets=True) == asset_registry.get_asset_by_object_path(asset_path, include_only_on_disk_assets=False)
 
 
+class UE_Material:
+    """
+    https://forums.unrealengine.com/t/setting-static-switch-parameters-of-a-material-instance-in-python/136415
+    BUG: material instances not respecting static switches in ES 3.1
+    BUG: could not set static switches in UE 4
+    FIXME: This is not optimal but to keep things simple.
+    """
+
+    OPAQUE = '/Game/Materials/base/M_SM_opaque'
+    ALPHA = '/Game/Materials/base/M_SK_dithered_alpha'
+
+
+def get_parent_material_path(is_alpha = False, is_skeletal = False, has_normal = False, has_emission = False):
+
+    if is_alpha:
+        return UE_Material.ALPHA
+    else:
+        return UE_Material.OPAQUE
+
 
 @dataclasses.dataclass
 class Settings_Unreal_Material_Instance(tool_settings.Settings):
-
-    # https://forums.unrealengine.com/t/setting-static-switch-parameters-of-a-material-instance-in-python/136415
-    # have a problem with child material instances not respecting static switches in ES 3.1
-    PARENT_MATERIAL = '/Game/Materials/base/M_main_orm'
-    PARENT_MATERIAL_WITHOUT_NORMALS = '/Game/Materials/base/M_main_orm_no_normal'
-
 
     name: str = ''
     dir: str = ''
 
     base_color_filepath: str = ''
-    _base_color_param_name: str = 'Base Color'
+    _base_color_param_name: str = 'BaseColor'
 
-    orm_filepath: str = ''
-    _orm_param_name: str = 'ORM'
+    orma_filepath: str = ''
+    _orma_param_name: str = 'ORMA'
 
     normal_filepath: str = ''
     _normal_param_name: str = 'Normal'
 
-    # not implemented
-    # emission_filepath: str = ''
-    # _emission_param_name: str = 'Emission'
+    emission_filepath: str = ''
+    _emission_param_name: str = 'Emission'
 
     is_alpha: bool = False
 
@@ -240,17 +258,32 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
         raise Exception(f"Fail to create Material Instance: {settings._asset_path}")
 
 
-    if settings.normal_filepath:
-        material_instance.set_editor_property('parent', unreal.load_asset(settings.PARENT_MATERIAL))
+    parent_material_path = get_parent_material_path(
+        is_alpha = settings.is_alpha,
+        # is_skeletal = settings.is_skeletal,
+        has_normal = settings.normal_filepath,
+        has_emission = settings.emission_filepath,
+    )
 
+    material_instance.set_editor_property('parent', unreal.load_asset(parent_material_path))
+
+
+    if settings.normal_filepath:
         normal_texture = import_texture(settings.normal_filepath, settings.dir)
         normal_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_NORMALMAP)
         normal_texture.set_editor_property('flip_green_channel', True)
         normal_texture.set_editor_property('srgb', False)  # ensuring that the pre/post change notifications are called
         unreal.EditorAssetLibrary.save_loaded_asset(normal_texture, only_if_is_dirty = False)
         unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._normal_param_name, normal_texture)
-    else:
-        material_instance.set_editor_property('parent', unreal.load_asset(settings.PARENT_MATERIAL_WITHOUT_NORMALS))
+
+        try:
+            unreal.MaterialEditingLibrary.set_material_instance_static_switch_parameter_value(material_instance, 'use_normal', True)
+        except AttributeError as e:
+            message = f"The static switch 'use_normal' is not set for material: {settings.name}. Need UE 5.0+."
+            show_nt_message('Static switch not set!', message)
+            print(message)
+
+
 
     if settings.base_color_filepath:
         base_color_texture = import_texture(settings.base_color_filepath, settings.dir)
@@ -258,20 +291,27 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
         unreal.EditorAssetLibrary.save_loaded_asset(base_color_texture, only_if_is_dirty = False)
         unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._base_color_param_name, base_color_texture)
 
-    if settings.orm_filepath:
-        orm_texture = import_texture(settings.orm_filepath, settings.dir)
+
+    if settings.orma_filepath:
+        orm_texture = import_texture(settings.orma_filepath, settings.dir)
         orm_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_MASKS)
         orm_texture.set_editor_property('srgb', False)  # ensuring that the pre/post change notifications are called
         unreal.EditorAssetLibrary.save_loaded_asset(orm_texture, only_if_is_dirty = False)
-        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._orm_param_name, orm_texture)
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._orma_param_name, orm_texture)
 
 
-    # if settings.emission_filepath:
-    #     texture = import_texture(settings.emission_filepath, settings.dir)
-    #     texture.compression_settings = unreal.TextureCompressionSettings.TC_DEFAULT
-    #     unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings.orm_param_name, texture)
-    # else:
-    #     unreal.MaterialEditingLibrary.set_material_instance_static_switch_parameter_value(material_instance, settings.use_emission_param_name, False)
+    if settings.emission_filepath:
+        emission_texture = import_texture(settings.emission_filepath, settings.dir)
+        emission_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_DEFAULT)
+        unreal.EditorAssetLibrary.save_loaded_asset(emission_texture, only_if_is_dirty = False)
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._emission_param_name, emission_texture)
+
+        try:
+            unreal.MaterialEditingLibrary.set_material_instance_static_switch_parameter_value(material_instance, 'use_emission', True)
+        except AttributeError as e:
+            message = f"The static switch 'use_emission' is not set for material: {settings.name}. Need UE 5.0+."
+            show_nt_message('Static switch not set!', message)
+            print(message)
 
 
     unreal.EditorAssetLibrary.save_loaded_asset(material_instance, only_if_is_dirty = False)
@@ -305,8 +345,9 @@ def create_materials(material_definitions: typing.List[dict], result_dir: str):
                 name = 'MI_' + definition['name'],
                 dir = result_dir,
                 base_color_filepath = definition['textures']['base_color'],
-                orm_filepath = definition['textures']['orm'],
+                orma_filepath = definition['textures']['orma'],
                 normal_filepath =  definition['textures']['normal'],
+                emission_filepath= definition['textures']['emission'],
                 is_alpha = definition['is_alpha'],
             )
         )
