@@ -100,6 +100,8 @@ def get_material_definitions_for_single_object():
 
         return name
 
+    bpy_utils.convert_materials_to_principled([object])
+
 
     for material_slot in object.material_slots:
 
