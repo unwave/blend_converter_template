@@ -1,6 +1,5 @@
 import os
 import sys
-import uuid
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if not ROOT in sys.path:
@@ -225,11 +224,11 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skele
 
     program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
 
-    uv_layer_name = f'__bc_{uuid.uuid1().hex}'
+    uv_layer_name = program.run(blender, bc_script.get_uuid1_hex)
 
     program.run(blender, bc_script.unwrap,
         objects,
-        uv_layer = uv_layer_name,
+        uv_layer_name = uv_layer_name,
         uv_layer_reuse = 'REUSE',
         settings = get_unwrap_settings(program.config),
         ministry_of_flat_settings = get_ministry_of_flat_settings(program.config)
