@@ -59,6 +59,7 @@ def convert_to_unreal_static_mesh(blend_path: str):
     program.run(blender, scripts_export.triangulate_geometry)
     program.run(blender, scripts_export.delete_unused_materials)
 
+    program.run(blender, scripts_unreal.reduce_to_single_mesh, dir_name)
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SM')
 
     material_definitions = program.run(blender, scripts_unreal.get_material_definitions_for_single_object)

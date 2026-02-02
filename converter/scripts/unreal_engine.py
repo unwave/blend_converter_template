@@ -14,6 +14,7 @@ import configuration
 if 'bpy' in sys.modules:
     import bpy
     from blend_converter.blender import bpy_utils
+    from blend_converter.blender import bpy_context
 
 
 if 'unreal' in sys.modules:
@@ -595,3 +596,50 @@ def show_nt_message(title, message):
     code = f"import ctypes, sys; ctypes.windll.user32.MessageBoxW(0, sys.argv[1], sys.argv[2], 0x10 | 0x40000)"
 
     subprocess.Popen([unreal.get_interpreter_executable_path(), '-c', code, str(message), str(title)], creationflags = subprocess.CREATE_NO_WINDOW)
+
+
+def get_bone_custom_shapes():
+
+    shapes: typing.Set[bpy.types.Object] = set()
+
+    for o in bpy.data.objects:
+
+        if o.type != 'ARMATURE':
+            continue
+
+        for bone in o.pose.bones:
+            if bone.custom_shape:
+                shapes.add(bone.custom_shape)
+
+    return shapes
+
+
+def reduce_to_single_mesh(collection_name: str):
+
+    view_layer_objects = bpy_utils.get_view_layer_objects()
+
+    collision_shapes = set(o for o in view_layer_objects if o.get(configuration.UNREAL_COLLISION_PROP_KEY))
+
+    mesh_objects = set(o for o in view_layer_objects if o.type == 'MESH')
+    mesh_objects -= get_bone_custom_shapes()
+    mesh_objects -= collision_shapes
+
+    with bpy_context.Focus(mesh_objects):
+        bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
+
+    bpy.data.batch_remove([o for o in bpy.data.objects if not(o in mesh_objects or o in collision_shapes)])
+
+    bpy.data.batch_remove(bpy.data.collections)
+
+    if not mesh_objects:
+        return
+
+    with bpy_context.Focus(mesh_objects):
+        bpy.ops.object.transform_apply()
+
+    single_object = bpy_utils.join_objects(mesh_objects)
+
+    with bpy_context.Focus(single_object):
+        bpy.ops.object.material_slot_remove_unused()
+
+    bpy_context.Focus([single_object] + list(collision_shapes)).__enter__().visible_collection.name = collection_name
