@@ -82,7 +82,7 @@ def get_material_definitions_for_single_object():
 
     from blend_converter.blender import bpy_node
 
-    object = bpy_utils.get_view_layer_objects()[0]
+    object = next(o for o in bpy_utils.get_view_layer_objects() if o.type == 'MESH')
 
     definitions = []
 
