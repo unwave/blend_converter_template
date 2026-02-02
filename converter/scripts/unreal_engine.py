@@ -533,3 +533,18 @@ def import_anim_sequence(settings: Settings_Unreal_Fbx):
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
     unreal.log(f"Animation Sequence imported: {settings}")
+
+
+def show_nt_message(title, message):
+
+    if os.name != 'nt':
+        return
+
+    if unreal.SystemLibrary.is_unattended() or not unreal.is_editor():
+        return
+
+    import subprocess
+
+    code = f"import ctypes, sys; ctypes.windll.user32.MessageBoxW(0, sys.argv[1], sys.argv[2], 0x10 | 0x40000)"
+
+    subprocess.Popen([unreal.get_interpreter_executable_path(), '-c', code, str(message), str(title)], creationflags = subprocess.CREATE_NO_WINDOW)
