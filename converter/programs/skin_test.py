@@ -11,7 +11,11 @@ import configuration
 from scripts import bake as scripts_bake
 
 
-def get_skin_test(blender_executable: str, blend_path):
+def get_skin_test(
+            blender_executable: str,
+            blend_path,
+            result_root = configuration.Folder.INTERMEDIATE_BLEND_SKIN_TEST,
+        ):
     """ For iterative testing of skinning and weight panting quality, same as the baking but simplified and faster by disregarding materials """
 
     from blend_converter.blender.executor import Blender
@@ -22,7 +26,7 @@ def get_skin_test(blender_executable: str, blend_path):
 
     blend_path = common.File(blend_path)
 
-    asset_folder = os.path.join(configuration.Folder.INTERMEDIATE_BLEND_SKIN_TEST, blend_path.dir_name)
+    asset_folder = os.path.join(result_root, blend_path.dir_name)
 
     result_path = os.path.join(asset_folder, blend_path.dir_name + '.blend')
 
@@ -50,13 +54,16 @@ def get_skin_test(blender_executable: str, blend_path):
     return program
 
 
-def get_skin_test_kwargs(blender_executable: str):
+def get_skin_test_kwargs(
+            blender_executable: str,
+            root = configuration.Folder.BLEND_SKELETAL,
+        ):
 
     from blend_converter import utils
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_SKELETAL) if file.is_dir()]
+    asset_folders = [file for file in os.scandir(root) if file.is_dir()]
 
     for folder in asset_folders:
 

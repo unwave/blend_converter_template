@@ -11,7 +11,11 @@ import configuration
 from scripts import export as scripts_export
 
 
-def get_rig(blender_executable: str, blend_path):
+def get_rig(
+            blender_executable: str,
+            blend_path,
+            result_root = configuration.Folder.BLEND_RIG
+        ):
     """ for use a linked rig + mesh for creating animations """
 
     from blend_converter.blender.executor import Blender
@@ -21,7 +25,7 @@ def get_rig(blender_executable: str, blend_path):
 
     blend_path = common.File(blend_path)
 
-    asset_folder = os.path.join(configuration.Folder.BLEND_RIG, blend_path.dir_name)
+    asset_folder = os.path.join(result_root, blend_path.dir_name)
 
     result_path = os.path.join(asset_folder, blend_path.dir_name + '.blend')
 
@@ -46,13 +50,16 @@ def get_rig(blender_executable: str, blend_path):
     return program
 
 
-def get_rig_kwargs(blender_executable: str):
+def get_rig_kwargs(
+            blender_executable: str,
+            root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,
+        ):
 
     from blend_converter import utils
 
     arguments = []
 
-    for folder in configuration.get_folders(configuration.Folder.INTERMEDIATE_BLEND_SKELETAL):
+    for folder in configuration.get_folders(root):
 
         last_blend = utils.get_last_blend(folder)
         if not last_blend:

@@ -294,16 +294,17 @@ def get_bake_program(
 
 def get_static_kwargs(
             blender_executable: str,
-            folder = configuration.Folder.BLEND_STATIC,
+            root = configuration.Folder.BLEND_STATIC,
             texel_density: int = None,
-            max_resolution: int = None
+            max_resolution: int = None,
+            result_root = configuration.Folder.INTERMEDIATE_BLEND_STATIC,
         ):
 
     from blend_converter import utils
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(folder) if file.is_dir()]
+    asset_folders = [file for file in os.scandir(root) if file.is_dir()]
 
 
     def get_baked(path: os.PathLike, folder: str, resources_folder: str):
@@ -339,7 +340,7 @@ def get_static_kwargs(
         elif folder.name.startswith('SPLIT_'):
             raise NotImplementedError("split into multiple fbx with independent materials")
         else:
-            arguments.append(get_baked(last_blend, configuration.Folder.INTERMEDIATE_BLEND_STATIC, configuration.Folder.INTERMEDIATE_BLEND_STATIC))
+            arguments.append(get_baked(last_blend, result_root, result_root))
 
 
     return arguments
@@ -347,16 +348,17 @@ def get_static_kwargs(
 
 def get_skeletal_kwargs(
             blender_executable: str,
-            folder = configuration.Folder.BLEND_SKELETAL,
+            root = configuration.Folder.BLEND_SKELETAL,
             texel_density: int = None,
-            max_resolution: int = None
+            max_resolution: int = None,
+            result_root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,
         ):
 
     from blend_converter import utils
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(folder) if file.is_dir()]
+    asset_folders = [file for file in os.scandir(root) if file.is_dir()]
 
 
     def get_baked(path: os.PathLike, folder: str, resources_folder: str):
@@ -387,7 +389,7 @@ def get_skeletal_kwargs(
         if not last_blend:
             continue
 
-        arguments.append(get_baked(last_blend, configuration.Folder.INTERMEDIATE_BLEND_SKELETAL, configuration.Folder.INTERMEDIATE_BLEND_SKELETAL))
+        arguments.append(get_baked(last_blend, result_root, result_root))
 
 
     return arguments

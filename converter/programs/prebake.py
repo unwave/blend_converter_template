@@ -42,13 +42,13 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
     return program
 
 
-def get_prebake_kwargs(blender_executable: str):
+def get_prebake_kwargs(blender_executable: str, root = None):
 
     from blend_converter import utils
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_MAIN) if file.is_dir()]
+    asset_folders = [file for file in os.scandir(root) if file.is_dir()]
 
     for folder in asset_folders:
 

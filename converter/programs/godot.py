@@ -13,7 +13,11 @@ from scripts import export as scripts_export
 from scripts import godot as scripts_godot
 
 
-def convert_to_static_mesh(blender_executable: str, blend_path: str):
+def convert_to_static_mesh(
+            blender_executable: str,
+            blend_path: str,
+            result_root = configuration.Folder.GODOT_GLTF_STATIC,
+        ):
     """ export as a fbx static mesh """
 
     from blend_converter.blender.executor import Blender
@@ -25,7 +29,7 @@ def convert_to_static_mesh(blender_executable: str, blend_path: str):
 
     blend_path: common.File = common.File(blend_path)
 
-    gltf_path = os.path.join(configuration.Folder.GODOT_GLTF_STATIC, blend_path.dir_name, blend_path.dir_name + '.gltf')
+    gltf_path = os.path.join(result_root, blend_path.dir_name, blend_path.dir_name + '.gltf')
 
     blender = Blender(blender_executable)
 
@@ -61,7 +65,11 @@ def convert_to_static_mesh(blender_executable: str, blend_path: str):
     return program
 
 
-def convert_to_skeletal_mesh(blender_executable: str, blend_path: str):
+def convert_to_skeletal_mesh(
+            blender_executable: str,
+            blend_path: str,
+            result_root = configuration.Folder.GODOT_GLTF_SKELETAL,
+        ):
     """ export as a fbx skeletal mesh """
 
     from blend_converter.blender.executor import Blender
@@ -74,7 +82,7 @@ def convert_to_skeletal_mesh(blender_executable: str, blend_path: str):
 
     blend_path: common.File = common.File(blend_path)
 
-    gltf_path = os.path.join(configuration.Folder.GODOT_GLTF_SKELETAL, blend_path.dir_name, blend_path.dir_name + '.gltf')
+    gltf_path = os.path.join(result_root, blend_path.dir_name, blend_path.dir_name + '.gltf')
 
     blender = Blender(blender_executable)
 
@@ -110,7 +118,13 @@ def convert_to_skeletal_mesh(blender_executable: str, blend_path: str):
     return program
 
 
-def convert_to_animation(blender_executable: str, blend_path, rig_name: str, animation_name: str):
+def convert_to_animation(
+            blender_executable: str,
+            blend_path,
+            rig_name: str,
+            animation_name: str,
+            result_root = configuration.Folder.GODOT_GLTF_ANIMATION,
+        ):
     """ export as an animation only fbx file """
 
     from blend_converter.blender.executor import Blender
@@ -121,7 +135,7 @@ def convert_to_animation(blender_executable: str, blend_path, rig_name: str, ani
 
     blend_path = common.File(blend_path)
 
-    gltf_path = os.path.join(configuration.Folder.GODOT_GLTF_ANIMATION, blend_path.dir_name, blend_path.dir_name + '.gltf')
+    gltf_path = os.path.join(result_root, blend_path.dir_name, blend_path.dir_name + '.gltf')
 
     blender = Blender(blender_executable)
 
@@ -150,12 +164,12 @@ def convert_to_animation(blender_executable: str, blend_path, rig_name: str, ani
     return program
 
 
-def get_anim_programs():
+def get_anim_programs(root = configuration.Folder.BLEND_ANIM):
 
     from blend_converter import utils
     programs = utils.Appendable_Dict()
 
-    for folder in configuration.get_folders(configuration.Folder.BLEND_ANIM):
+    for folder in configuration.get_folders(root):
 
         rig_name = os.path.basename(folder)
 
@@ -169,13 +183,16 @@ def get_anim_programs():
     return programs
 
 
-def get_godot_kwargs(blender_executable: str):
+def get_godot_kwargs(
+            blender_executable: str,
+            root = configuration.Folder.INTERMEDIATE_BLEND_STATIC
+        ):
 
     from blend_converter import utils
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(configuration.Folder.INTERMEDIATE_BLEND_STATIC) if file.is_dir()]
+    asset_folders = [file for file in os.scandir(root) if file.is_dir()]
 
     for folder in asset_folders:
 

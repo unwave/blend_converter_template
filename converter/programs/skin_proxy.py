@@ -12,7 +12,11 @@ from scripts import export as scripts_export
 from scripts import rig as scripts_rig
 
 
-def get_skin_proxy(blender_executable: str, blend_path):
+def get_skin_proxy(
+            blender_executable: str,
+            blend_path,
+            result_root = configuration.Folder.INTERMEDIATE_BLEND_SKIN_PROXY,
+        ):
     """ a proxy to use in external tools like Mixamo and further re-integration, prioritizing a base clean topology """
 
     from blend_converter.blender.executor import Blender
@@ -23,7 +27,7 @@ def get_skin_proxy(blender_executable: str, blend_path):
 
     blend_path = common.File(blend_path)
 
-    asset_folder = os.path.join(configuration.Folder.INTERMEDIATE_BLEND_SKIN_PROXY, blend_path.dir_name)
+    asset_folder = os.path.join(result_root, blend_path.dir_name)
 
     result_path = os.path.join(asset_folder, blend_path.dir_name + '.fbx')
 
@@ -47,13 +51,16 @@ def get_skin_proxy(blender_executable: str, blend_path):
     return program
 
 
-def get_skin_proxy_kwargs(blender_executable: str):
+def get_skin_proxy_kwargs(
+            blender_executable: str,
+            root = configuration.Folder.BLEND_SKELETAL,
+        ):
 
     from blend_converter import utils
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_SKELETAL) if file.is_dir()]
+    asset_folders = [file for file in os.scandir(root) if file.is_dir()]
 
     for folder in asset_folders:
 
