@@ -53,6 +53,7 @@ def get_rig(
 def get_rig_kwargs(
             blender_executable: str,
             root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,
+            result_root = configuration.Folder.BLEND_RIG,
         ):
 
     from blend_converter import utils
@@ -68,6 +69,7 @@ def get_rig_kwargs(
         arguments.append(dict(
             blender_executable = blender_executable,
             blend_path = last_blend,
+            result_root = result_root,
         ))
 
 
