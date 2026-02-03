@@ -108,9 +108,24 @@ def get_texture_bake_settings(config: gui_config.Config, texture_name_prefix: st
         )
 
 
-def get_bake_settings(config: gui_config.Config, uv_layer_name: str, textures_folder: str, pre_bake_labels: list):
+def get_bake_settings(*,
+            config: gui_config.Config,
+            uv_layer_name: str,
+            textures_folder: str,
+            pre_bake_labels: list,
+            texel_density: int = None,
+            max_resolution: int = None,
+        ):
 
     from blend_converter import tool_settings
+
+
+    if texel_density is None:
+        texel_density = config.blend_bake.texel_density
+
+    if max_resolution is None:
+        max_resolution = config.blend_bake.max_resolution
+
 
     if config.quality.preset == 'preview':
 
@@ -119,9 +134,9 @@ def get_bake_settings(config: gui_config.Config, uv_layer_name: str, textures_fo
             ignore_default_settings = True,
             image_dir = textures_folder,
 
-            texel_density = config.blend_bake.texel_density // 2,
+            texel_density = texel_density // 2,
             min_resolution = config.blend_bake.min_resolution // 2,
-            max_resolution = config.blend_bake.max_resolution // 2,
+            max_resolution = max_resolution // 2,
 
             denoise_all = False,
             ao_bake_use_normals = False,
@@ -137,9 +152,9 @@ def get_bake_settings(config: gui_config.Config, uv_layer_name: str, textures_fo
             ignore_default_settings = True,
             image_dir = textures_folder,
 
-            texel_density = config.blend_bake.texel_density,
+            texel_density = texel_density,
             min_resolution = config.blend_bake.min_resolution,
-            max_resolution = config.blend_bake.max_resolution,
+            max_resolution = max_resolution,
 
             denoise_all = True,
             faster_ao_bake = config.blend_bake.faster_ao_bake,
@@ -158,7 +173,7 @@ def get_texture_prefix(folder_name: str):
     return configuration.get_ascii_underscored(folder_name)
 
 
-def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skeletal: bool):
+def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skeletal: bool, texel_density: int = None, max_resolution: int = None):
     """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
 
     from blend_converter.blender.executor import Blender
@@ -240,7 +255,14 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skele
 
     objects = program.run(blender, bc_script.pack_copy_bake,
         objects,
-        get_bake_settings(program.config, uv_layer_name, textures_folder, pre_bake_labels),
+        get_bake_settings(
+            config = program.config,
+            uv_layer_name = uv_layer_name,
+            textures_folder = textures_folder,
+            pre_bake_labels = pre_bake_labels,
+            texel_density = texel_density,
+            max_resolution = max_resolution,
+        ),
         bake_settings = get_texture_bake_settings(program.config, get_texture_prefix(blend_path.dir_name)),
         pack_settings = get_uv_pack_settings(program.config),
     )
@@ -260,7 +282,7 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skele
     return program
 
 
-def get_static_kwargs(folder = configuration.Folder.BLEND_STATIC):
+def get_static_kwargs(folder = configuration.Folder.BLEND_STATIC, texel_density: int = None, max_resolution: int = None):
 
     from blend_converter import utils
 
@@ -282,6 +304,8 @@ def get_static_kwargs(folder = configuration.Folder.BLEND_STATIC):
             top_folder = folder,
             textures_folder = texture_folder,
             is_skeletal = False,
+            texel_density = texel_density,
+            max_resolution = max_resolution,
         )
 
 
@@ -305,7 +329,7 @@ def get_static_kwargs(folder = configuration.Folder.BLEND_STATIC):
     return arguments
 
 
-def get_skeletal_kwargs(folder = configuration.Folder.BLEND_SKELETAL):
+def get_skeletal_kwargs(folder = configuration.Folder.BLEND_SKELETAL, texel_density: int = None, max_resolution: int = None):
 
     from blend_converter import utils
 
@@ -327,6 +351,8 @@ def get_skeletal_kwargs(folder = configuration.Folder.BLEND_SKELETAL):
             top_folder = folder,
             textures_folder = texture_folder,
             is_skeletal = True,
+            texel_density = texel_density,
+            max_resolution = max_resolution,
         )
 
 
