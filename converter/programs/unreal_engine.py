@@ -13,6 +13,18 @@ from scripts import export as scripts_export
 from scripts import unreal_engine as scripts_unreal
 
 
+class Hierarchy:
+
+    STATIC = '/Game/static_meshes/'
+    SKELETAL = '/Game/skeletal_meshes/'
+    ANIM = '/Game/animations/'
+
+    @staticmethod
+    def join(*paths):
+        path = os.path.join(*paths).replace(os.sep, '/')
+        path = path.lstrip('/')
+        return '/' + path
+
 
 
 def convert_to_unreal_static_mesh(
@@ -75,7 +87,7 @@ def convert_to_unreal_static_mesh(
     fbx_settings = scripts_unreal.Settings_Unreal_Fbx(
         fbx_path = fbx_path,
         dist_name = stem,
-        dist_dir = f'/Game/static_meshes/{stem}/',
+        dist_dir = Hierarchy.join(Hierarchy.STATIC, stem),
         material_definitions = material_definitions,
         has_custom_collisions = has_custom_collisions
     )
@@ -149,7 +161,7 @@ def convert_to_unreal_skeletal_mesh(
     fbx_settings = scripts_unreal.Settings_Unreal_Fbx(
         fbx_path = fbx_path,
         dist_name = stem,
-        dist_dir = f'/Game/skeletal_meshes/{stem}/',
+        dist_dir = Hierarchy.join(Hierarchy.SKELETAL, stem),
         material_definitions = material_definitions,
     )
 
@@ -213,8 +225,8 @@ def convert_to_unreal_animation(
 
     ue_fbx_settings = scripts_unreal.Settings_Unreal_Fbx(
         fbx_path = fbx_path,
-        dist_dir = f'/Game/animations/{rig_name}/',
-        dist_name = f'A_{rig_name}_' + animation_name,
+        dist_dir =  Hierarchy.join(Hierarchy.ANIM, rig_name),
+        dist_name = f'A_{rig_name}_{animation_name}',
     )
 
     program.run(unreal, scripts_unreal.import_anim_sequence, ue_fbx_settings)
