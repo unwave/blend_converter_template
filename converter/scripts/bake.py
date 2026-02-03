@@ -66,17 +66,7 @@ def get_target_objects():
     return objects
 
 
-def hid_non_target_objects():
-
-
-    custom_shapes = get_bone_custom_shapes()
-    for object in custom_shapes:
-        object.hide_set(True)
-
-
-    for object in bpy.data.objects:
-        if object.name.startswith('#'):
-            object.hide_set(True)
+def hide_non_target_objects():
 
 
     def traverse(layer_collection: bpy.types.LayerCollection):
@@ -89,6 +79,20 @@ def hid_non_target_objects():
             traverse(layer)
 
     traverse(bpy.context.view_layer.layer_collection)
+
+
+    custom_shapes = get_bone_custom_shapes()
+    for object in custom_shapes:
+        if object.visible_get():
+            object.hide_set(True)
+
+
+    for object in bpy.data.objects:
+        if object.name.startswith('#'):
+            if object.visible_get():
+                object.hide_set(True)
+
+
 
 
 
