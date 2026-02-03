@@ -6,6 +6,9 @@ import time
 import typing
 
 
+from blend_converter import common
+
+
 if typing.TYPE_CHECKING:
     from blend_converter import updater
 
@@ -23,7 +26,7 @@ def get_func_name(entry: 'updater.Program_Entry'):
     return getattr(entry.program, '_prog_type', 'NONE')
 
 
-def main(file_and_getter_pairs: typing.List[typing.Tuple[str, str]]):
+def main(definitions: typing.List[common.Program_Definition]):
 
     is_using_terminal = not {'PROMPT', 'TERM_PROGRAM', 'TERM', 'TERMINAL_EMULATOR'}.isdisjoint(os.environ)
 
@@ -38,7 +41,7 @@ def main(file_and_getter_pairs: typing.List[typing.Tuple[str, str]]):
     columns = [
         ('func', 170, get_func_name),
     ]
-    app = updater_ui.Main_Frame.get_app(file_and_getter_pairs, columns)
+    app = updater_ui.Main_Frame.get_app(definitions, columns)
 
     app.main_frame.updater.total_max_parallel_executions = os.cpu_count()
     app.main_frame.updater.default_max_parallel_executions = os.cpu_count()
@@ -90,4 +93,4 @@ if __name__ == '__main__':
         input("Press Enter to exit.")
 
     else:
-        main([programs[n] for n in names])
+        main([common.Program_Definition(*programs[n]) for n in names])
