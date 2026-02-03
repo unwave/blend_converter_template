@@ -13,7 +13,7 @@ from scripts import export as scripts_export
 from scripts import godot as scripts_godot
 
 
-def convert_to_static_mesh(blend_path: str):
+def convert_to_static_mesh(blender_executable: str, blend_path: str):
     """ export as a fbx static mesh """
 
     from blend_converter.blender.executor import Blender
@@ -27,7 +27,7 @@ def convert_to_static_mesh(blend_path: str):
 
     gltf_path = os.path.join(configuration.Folder.GODOT_GLTF_STATIC, blend_path.dir_name, blend_path.dir_name + '.gltf')
 
-    blender = Blender(configuration.BLENDER_EXECUTABLE)
+    blender = Blender(blender_executable)
 
     program = common.Program(
         blend_path = blend_path,
@@ -61,7 +61,7 @@ def convert_to_static_mesh(blend_path: str):
     return program
 
 
-def convert_to_skeletal_mesh(blend_path: str):
+def convert_to_skeletal_mesh(blender_executable: str, blend_path: str):
     """ export as a fbx skeletal mesh """
 
     from blend_converter.blender.executor import Blender
@@ -76,7 +76,7 @@ def convert_to_skeletal_mesh(blend_path: str):
 
     gltf_path = os.path.join(configuration.Folder.GODOT_GLTF_SKELETAL, blend_path.dir_name, blend_path.dir_name + '.gltf')
 
-    blender = Blender(configuration.BLENDER_EXECUTABLE)
+    blender = Blender(blender_executable)
 
     program = common.Program(
         blend_path = blend_path,
@@ -110,7 +110,7 @@ def convert_to_skeletal_mesh(blend_path: str):
     return program
 
 
-def convert_to_animation(blend_path, rig_name: str, animation_name: str):
+def convert_to_animation(blender_executable: str, blend_path, rig_name: str, animation_name: str):
     """ export as an animation only fbx file """
 
     from blend_converter.blender.executor import Blender
@@ -123,7 +123,7 @@ def convert_to_animation(blend_path, rig_name: str, animation_name: str):
 
     gltf_path = os.path.join(configuration.Folder.GODOT_GLTF_ANIMATION, blend_path.dir_name, blend_path.dir_name + '.gltf')
 
-    blender = Blender(configuration.BLENDER_EXECUTABLE)
+    blender = Blender(blender_executable)
 
     program = common.Program(
         blend_path = blend_path,
@@ -169,7 +169,7 @@ def get_anim_programs():
     return programs
 
 
-def get_godot_kwargs():
+def get_godot_kwargs(blender_executable: str):
 
     from blend_converter import utils
 
@@ -188,7 +188,10 @@ def get_godot_kwargs():
         elif folder.name.startswith('SPLIT_'):
             raise NotImplementedError("split into multiple fbx with independent materials")
         else:
-            arguments.append(dict(blend_path = last_blend))
+            arguments.append(dict(
+                blender_executable = blender_executable,
+                blend_path = last_blend,
+            ))
 
 
     return arguments

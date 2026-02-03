@@ -78,7 +78,9 @@ if __name__ == '__main__':
 
     names = []
 
-    for arg in sys.argv[1:]:
+    blender_executable = sys.argv[1]
+
+    for arg in sys.argv[2:]:
 
         if arg.startswith('_'):
             break
@@ -96,4 +98,4 @@ if __name__ == '__main__':
         input("Press Enter to exit.")
 
     else:
-        main([common.Program_Definition(*programs[n]) for n in names])
+        main([common.Program_Definition(*programs[n], kwargs=dict(blender_executable = blender_executable)) for n in names])

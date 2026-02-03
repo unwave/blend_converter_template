@@ -5,8 +5,6 @@ import re
 
 from blend_converter import utils as bc_utils
 
-BLENDER_EXECUTABLE = r'C:\Program Files (x86)\Steam\steamapps\common\Blender\blender.exe'
-
 
 def get_ascii_underscored(string: str):
     r"""

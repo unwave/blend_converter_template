@@ -11,7 +11,7 @@ import configuration
 from scripts import scan as scripts_scan
 
 
-def get_scan_program(blend_path, result_dir):
+def get_scan_program(blender_executable: str, blend_path, result_dir):
 
     from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
     from blend_converter.blender.executor import Blender
@@ -23,12 +23,12 @@ def get_scan_program(blend_path, result_dir):
 
     result_path = os.path.join(result_dir, blend_path.dir_name + '.blend')
 
-    blender = Blender(configuration.BLENDER_EXECUTABLE)
+    blender = Blender(blender_executable)
 
     program = common.Program(
         blend_path = blend_path,
         result_path = result_path,
-        blender_executable = blender.binary_path
+        blender_executable = blender_executable
     )
 
     program.run(blender, open_mainfile, blend_path)
@@ -42,7 +42,7 @@ def get_scan_program(blend_path, result_dir):
     return program
 
 
-def get_prebake_kwargs():
+def get_prebake_kwargs(blender_executable: str):
 
     from blend_converter import utils
 
@@ -72,7 +72,11 @@ def get_prebake_kwargs():
 
             result_dir = os.path.join(low_poly_folder, file.name)
 
-            arguments.append(dict(blend_path = last_blend, result_dir = result_dir))
+            arguments.append(dict(
+                blender_executable = blender_executable,
+                blend_path = last_blend,
+                result_dir = result_dir,
+            ))
 
 
     return arguments

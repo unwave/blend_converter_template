@@ -15,7 +15,7 @@ from scripts import unreal_engine as scripts_unreal
 
 
 
-def convert_to_unreal_static_mesh(blend_path: str):
+def convert_to_unreal_static_mesh(blender_executable: str, blend_path: str):
     """ export as a fbx static mesh """
 
     from blend_converter.unreal import Unreal
@@ -34,12 +34,12 @@ def convert_to_unreal_static_mesh(blend_path: str):
     fbx_path = os.path.join(configuration.Folder.INTERMEDIATE_UNREAL_SM, dir_name, dir_name + '.fbx')
 
     unreal = Unreal()
-    blender = Blender(configuration.BLENDER_EXECUTABLE)
+    blender = Blender(blender_executable)
 
     program = common.Program(
         blend_path = blend_path,
         result_path = fbx_path,
-        blender_executable = configuration.BLENDER_EXECUTABLE,
+        blender_executable = blender.binary_path,
     )
 
     program.tags.add('unreal')
@@ -81,7 +81,7 @@ def convert_to_unreal_static_mesh(blend_path: str):
     return program
 
 
-def convert_to_unreal_skeletal_mesh(blend_path: str):
+def convert_to_unreal_skeletal_mesh(blender_executable: str, blend_path: str):
     """ export as a fbx skeletal mesh """
 
     from blend_converter.unreal import Unreal
@@ -100,12 +100,12 @@ def convert_to_unreal_skeletal_mesh(blend_path: str):
     fbx_path = os.path.join(configuration.Folder.INTERMEDIATE_UNREAL_SK, dir_name, dir_name + '.fbx')
 
     unreal = Unreal()
-    blender = Blender(configuration.BLENDER_EXECUTABLE)
+    blender = Blender(blender_executable)
 
     program = common.Program(
         blend_path = blend_path,
         result_path = fbx_path,
-        blender_executable = configuration.BLENDER_EXECUTABLE,
+        blender_executable = blender.binary_path,
     )
 
     program.tags.add('unreal')
@@ -150,7 +150,7 @@ def convert_to_unreal_skeletal_mesh(blend_path: str):
     return program
 
 
-def convert_to_unreal_animation(blend_path, rig_name: str, animation_name: str):
+def convert_to_unreal_animation(blender_executable: str, blend_path, rig_name: str, animation_name: str):
     """ export as an animation only fbx file """
 
     from blend_converter.unreal import Unreal
@@ -168,12 +168,12 @@ def convert_to_unreal_animation(blend_path, rig_name: str, animation_name: str):
     fbx_path = os.path.join(configuration.Folder.INTERMEDIATE_UNREAL_A, rig_name, animation_name + '.fbx')
 
     unreal = Unreal()
-    blender = Blender(configuration.BLENDER_EXECUTABLE)
+    blender = Blender(blender_executable)
 
     program = common.Program(
         blend_path = blend_path,
         result_path = fbx_path,
-        blender_executable = configuration.BLENDER_EXECUTABLE,
+        blender_executable = blender.binary_path,
     )
 
     program.tags.add('unreal')
@@ -208,7 +208,7 @@ def convert_to_unreal_animation(blend_path, rig_name: str, animation_name: str):
     return program
 
 
-def get_unreal_kwargs(root: str):
+def get_unreal_kwargs(blender_executable: str, root: str):
 
     from blend_converter import utils
 
@@ -230,15 +230,18 @@ def get_unreal_kwargs(root: str):
         elif folder.name.startswith('SPLIT_'):
             raise NotImplementedError("split into multiple fbx with independent materials")
         else:
-            arguments.append(dict(blend_path = last_blend))
+            arguments.append(dict(
+                blender_executable = blender_executable,
+                blend_path = last_blend,
+            ))
 
 
     return arguments
 
 
-def get_static_unreal_kwargs():
-    return get_unreal_kwargs(configuration.Folder.INTERMEDIATE_BLEND_STATIC)
+def get_static_unreal_kwargs(blender_executable: str):
+    return get_unreal_kwargs(blender_executable, configuration.Folder.INTERMEDIATE_BLEND_STATIC)
 
 
-def get_skeletal_unreal_kwargs():
-    return get_unreal_kwargs(configuration.Folder.INTERMEDIATE_BLEND_SKELETAL)
+def get_skeletal_unreal_kwargs(blender_executable: str):
+    return get_unreal_kwargs(blender_executable, configuration.Folder.INTERMEDIATE_BLEND_SKELETAL)

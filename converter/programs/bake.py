@@ -173,7 +173,15 @@ def get_texture_prefix(folder_name: str):
     return configuration.get_ascii_underscored(folder_name)
 
 
-def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skeletal: bool, texel_density: int = None, max_resolution: int = None):
+def get_bake_program(
+            blender_executable: str,
+            blend_path,
+            top_folder: str,
+            textures_folder: str,
+            is_skeletal: bool,
+            texel_density: int = None,
+            max_resolution: int = None
+        ):
     """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
 
     from blend_converter.blender.executor import Blender
@@ -189,7 +197,7 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skele
 
     print(result_path)
 
-    blender = Blender(configuration.BLENDER_EXECUTABLE, timeout = 30 * 60)
+    blender = Blender(blender_executable, timeout = 30 * 60)
 
     program = common.Program(
         blend_path = blend_path,
@@ -284,7 +292,12 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skele
     return program
 
 
-def get_static_kwargs(folder = configuration.Folder.BLEND_STATIC, texel_density: int = None, max_resolution: int = None):
+def get_static_kwargs(
+            blender_executable: str,
+            folder = configuration.Folder.BLEND_STATIC,
+            texel_density: int = None,
+            max_resolution: int = None
+        ):
 
     from blend_converter import utils
 
@@ -302,6 +315,7 @@ def get_static_kwargs(folder = configuration.Folder.BLEND_STATIC, texel_density:
         texture_folder = os.path.join(resources_folder, dir_name, 'textures')
 
         return dict(
+            blender_executable = blender_executable,
             blend_path = path,
             top_folder = folder,
             textures_folder = texture_folder,
@@ -331,7 +345,12 @@ def get_static_kwargs(folder = configuration.Folder.BLEND_STATIC, texel_density:
     return arguments
 
 
-def get_skeletal_kwargs(folder = configuration.Folder.BLEND_SKELETAL, texel_density: int = None, max_resolution: int = None):
+def get_skeletal_kwargs(
+            blender_executable: str,
+            folder = configuration.Folder.BLEND_SKELETAL,
+            texel_density: int = None,
+            max_resolution: int = None
+        ):
 
     from blend_converter import utils
 
@@ -349,6 +368,7 @@ def get_skeletal_kwargs(folder = configuration.Folder.BLEND_SKELETAL, texel_dens
         texture_folder = os.path.join(resources_folder, dir_name, 'textures')
 
         return dict(
+            blender_executable = blender_executable,
             blend_path = path,
             top_folder = folder,
             textures_folder = texture_folder,
