@@ -444,3 +444,13 @@ def set_legacy_ik_solver():
             state.set(object.pose, 'ik_solver', 'LEGACY')
 
     return state
+
+
+def convert_to_mesh_non_mesh_objects(objects: typing.List['bpy.types.Object']):
+
+    for object in objects:
+
+        if object.type == 'MESH':
+            continue
+
+        bpy_utils.convert_to_mesh(object)
