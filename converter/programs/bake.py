@@ -267,13 +267,13 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skele
     return program
 
 
-def get_static_kwargs():
+def get_static_kwargs(folder = configuration.Folder.BLEND_STATIC):
 
     from blend_converter import utils
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_STATIC) if file.is_dir()]
+    asset_folders = [file for file in os.scandir(folder) if file.is_dir()]
 
 
     def get_baked(path: os.PathLike, folder: str, resources_folder: str):
@@ -312,13 +312,13 @@ def get_static_kwargs():
     return arguments
 
 
-def get_skeletal_kwargs():
+def get_skeletal_kwargs(folder = configuration.Folder.BLEND_SKELETAL):
 
     from blend_converter import utils
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(configuration.Folder.BLEND_SKELETAL) if file.is_dir()]
+    asset_folders = [file for file in os.scandir(folder) if file.is_dir()]
 
 
     def get_baked(path: os.PathLike, folder: str, resources_folder: str):
