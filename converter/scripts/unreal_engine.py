@@ -203,12 +203,65 @@ class UE_Material:
     ALPHA = '/Game/Materials/base/M_SK_dithered_alpha'
 
 
+class UE_Material_Permutations:
+
+    O_SM_C_ORM = '/Game/Materials/manual_permutations/opaque/static/M_O_SM_C_ORM'
+    O_SM_C_ORM_E = '/Game/Materials/manual_permutations/opaque/static/MI_O_SM_C_ORM_E'
+    O_SM_C_ORM_N = '/Game/Materials/manual_permutations/opaque/static/MI_O_SM_C_ORM_N'
+    O_SM_C_ORM_N_E = '/Game/Materials/manual_permutations/opaque/static/MI_O_SM_C_ORM_N_E'
+
+    O_SK_C_ORM = '/Game/Materials/manual_permutations/opaque/skeletal/M_O_SK_C_ORM'
+    O_SK_C_ORM_E = '/Game/Materials/manual_permutations/opaque/skeletal/MI_O_SK_C_ORM_E'
+    O_SK_C_ORM_N = '/Game/Materials/manual_permutations/opaque/skeletal/MI_O_SK_C_ORM_N'
+    O_SK_C_ORM_N_E = '/Game/Materials/manual_permutations/opaque/skeletal/MI_O_SK_C_ORM_N_E'
+
+    A_SM_C_ORMA = '/Game/Materials/manual_permutations/alpha/static/M_A_SM_C_ORMA'
+    A_SM_C_ORMA_E = '/Game/Materials/manual_permutations/alpha/static/MI_A_SM_C_ORMA_E'
+    A_SM_C_ORMA_N = '/Game/Materials/manual_permutations/alpha/static/MI_A_SM_C_ORMA_N'
+    A_SM_C_ORMA_N_E = '/Game/Materials/manual_permutations/alpha/static/MI_A_SM_C_ORMA_N_E'
+
+    A_SK_C_ORMA = '/Game/Materials/manual_permutations/alpha/skeletal/M_A_SK_C_ORMA'
+    A_SK_C_ORMA_E = '/Game/Materials/manual_permutations/alpha/skeletal/MI_A_SK_C_ORMA_E'
+    A_SK_C_ORMA_N = '/Game/Materials/manual_permutations/alpha/skeletal/MI_A_SK_C_ORMA_N'
+    A_SK_C_ORMA_N_E = '/Game/Materials/manual_permutations/alpha/skeletal/MI_A_SK_C_ORMA_N_E'
+
+
 def get_parent_material_path(is_alpha = False, is_skeletal = False, has_normal = False, has_emission = False):
 
     if is_alpha:
         return UE_Material.ALPHA
     else:
         return UE_Material.OPAQUE
+
+
+def get_parent_material_permutation_path(is_alpha = False, is_skeletal = False, has_normal = False, has_emission = False):
+
+    name = []
+
+    if is_alpha:
+        name.append('A')
+    else:
+        name.append('O')
+
+    if is_skeletal:
+        name.append('SK')
+    else:
+        name.append('SM')
+
+    name.append('C')
+
+    if is_alpha:
+        name.append('ORMA')
+    else:
+        name.append('ORM')
+
+    if has_normal:
+        name.append('N')
+
+    if has_emission:
+        name.append('E')
+
+    return getattr(UE_Material_Permutations, '_'.join(name))
 
 
 @dataclasses.dataclass
@@ -230,6 +283,7 @@ class Settings_Unreal_Material_Instance(tool_settings.Settings):
     _emission_param_name: str = 'Emission'
 
     is_alpha: bool = False
+    is_skeletal: bool = False
 
 
     @property
@@ -265,14 +319,29 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
         raise Exception(f"Fail to create Material Instance: {settings._asset_path}")
 
 
-    parent_material_path = get_parent_material_path(
-        is_alpha = settings.is_alpha,
-        # is_skeletal = settings.is_skeletal,
-        has_normal = settings.normal_filepath,
-        has_emission = settings.emission_filepath,
-    )
+    has_manual_permutations = unreal.EditorAssetLibrary.does_directory_exist('/Game/Materials/manual_permutations')
 
-    material_instance.set_editor_property('parent', unreal.load_asset(parent_material_path))
+    if has_manual_permutations:
+        parent_material_path = get_parent_material_permutation_path(
+            is_alpha = settings.is_alpha,
+            is_skeletal = settings.is_skeletal,
+            has_normal = settings.normal_filepath,
+            has_emission = settings.emission_filepath,
+        )
+
+    else:
+        parent_material_path = get_parent_material_path(
+            is_alpha = settings.is_alpha,
+            is_skeletal = settings.is_skeletal,
+            has_normal = settings.normal_filepath,
+            has_emission = settings.emission_filepath,
+        )
+
+    parent_material = unreal.load_asset(parent_material_path)
+    if not parent_material:
+        raise Exception(f"Fail to load material from path: {parent_material_path}")
+
+    material_instance.set_editor_property('parent', parent_material)
 
 
     if settings.normal_filepath:
@@ -284,7 +353,8 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
         unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._normal_param_name, normal_texture)
 
         try:
-            unreal.MaterialEditingLibrary.set_material_instance_static_switch_parameter_value(material_instance, 'use_normal', True)
+            if not has_manual_permutations:
+                unreal.MaterialEditingLibrary.set_material_instance_static_switch_parameter_value(material_instance, 'use_normal', True)
         except AttributeError as e:
             message = f"The static switch 'use_normal' is not set for material: {settings.name}. Need UE 5.0+."
             show_nt_message('Static switch not set!', message)
@@ -314,7 +384,8 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
         unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._emission_param_name, emission_texture)
 
         try:
-            unreal.MaterialEditingLibrary.set_material_instance_static_switch_parameter_value(material_instance, 'use_emission', True)
+            if not has_manual_permutations:
+                unreal.MaterialEditingLibrary.set_material_instance_static_switch_parameter_value(material_instance, 'use_emission', True)
         except AttributeError as e:
             message = f"The static switch 'use_emission' is not set for material: {settings.name}. Need UE 5.0+."
             show_nt_message('Static switch not set!', message)
@@ -341,7 +412,7 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
     return material_instance
 
 
-def create_materials(material_definitions: typing.List[dict], result_dir: str):
+def create_materials(material_definitions: typing.List[dict], result_dir: str, is_skeletal: bool):
 
     materials_settings: typing.List[unreal.MaterialInstanceConstant] = []
 
@@ -356,6 +427,7 @@ def create_materials(material_definitions: typing.List[dict], result_dir: str):
                 normal_filepath =  definition['textures']['normal'],
                 emission_filepath= definition['textures']['emission'],
                 is_alpha = definition['is_alpha'],
+                is_skeletal = is_skeletal,
             )
         )
 
@@ -488,7 +560,7 @@ def import_static_mesh(settings: Settings_Unreal_Fbx):
 
     asset: unreal.StaticMesh = unreal.load_asset(settings._asset_path)
 
-    materials = create_materials(settings.material_definitions, settings.dist_dir)
+    materials = create_materials(settings.material_definitions, settings.dist_dir, is_skeletal = False)
     set_static_mesh_materials(asset, materials)
 
     unreal.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty = False)
@@ -521,7 +593,7 @@ def import_skeletal_mesh(settings: Settings_Unreal_Fbx):
 
     asset: unreal.SkeletalMesh = unreal.load_asset(settings._asset_path)
 
-    materials = create_materials(settings.material_definitions, settings.dist_dir)
+    materials = create_materials(settings.material_definitions, settings.dist_dir, is_skeletal = True)
     set_skeletal_mesh_materials(asset, materials)
 
     unreal.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty = False)

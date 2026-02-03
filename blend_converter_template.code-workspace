@@ -10,6 +10,9 @@
 		"files.insertFinalNewline": true,
 		"files.exclude": {
 			"**/__pycache__": true
-		}
+		},
+		"cSpell.words": [
+			"ORMA"
+		]
 	}
 }
