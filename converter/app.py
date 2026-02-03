@@ -53,12 +53,10 @@ def main(definitions: typing.List[common.Program_Definition]):
 
     app.MainLoop()
 
-
-if __name__ == '__main__':
-
+def get_program_paths():
     ROOT = os.path.join(os.path.dirname(__file__))
 
-    programs = dict(
+    return dict(
         static = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_program', 'get_static_kwargs'),
         skeletal = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_program', 'get_skeletal_kwargs'),
         godot = (os.path.join(ROOT, 'programs', 'godot.py'), 'convert_to_static_mesh', 'get_godot_kwargs'),
@@ -69,6 +67,11 @@ if __name__ == '__main__':
         prebake = (os.path.join(ROOT, 'programs', 'prebake.py'), 'get_scan_program', 'get_prebake_kwargs'),
         rig = (os.path.join(ROOT, 'programs', 'rig.py'), 'get_rig', 'get_rig_kwargs'),
     )
+
+
+if __name__ == '__main__':
+
+    programs = get_program_paths()
 
     print(sys.argv)
     print()
