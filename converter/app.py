@@ -62,6 +62,7 @@ def get_program_paths():
         godot = (os.path.join(ROOT, 'programs', 'godot.py'), 'convert_to_static_mesh', 'get_godot_kwargs'),
         ue_static = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'convert_to_unreal_static_mesh', 'get_static_unreal_kwargs'),
         ue_skeletal = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'convert_to_unreal_skeletal_mesh', 'get_skeletal_unreal_kwargs'),
+        ue_animation = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'convert_to_unreal_animation', 'get_unreal_animation_kwargs'),
         skin_test = (os.path.join(ROOT, 'programs', 'skin_test.py'), 'get_skin_test', 'get_skin_test_kwargs'),
         skin_proxy = (os.path.join(ROOT, 'programs', 'skin_proxy.py'), 'get_skin_proxy', 'get_skin_proxy_kwargs'),
         prebake = (os.path.join(ROOT, 'programs', 'prebake.py'), 'get_scan_program', 'get_prebake_kwargs'),

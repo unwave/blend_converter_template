@@ -644,10 +644,15 @@ def import_anim_sequence(settings: Settings_Unreal_Fbx):
     options.set_editor_property('automated_import_should_detect_type', False)
     options.set_editor_property('mesh_type_to_import', unreal.FBXImportType.FBXIT_ANIMATION)
 
-    options.set_editor_property('skeleton', unreal.load_asset(settings._asset_path))
+    skeleton = unreal.load_asset(settings.skeleton_asset_path)
+    if not skeleton:
+        raise Exception(f"Fail to load Skeleton: {settings}")
 
-    # import_data = get_animation_import_data(settings._asset_path)
-    # options.set_editor_property('anim_sequence_import_data', import_data)
+    options.set_editor_property('skeleton', skeleton)
+
+    import_data = get_animation_import_data(settings._asset_path)
+    import_data.set_editor_property('import_uniform_scale', 100)
+    options.set_editor_property('anim_sequence_import_data', import_data)
 
     task = get_import_task(options, settings.fbx_path, settings.dist_dir, settings.dist_name)
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])

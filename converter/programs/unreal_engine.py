@@ -227,6 +227,7 @@ def convert_to_unreal_animation(
         fbx_path = fbx_path,
         dist_dir =  Hierarchy.join(Hierarchy.ANIM, rig_name),
         dist_name = f'A_{rig_name}_{animation_name}',
+        skeleton_asset_path = Hierarchy.join(Hierarchy.SKELETAL, rig_name, f'{rig_name}_Skeleton'),
     )
 
     program.run(unreal, scripts_unreal.import_anim_sequence, ue_fbx_settings)
@@ -277,3 +278,37 @@ def get_skeletal_unreal_kwargs(
             root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,
         ):
     return get_unreal_kwargs(blender_executable, root)
+
+
+def get_unreal_animation_kwargs(
+            blender_executable: str,
+            root: str,
+            result_root = configuration.Folder.INTERMEDIATE_UNREAL_A,
+        ):
+
+    from blend_converter import utils
+
+    arguments = []
+
+    for rig_folder in configuration.get_folders(root):
+
+        rig_name = os.path.basename(rig_folder)
+
+        for anim_folder in configuration.get_folders(rig_folder):
+
+            animation_name = os.path.basename(anim_folder)
+
+            last_blend = utils.get_last_blend(anim_folder)
+            if not last_blend:
+                continue
+
+            arguments.append(dict(
+                blender_executable = blender_executable,
+                blend_path = last_blend,
+                rig_name = rig_name,
+                animation_name = animation_name,
+                result_root = result_root,
+            ))
+
+
+    return arguments
