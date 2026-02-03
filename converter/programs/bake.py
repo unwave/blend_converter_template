@@ -152,17 +152,10 @@ def get_bake_settings(config: gui_config.Config, uv_layer_name: str, textures_fo
 
 
 def get_texture_prefix(folder_name: str):
-    """ TODO: should be a visible warning """
 
-    if folder_name.lower() != configuration.get_ascii_underscored(folder_name):
-        raise Exception(f"Invalid folder name: {repr(folder_name.lower())} != {repr(configuration.get_ascii_underscored(folder_name))}")
+    folder_name = str(folder_name).removeprefix('GROUP_').removeprefix('SPLIT_')
 
-    texture_prefix = 'T_' + str(folder_name).removeprefix('GROUP_').removeprefix('SPLIT_')
-
-    if texture_prefix.lower() != configuration.get_ascii_underscored(texture_prefix):
-        raise Exception(f"Invalid texture_prefix: {repr(folder_name.lower())} != {repr(configuration.get_ascii_underscored(texture_prefix))}")
-
-    return texture_prefix
+    return configuration.get_ascii_underscored(folder_name)
 
 
 def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skeletal: bool):
