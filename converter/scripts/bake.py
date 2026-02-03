@@ -3,6 +3,7 @@
 import os
 import sys
 import typing
+import uuid
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -448,9 +449,13 @@ def set_legacy_ik_solver():
 
 def convert_to_mesh_non_mesh_objects(objects: typing.List['bpy.types.Object']):
 
+    mesh_objects = []
+
     for object in objects:
 
         if object.type == 'MESH':
-            continue
+            mesh_objects.append(object)
+        else:
+            mesh_objects.append(bpy_utils.convert_to_mesh(object))
 
-        bpy_utils.convert_to_mesh(object)
+    return mesh_objects

@@ -222,7 +222,7 @@ def get_bake_program(blend_path, top_folder: str, textures_folder: str, is_skele
 
     program.run(blender, scripts_bake.delete_hidden_modifiers, objects)
 
-    program.run(blender, scripts_bake.convert_to_mesh_non_mesh_objects, objects)
+    objects = program.run(blender, scripts_bake.convert_to_mesh_non_mesh_objects, objects)
 
     ignore_type = ['ARMATURE'] if is_skeletal else []
 
