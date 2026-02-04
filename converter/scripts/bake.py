@@ -401,6 +401,7 @@ def unassign_deform_bones_with_missing_weights():
 
 def create_game_rig_and_bake_actions():
 
+    baked_actions = []
 
     for armature in get_armature_objects():
 
@@ -414,7 +415,7 @@ def create_game_rig_and_bake_actions():
             collection.objects.link(new)
 
         for action in bpy_utils.get_compatible_armature_actions([armature]):
-            bpy_action.bake_single_action(armature, action, new)
+            baked_actions.append(bpy_action.bake_single_action(armature, action, new))
 
         for mesh in meshes:
 
@@ -426,6 +427,8 @@ def create_game_rig_and_bake_actions():
                     modifier.object = new
 
         bpy.data.objects.remove(armature)
+
+    bpy.data.batch_remove([a for a in bpy.data.actions if not a in baked_actions])
 
 
 def make_paths_relative():
