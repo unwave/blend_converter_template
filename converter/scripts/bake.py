@@ -319,7 +319,39 @@ def get_objects_for_armature(armature: 'bpy.types.Object'):
     return objects
 
 
-def get_root_bones(armature: 'bpy.types.Object'):
+def get_root_bones(armature: 'bpy.types.Object', k_deform_root = '__bc_deform_root', k_control_root = '__bc_control_root'):
+
+    sentinel = object()
+
+    roots = [b for b in armature.data.bones if b.get(k_deform_root, sentinel) is not sentinel]
+    if len(roots) > 1:
+        raise Exception(
+            f"Multiple deform roots."
+            "\n\t" f"Armature: {armature.name_full}"
+            "\n\t" f"Bones: {roots}"
+        )
+    elif not roots:
+        deform_root = None
+    else:
+        deform_root = roots[0]
+
+
+    roots = [b for b in armature.data.bones if b.get(k_control_root, sentinel) is not sentinel]
+    if len(roots) > 1:
+        raise Exception(
+            f"Multiple control roots."
+            "\n\t" f"Armature: {armature.name_full}"
+            "\n\t" f"Bones: {roots}"
+        )
+    elif not roots:
+        control_root = None
+    else:
+        control_root = roots[0]
+
+
+    if deform_root and control_root:
+        return deform_root.name, control_root.name
+
 
     names = set(b.name for b in armature.data.bones)
 
@@ -337,6 +369,28 @@ def get_root_bones(armature: 'bpy.types.Object'):
         return 'Hips', 'Ctrl_Master'
 
 
+    if deform_root:
+        deform_root_message = f"Deform root: {deform_root.name}"
+    else:
+        deform_root_message = f"Assign a custom property of any type with name '{k_deform_root}' to a single Edit bone to mark the deform root bone."
+
+    if control_root:
+        control_root_message = f"Deform root: {control_root.name}"
+    else:
+        control_root_message = f"Assign a custom property of any type with name '{k_control_root}' to a single Edit bone to mark the control root bone."
+
+    raise Exception(
+        f"Fail to find a deform or a control root bones in a control armature."
+        "\n\t" f"Armature: '{armature.name_full}'"
+        "\n\t" f"{deform_root_message}"
+        "\n\t" f"{control_root_message}"
+    )
+
+
+def validate_root_bones():
+    for armature in get_armature_objects():
+        get_root_bones(armature)
+
 
 def create_game_rig_and_bake_actions():
 
@@ -347,12 +401,7 @@ def create_game_rig_and_bake_actions():
 
         # bpy_action.unassign_deform_bones_with_missing_weights(armature, meshes)
 
-        deform_root = armature.get('BC_deform_root')
-        control_root =  armature.get('BC_control_root')
-
-        if not deform_root or not control_root:
-            deform_root, control_root = get_root_bones(armature)
-
+        deform_root, control_root = get_root_bones(armature)
 
         new = bpy_action.create_simplified_armature_and_constrain(armature, deform_root, control_root, meshes)
 

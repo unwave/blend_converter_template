@@ -220,6 +220,7 @@ def get_bake_program(
     program.run(blender, scripts_bake.delete_undefined_nodes)
 
     if is_skeletal:
+        program.run(blender, scripts_bake.validate_root_bones)
         program.run(blender, scripts_bake.reset_timeline)
 
     program.run(blender, scripts_bake.find_missing)

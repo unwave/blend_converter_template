@@ -9,6 +9,7 @@ if not ROOT in sys.path:
 import configuration
 
 from scripts import export as scripts_export
+from scripts import bake as scripts_bake
 
 
 def get_rig(
@@ -44,6 +45,7 @@ def get_rig(
     program.run(blender, scripts_export.remove_unused_uv_layouts)
     program.run(blender, bc_script.remove_all_node_groups_from_materials)
     program.run(blender, bc_script.use_backface_culling)
+    program.run(blender, scripts_bake.validate_root_bones)
 
     program.run(blender, scripts_export.save_blend_with_repack, result_path)
 
