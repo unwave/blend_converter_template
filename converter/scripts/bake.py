@@ -392,14 +392,19 @@ def validate_root_bones():
         get_root_bones(armature)
 
 
+def unassign_deform_bones_with_missing_weights():
+
+    for armature in get_armature_objects():
+        meshes = get_objects_for_armature(armature)
+        bpy_action.unassign_deform_bones_with_missing_weights(armature, meshes)
+
+
 def create_game_rig_and_bake_actions():
 
 
     for armature in get_armature_objects():
 
         meshes = get_objects_for_armature(armature)
-
-        # bpy_action.unassign_deform_bones_with_missing_weights(armature, meshes)
 
         deform_root, control_root = get_root_bones(armature)
 
