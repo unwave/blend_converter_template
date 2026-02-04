@@ -152,7 +152,7 @@ def convert_to_unreal_skeletal_mesh(
     material_definitions = program.run(blender, scripts_unreal.get_material_definitions_for_single_object)
 
     program.run(blender, export_fbx, fbx_path, Settings_Fbx(
-        add_leaf_bones=True,
+        add_leaf_bones = False,
         bake_anim=False,
     ))
 
@@ -215,7 +215,7 @@ def convert_to_unreal_animation(
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SK')
 
     program.run(blender, export_fbx, fbx_path, Settings_Fbx(
-        add_leaf_bones=True,
+        add_leaf_bones = False,
         # bake_anim_force_startend_keying=True,
         # bake_anim_use_all_bones=False,
         # bake_anim_use_nla_strips=False,
