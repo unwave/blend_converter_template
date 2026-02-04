@@ -447,7 +447,10 @@ def save_blend_with_repack(filepath: str):
     os.makedirs(os.path.dirname(filepath), exist_ok = True)
 
     bpy.ops.outliner.orphans_purge()
-    bpy.ops.file.pack_all()
+    try:
+        bpy.ops.file.pack_all()
+    except RuntimeError as e:
+        print(e)
 
     try:
         bpy.ops.wm.save_as_mainfile(filepath=filepath, compress=True, copy=False)
