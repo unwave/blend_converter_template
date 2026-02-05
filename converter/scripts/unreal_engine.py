@@ -450,13 +450,14 @@ def set_skeletal_mesh_materials(asset: unreal.SkeletalMesh, materials: typing.Li
         # to preserve imported_material_slot_name
         copy: unreal.SkeletalMaterial = skeletal_material.copy()
 
-        material_slot_name = str(skeletal_material.get_editor_property('material_slot_name'))
+        imported_material_slot_name = str(skeletal_material.get_editor_property('imported_material_slot_name'))
 
         for new_material in materials:
 
             material_name = str(new_material.get_name()).split('_', maxsplit=1)[1]
 
-            if material_name == material_slot_name:
+            if material_name == imported_material_slot_name:
+                copy.set_editor_property('material_slot_name', imported_material_slot_name)
                 copy.set_editor_property('material_interface', new_material)
                 break
 
