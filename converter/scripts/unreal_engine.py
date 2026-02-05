@@ -843,3 +843,14 @@ def ensure_bone_count_limit_per_material(limit = 75):
                         half_of_faces = [face for face in mesh.data.polygons if face.index in half_of_face_indexes]
                         for face in half_of_faces:
                             face.material_index = new_slot.slot_index
+
+
+def limit_total_bone_weights(limit = 4):
+
+    for armature in bake_scripts.get_armature_objects():
+
+        for mesh in bake_scripts.get_objects_for_armature(armature):
+
+            with bpy_context.Focus(mesh, 'WEIGHT_PAINT'):
+                bpy.ops.object.vertex_group_normalize_all(group_select_mode='BONE_DEFORM', lock_active=False)
+                bpy.ops.object.vertex_group_limit_total(group_select_mode='BONE_DEFORM', limit=limit)
