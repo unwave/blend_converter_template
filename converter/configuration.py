@@ -8,13 +8,13 @@ from blend_converter import utils as bc_utils
 
 def get_ascii_underscored(string: str):
     r"""
-    For creating slag names in the Unreal Engine style.
+    For creating slug names in the Unreal Engine style.
 
     >A folder name may not contain any of the following characters: \:*?"<>l',.&!~@#/[]
     """
 
-    string = re.sub(r'([A-Za-z0-9]+)(\d)', r'\1_\2', string)
-    string = re.sub(r'(\d)([A-Za-z0-9]+)', r'\1_\2', string)
+    string = re.sub(r'([A-Za-z]+)(\d+)', r'\1_\2', string)
+    string = re.sub(r'(\d+)([A-Za-z]+)', r'\1_\2', string)
     string = re.sub(r'([A-Z]+)([A-Z][a-z0-9])', r'\1_\2', string)
     string = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', string)
     string = re.sub(r'[^a-zA-Z0-9]+', '_', string)
