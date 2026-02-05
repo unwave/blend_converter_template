@@ -167,7 +167,7 @@ def import_texture(os_path: str, ue_dir: str, name: typing.Optional[str] = None)
     if name:
         dest_ue_name = name
     else:
-        dest_ue_name = os.path.splitext(os.path.basename(os_path))[0]
+        dest_ue_name = 'T_' + os.path.splitext(os.path.basename(os_path))[0]
 
     task = unreal.AssetImportTask()
 
