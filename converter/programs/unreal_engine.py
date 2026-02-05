@@ -146,6 +146,7 @@ def convert_to_unreal_skeletal_mesh(
     program.run(blender, scripts_export.delete_unused_materials)
     program.run(blender, scripts_bake.create_game_rig_and_bake_actions)
 
+    program.run(blender, scripts_unreal.ensure_bone_count_limit_per_material)
 
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SK')
     program.run(blender, scripts_export.rename_all_armatures)

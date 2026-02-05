@@ -2,6 +2,9 @@ import os
 import sys
 import typing
 import uuid
+import operator
+import collections
+
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 if not ROOT in sys.path:
@@ -10,11 +13,14 @@ if not ROOT in sys.path:
 
 import configuration
 
+from scripts import bake as bake_scripts
+
 
 if 'bpy' in sys.modules:
     import bpy
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_context
+    from blend_converter import utils as bc_utils
 
 
 if 'unreal' in sys.modules:
@@ -721,3 +727,119 @@ def reduce_to_single_mesh(collection_name: str):
         bpy.ops.object.material_slot_remove_unused()
 
     bpy_context.Focus([single_object] + list(collision_shapes)).__enter__().visible_collection.name = collection_name
+
+
+def get_group_to_face_indexes_map(mesh: 'bpy.types.Object'):
+
+    vert_to_face_map: typing.Dict[int, typing.Set[int]] = collections.defaultdict(set)
+    for face in mesh.data.polygons:
+        for vert in face.vertices:
+            vert_to_face_map[vert].add(face.index)
+
+    result: typing.Dict[str, typing.Set[int]] = collections.defaultdict(set)
+
+    for vert in mesh.data.vertices:
+
+        group_indexes: typing.List[int] = list(map(operator.attrgetter('group'), vert.groups))
+
+        for index in group_indexes:
+
+            result[mesh.vertex_groups[index].name].update(vert_to_face_map[vert.index])
+
+    return result
+
+
+def get_face_group_map(mesh: 'bpy.types.Object'):
+
+    face_to_groups: typing.Dict[int, typing.Set[str]] = collections.defaultdict(set)
+
+    group_to_faces = get_group_to_face_indexes_map(mesh)
+
+    for group, face_indexes in group_to_faces.items():
+        for index in face_indexes:
+            face_to_groups[index].add(group)
+
+    return face_to_groups, group_to_faces
+
+
+def ensure_bone_count_limit_per_material(limit = 75):
+    """
+    NOTE: Run `unassign_deform_bones_with_missing_weights` before this one.
+
+    https://github.com/SpeculativeCoder/UnrealEngine/blob/3acb62c7fc6f65e94d3b41397087a3d3530ee8c6/Engine/Source/Runtime/Engine/Public/GPUSkinVertexFactory.h#L29
+    ```cpp
+    enum
+    {
+        MAX_GPU_BONE_MATRICES_UNIFORMBUFFER = 75,
+    };
+
+    BEGIN_GLOBAL_SHADER_PARAMETER_STRUCT(FBoneMatricesUniformShaderParameters,)
+        SHADER_PARAMETER_ARRAY(FMatrix3x4, BoneMatrices, [MAX_GPU_BONE_MATRICES_UNIFORMBUFFER])
+    END_GLOBAL_SHADER_PARAMETER_STRUCT()
+    ```
+
+    https://github.com/SpeculativeCoder/UnrealEngine/blob/3acb62c7fc6f65e94d3b41397087a3d3530ee8c6/Engine/Source/Runtime/Engine/Private/GPUSkinVertexFactory.cpp#L309
+    ```cpp
+    static FBoneMatricesUniformShaderParameters GBoneUniformStruct;
+    ...
+    check(NumBones * sizeof(FMatrix3x4) <= sizeof(GBoneUniformStruct));
+    ```
+
+    https://dev.epicgames.com/documentation/en-us/unreal-engine/skeletal-mesh-rendering-paths-in-unreal-engine?application_version=5.7
+
+    By default, the maximum bones per Section is set to 65536. Mobile platforms have a capped maximum of 75 bones per Section.
+    """
+
+    armatures = bake_scripts.get_armature_objects()
+
+    with bpy_context.Focus(armatures):
+
+        for armature in armatures:
+
+            deform_bone_names = set(b.name for b in armature.data.bones if b.use_deform)
+
+            for mesh in bake_scripts.get_objects_for_armature(armature):
+
+                face_to_groups, group_to_faces = get_face_group_map(mesh)
+                deform_group_indexes = {group.name for group in mesh.vertex_groups if group.name in deform_bone_names}
+
+                for material_slot in list(mesh.material_slots):
+
+                    while True:
+
+                        material_index_to_face_indexes_map: typing.Dict[int, typing.List[int]] = collections.defaultdict(list)
+                        for face in mesh.data.polygons:
+                            material_index_to_face_indexes_map[face.material_index].append(face.index)
+
+                        face_indexes = material_index_to_face_indexes_map[material_slot.slot_index]
+
+                        groups: typing.Set[str] = set()
+                        for index in face_indexes:
+                            groups.update(face_to_groups[index])
+
+                        groups = groups.intersection(deform_group_indexes)
+
+                        if len(groups) <= limit:
+                            break
+
+                        bc_utils.print_in_color(bc_utils.get_color_code(224, 51, 29, 10, 10, 10),
+                            f"Bone limit per material excited."
+                            "\n\t" f"Object: {mesh.name_full}"
+                            "\n\t" f"Slot Index: {material_slot.slot_index}"
+                            "\n\t" f"Material: {material_slot.material.name_full}"
+                            "\n\t" f"Bone count: {len(groups)}"
+                        )
+
+                        mesh.data.materials.append(None)
+                        new_slot = mesh.material_slots[-1]
+                        new_slot.material = material_slot.material.copy()
+
+                        half_of_groups = list(sorted(groups))[len(groups)//2:]
+
+                        half_of_face_indexes: typing.Set[int] = set()
+                        for name in half_of_groups:
+                            half_of_face_indexes.update(group_to_faces[name])
+
+                        half_of_faces = [face for face in mesh.data.polygons if face.index in half_of_face_indexes]
+                        for face in half_of_faces:
+                            face.material_index = new_slot.slot_index
