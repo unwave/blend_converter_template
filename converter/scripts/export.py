@@ -90,7 +90,9 @@ def scene_clean_up():
 
 def make_local():
 
-    bpy.ops.object.make_local(type='ALL')
+    with bpy_context.Focus([]):
+        bpy.ops.object.make_local(type='ALL')
+
 
 def delete_non_armature_objects():
     """ This is used for animation only blend files. To export as only an armature and an action. """
