@@ -88,10 +88,12 @@ def scene_clean_up():
     bpy.ops.outliner.orphans_purge()
 
 
-def make_local_and_delete_non_armature_objects():
-    """ This is used for animation only blend files. To export as only an armature and an action. """
+def make_local():
 
     bpy.ops.object.make_local(type='ALL')
+
+def delete_non_armature_objects():
+    """ This is used for animation only blend files. To export as only an armature and an action. """
 
     bpy.data.batch_remove([o for o in bpy.data.objects if o.type != 'ARMATURE'])
 

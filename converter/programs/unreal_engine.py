@@ -213,8 +213,9 @@ def convert_to_unreal_animation(
 
     program.run(blender, open_mainfile, blend_path)
 
-    program.run(blender, scripts_export.make_local_and_delete_non_armature_objects)
+    program.run(blender, scripts_export.make_local)
     program.run(blender, scripts_bake.create_game_rig_and_bake_actions)
+    program.run(blender, scripts_export.delete_non_armature_objects)
     program.run(blender, scripts_export.rename_all_armatures)
 
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SK')

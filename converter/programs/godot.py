@@ -152,9 +152,10 @@ def convert_to_animation(
     program.run(blender, open_mainfile, blend_path)
 
     program.run(blender, scripts_godot.rename_objects_for_godot, 'SK')
-    program.run(blender, scripts_export.make_local_and_delete_non_armature_objects)
+    program.run(blender, scripts_export.make_local)
     program.run(blender, scripts_godot.add_export_timestamp)
     program.run(blender, scripts_bake.create_game_rig_and_bake_actions)
+    program.run(blender, scripts_export.delete_non_armature_objects)
     program.run(blender, scripts_export.rename_all_armatures)
 
     program.run(blender, export_gltf, gltf_path, Settings_GLTF(export_format='GLTF_SEPARATE'))
