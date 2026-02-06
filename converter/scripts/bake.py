@@ -399,6 +399,15 @@ def unassign_deform_bones_with_missing_weights():
         bpy_action.unassign_deform_bones_with_missing_weights(armature, meshes)
 
 
+def add_copy_uniform_scale(bone: 'bpy.types.PoseBone', target: 'bpy.types.Object', subtarget: str):
+
+    constraint: bpy.types.CopyScaleConstraint = bone.constraints.new('COPY_SCALE')
+    constraint.target = target
+    constraint.subtarget = subtarget
+
+    constraint.use_make_uniform = True
+
+
 def create_game_rig_and_bake_actions():
 
     baked_actions = []
@@ -410,6 +419,11 @@ def create_game_rig_and_bake_actions():
         deform_root, control_root = get_root_bones(armature)
 
         new = bpy_action.create_simplified_armature_and_constrain(armature, deform_root, control_root, meshes)
+
+        with bpy_context.Focus(new, 'POSE'):
+            for pose_bone in new.pose.bones:
+                copy_transform = pose_bone.constraints[0]
+                add_copy_uniform_scale(pose_bone, copy_transform.target, copy_transform.subtarget)
 
         for collection in armature.users_collection:
             collection.objects.link(new)
