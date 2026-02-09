@@ -4,6 +4,7 @@ import typing
 import uuid
 import operator
 import collections
+import functools
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -162,7 +163,8 @@ def get_material_definitions_for_single_object():
     return definitions
 
 
-def import_texture(os_path: str, ue_dir: str, name: typing.Optional[str] = None) -> 'unreal.Texture':
+@functools.lru_cache(None)
+def import_texture(os_path: str, ue_dir: str, name: typing.Optional[str] = None, **editor_property) -> 'unreal.Texture':
 
     if name:
         dest_ue_name = name
@@ -187,7 +189,14 @@ def import_texture(os_path: str, ue_dir: str, name: typing.Optional[str] = None)
 
     assert len(task.imported_object_paths) == 1
 
-    return unreal.load_asset(task.imported_object_paths[0])
+    asset = unreal.load_asset(task.imported_object_paths[0])
+
+    for key, value in editor_property.items():
+        asset.set_editor_property(key, value)
+
+    unreal.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty = False)
+
+    return asset
 
 
 def is_in_memory_asset(asset_path: str):
@@ -351,12 +360,14 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
 
 
     if settings.normal_filepath:
-        normal_texture = import_texture(settings.normal_filepath, settings.dir)
-        normal_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_NORMALMAP)
-        normal_texture.set_editor_property('flip_green_channel', True)
-        normal_texture.set_editor_property('srgb', False)  # ensuring that the pre/post change notifications are called
-        unreal.EditorAssetLibrary.save_loaded_asset(normal_texture, only_if_is_dirty = False)
-        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._normal_param_name, normal_texture)
+        texture = import_texture(
+            settings.normal_filepath,
+            settings.dir,
+            compression_settings = unreal.TextureCompressionSettings.TC_NORMALMAP,
+            flip_green_channel = True,
+            srgb = False,
+        )
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._normal_param_name, texture)
 
         try:
             if not has_manual_permutations:
@@ -369,25 +380,31 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
 
 
     if settings.base_color_filepath:
-        base_color_texture = import_texture(settings.base_color_filepath, settings.dir)
-        base_color_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_DEFAULT)
-        unreal.EditorAssetLibrary.save_loaded_asset(base_color_texture, only_if_is_dirty = False)
-        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._base_color_param_name, base_color_texture)
+        texture = import_texture(
+            settings.base_color_filepath,
+            settings.dir,
+            compression_settings = unreal.TextureCompressionSettings.TC_DEFAULT,
+        )
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._base_color_param_name, texture)
 
 
     if settings.orma_filepath:
-        orm_texture = import_texture(settings.orma_filepath, settings.dir)
-        orm_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_MASKS)
-        orm_texture.set_editor_property('srgb', False)  # ensuring that the pre/post change notifications are called
-        unreal.EditorAssetLibrary.save_loaded_asset(orm_texture, only_if_is_dirty = False)
-        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._orma_param_name, orm_texture)
+        texture = import_texture(
+            settings.orma_filepath,
+            settings.dir,
+            compression_settings = unreal.TextureCompressionSettings.TC_MASKS,
+            srgb = False,
+        )
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._orma_param_name, texture)
 
 
     if settings.emission_filepath:
-        emission_texture = import_texture(settings.emission_filepath, settings.dir)
-        emission_texture.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_DEFAULT)
-        unreal.EditorAssetLibrary.save_loaded_asset(emission_texture, only_if_is_dirty = False)
-        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._emission_param_name, emission_texture)
+        texture = import_texture(
+            settings.emission_filepath,
+            settings.dir,
+            compression_settings = unreal.TextureCompressionSettings.TC_DEFAULT,
+        )
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._emission_param_name, texture)
 
         try:
             if not has_manual_permutations:
