@@ -154,6 +154,7 @@ def convert_to_unreal_skeletal_mesh(
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SK')
     program.run(blender, scripts_export.rename_all_armatures)
 
+    program.run(blender, scripts_unreal.join_all_mesh_objects, dir_name)
 
     material_definitions = program.run(blender, scripts_unreal.get_material_definitions_for_single_object)
 
