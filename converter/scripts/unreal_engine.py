@@ -762,7 +762,7 @@ def get_face_group_map(mesh: 'bpy.types.Object'):
     return face_to_groups, group_to_faces
 
 
-def ensure_bone_count_limit_per_material(limit = 75):
+def ensure_bone_count_limit_per_material(limit = 75, max_attempts = 50):
     """
     NOTE: Run `unassign_deform_bones_with_missing_weights` before this one.
 
@@ -801,26 +801,43 @@ def ensure_bone_count_limit_per_material(limit = 75):
             for mesh in bake_scripts.get_objects_for_armature(armature):
 
                 face_to_groups, group_to_faces = get_face_group_map(mesh)
-                deform_group_indexes = {group.name for group in mesh.vertex_groups if group.name in deform_bone_names}
+                deform_group_names = {group.name for group in mesh.vertex_groups if group.name in deform_bone_names}
+                print(f"Bone count: {len(deform_group_names)}")
 
-                for material_slot in list(mesh.material_slots):
 
-                    while True:
+                has_over_limit_materials = True
+                attempt_count = 0
+                good_materials = set()
 
-                        material_index_to_face_indexes_map: typing.Dict[int, typing.List[int]] = collections.defaultdict(list)
-                        for face in mesh.data.polygons:
-                            material_index_to_face_indexes_map[face.material_index].append(face.index)
+                while has_over_limit_materials:
 
-                        face_indexes = material_index_to_face_indexes_map[material_slot.slot_index]
+                    if attempt_count > max_attempts:
+                        raise Exception(f"Fail to split materials: {mesh.name_full}")
+
+                    has_over_limit_materials = False
+
+
+                    material_index_to_face_indexes_map: typing.Dict[int, typing.List[int]] = collections.defaultdict(list)
+                    for face in mesh.data.polygons:
+                        material_index_to_face_indexes_map[face.material_index].append(face.index)
+
+
+                    for material_slot in mesh.material_slots:
+
+                        if material_slot.slot_index in good_materials:
+                            continue
+
+                        face_indexes = set(material_index_to_face_indexes_map[material_slot.slot_index])
+
 
                         groups: typing.Set[str] = set()
                         for index in face_indexes:
-                            groups.update(face_to_groups[index])
+                            groups.update(deform_group_names.intersection(face_to_groups[index]))
 
-                        groups = groups.intersection(deform_group_indexes)
 
                         if len(groups) <= limit:
-                            break
+                            good_materials.add(material_slot.slot_index)
+                            continue
 
                         bc_utils.print_in_color(bc_utils.get_color_code(224, 51, 29, 10, 10, 10),
                             f"Bone limit per material excited."
@@ -830,19 +847,67 @@ def ensure_bone_count_limit_per_material(limit = 75):
                             "\n\t" f"Bone count: {len(groups)}"
                         )
 
+                        has_over_limit_materials = True
+
                         mesh.data.materials.append(None)
                         new_slot = mesh.material_slots[-1]
                         new_slot.material = material_slot.material.copy()
 
-                        half_of_groups = list(sorted(groups))[len(groups)//2:]
 
-                        half_of_face_indexes: typing.Set[int] = set()
-                        for name in half_of_groups:
-                            half_of_face_indexes.update(group_to_faces[name])
+                        sorted_groups = list(groups)
 
-                        half_of_faces = [face for face in mesh.data.polygons if face.index in half_of_face_indexes]
-                        for face in half_of_faces:
-                            face.material_index = new_slot.slot_index
+                        def get_connected_groups(group_name: str):
+
+                            groups = set()
+
+                            for i in group_to_faces[group_name]:
+                                groups.update(deform_group_names.intersection(face_to_groups[i]))
+
+                            return len(groups)
+
+                        sorted_groups.sort(key = get_connected_groups, reverse = True)
+
+
+                        def assign_new_material():
+
+                            faces_assigned = 0
+                            half_of_faces = len(face_indexes) // 2
+
+                            for start in sorted_groups:
+
+                                stack = [start]
+                                processed = set()
+
+                                while stack:
+
+                                    group = stack.pop()
+
+                                    if group in processed:
+                                        continue
+
+                                    processed.add(group)
+
+                                    for i in sorted(group_to_faces[group]):
+
+                                        if not i in face_indexes:
+                                            continue
+
+                                        mesh.data.polygons[i].material_index = new_slot.slot_index
+                                        faces_assigned += 1
+
+                                        if faces_assigned >= half_of_faces:
+                                            return
+
+                                        stack.extend(deform_group_names.intersection(face_to_groups[i]))
+
+                                    if len(processed) >= limit:
+                                        return
+
+                        assign_new_material()
+
+                        break
+
+                    attempt_count += 1
 
 
 def limit_total_bone_weights(limit = 4):
