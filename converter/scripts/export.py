@@ -483,3 +483,28 @@ def delete_unused_materials():
 
         with bpy_context.Focus(object):
             bpy.ops.object.material_slot_remove_unused()
+
+
+def check_if_writable(path: str):
+    """
+    File locking on Windows can freeze an attempt to interact with a file.
+    This happens with the broken FBX preview in Microsoft Explorer.
+    """
+
+    if not os.path.exists(path):
+        return
+
+    import subprocess
+
+    command = [sys.executable, '-c', "import sys; open(sys.argv[1], 'wb').close()", path]
+
+    with subprocess.Popen(command, stdout = subprocess.PIPE, stderr = subprocess.PIPE) as process:
+        try:
+            process.wait(2)
+            process.terminate()
+            assert process.returncode == 0
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired, AssertionError) as e:
+            raise Exception(
+                f"Fail to write: {path}"
+                "\n\n" f"{process.stderr.read().decode()}"
+            ) from e

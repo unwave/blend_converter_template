@@ -80,6 +80,8 @@ def convert_to_unreal_static_mesh(
 
     material_definitions = program.run(blender, scripts_unreal.get_material_definitions_for_single_object)
 
+    program.run(blender, scripts_export.check_if_writable, fbx_path)
+
     program.run(blender, export_fbx, fbx_path, Settings_Fbx(
         mesh_smooth_type = 'SMOOTH_GROUP'
     ))
@@ -155,6 +157,8 @@ def convert_to_unreal_skeletal_mesh(
 
     material_definitions = program.run(blender, scripts_unreal.get_material_definitions_for_single_object)
 
+    program.run(blender, scripts_export.check_if_writable, fbx_path)
+
     program.run(blender, export_fbx, fbx_path, Settings_Fbx(
         add_leaf_bones = False,
         bake_anim=False,
@@ -219,6 +223,8 @@ def convert_to_unreal_animation(
     program.run(blender, scripts_export.rename_all_armatures)
 
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SK')
+
+    program.run(blender, scripts_export.check_if_writable, fbx_path)
 
     program.run(blender, export_fbx, fbx_path, Settings_Fbx(
         add_leaf_bones = False,
