@@ -85,82 +85,118 @@ def rename_objects_for_unreal(prefix: str):
                 object.name = name
 
 
-def get_material_definitions_for_single_object():
-    """ This is used to recreate the materials inside Unreal. """
+@dataclasses.dataclass
+class S_Material_Definition(tool_settings.Settings):
+
+    base_color: str = ''
+    orma: str = ''
+    normal: str = ''
+    emission: str = ''
+
+    is_alpha: bool = False
+
+
+def get_material_definition(material: 'bpy.types.Material'):
 
     from blend_converter.blender import bpy_node
 
+    result = S_Material_Definition()
+
+    tree = bpy_node.Shader_Tree_Wrapper(material.node_tree)
+    principled =  tree.output[0]
+
+    def get_first_image(socket_identifier: str):
+
+        for node in principled.inputs[socket_identifier].descendants:
+            if node.be('ShaderNodeTexImage') and node.image:
+                return bpy_utils.get_block_abspath(node.image)
+
+        return ''
+
+    result.base_color = get_first_image('Base Color')
+    result.orma = get_first_image('Metallic')
+    result.normal = get_first_image('Normal')
+    result.emission = get_first_image(bpy_node.Socket_Identifier.EMISSION)
+
+    result.is_alpha = bool(principled['Alpha'] or principled.inputs['Alpha'].default_value != 1)
+
+    return result
+
+
+def get_material_definitions_for_single_object():
+    """ This is used to recreate the materials inside Unreal. """
+
+    used_slot_names: typing.Set[str] = set()
+    index_to_name: typing.Dict[int, str] = {}
+    slot_name_to_name: typing.Dict[str, str] = {}
+    name_to_definition: typing.Dict[str, S_Material_Definition] = {}
+
+
     object = next((o for o in bpy_utils.get_view_layer_objects() if o.type == 'MESH'), None)
     if not object:
-        return []
+        return dict(slot_name_to_name = slot_name_to_name, name_to_definition = name_to_definition)
 
-    definitions = []
 
-    used_names = set()
-
-    def ensure_unique_name(name: str):
+    def ensure_unique_name(name: str, index = 2):
 
         orig_name = name
-        index = 2
-        while name in used_names:
+        while name in used_slot_names:
             name = orig_name + '_' + str(index).zfill(2)
             index += 1
 
-        used_names.add(name)
+        used_slot_names.add(name)
 
         return name
 
+
+    # standardize the materials
     bpy_utils.convert_materials_to_principled([object])
+    assert all(s.material and s.material.node_tree for s in object.material_slots)
 
 
-    for material_slot in object.material_slots:
+    # collect material definitions
+    for slot in object.material_slots:
 
-        assert material_slot.material
-        assert material_slot.material.node_tree
+        definition = name_to_definition.get(slot.material.name)
+        if definition is None:
+            name_to_definition[slot.material.name] = get_material_definition(slot.material)._to_dict()
 
-        definition = {}
-        definition['textures'] = textures = {}
-
-        material = material_slot.material
-
-        name = ensure_unique_name(configuration.get_ascii_underscored(material.name))
-        definition['name'] = name
-        material.name = name
-
-        tree = bpy_node.Shader_Tree_Wrapper(material.node_tree)
-
-        principled =  tree.output[0]
-
-        node = next((node for node in principled.inputs['Base Color'].descendants if node.be('ShaderNodeTexImage')), None)
-        if node:
-            textures['base_color'] = bpy_utils.get_block_abspath(node.image)
-        else:
-            textures['base_color'] = None
-
-        node = next((node for node in principled.inputs['Metallic'].descendants if node.be('ShaderNodeTexImage')), None)
-        if node:
-            textures['orma'] = bpy_utils.get_block_abspath(node.image)
-        else:
-            textures['orma'] = None
-
-        node = next((node for node in principled.inputs['Normal'].descendants if node.be('ShaderNodeTexImage')), None)
-        if node:
-            textures['normal'] = bpy_utils.get_block_abspath(node.image)
-        else:
-            textures['normal'] = None
-
-        node = next((node for node in principled.inputs[bpy_node.Socket_Identifier.EMISSION].descendants if node.be('ShaderNodeTexImage')), None)
-        if node:
-            textures['emission'] = bpy_utils.get_block_abspath(node.image)
-        else:
-            textures['emission'] = None
+        index_to_name[slot.slot_index] = slot.material.name
 
 
-        definition['is_alpha'] = bool(principled['Alpha'] or principled.inputs['Alpha'].default_value != 1)
+    # make so if a material is used more than once the socket will have a number suffix for clarity
+    seen = set()
+    has_multiple_users = set()
+    for material_name in index_to_name.values():
 
-        definitions.append(definition)
+        if material_name in seen and not material_name in has_multiple_users:
+            used_slot_names.add(material_name)
+            has_multiple_users.add(material_name)
 
-    return definitions
+        seen.add(material_name)
+
+
+    # map slot names to material names
+    # Unreal uses the material names as the slot names and merges slots with the same materials
+    # so we have to duplicate them to make unique
+    for slot in object.material_slots:
+
+        material_name = index_to_name[slot.slot_index]
+
+        name = ensure_unique_name(configuration.get_ascii_underscored(material_name), index = 1 if material_name in has_multiple_users else 2)
+
+        slot.material = slot.material.copy()
+
+        existing_material = bpy.data.materials.get(name)
+        if existing_material:
+            existing_material.name += '(renamed)'
+
+        slot.material.name = name
+
+        slot_name_to_name[name] = material_name
+
+
+    return dict(slot_name_to_name = slot_name_to_name, name_to_definition = name_to_definition)
 
 
 @functools.lru_cache(None)
@@ -279,77 +315,69 @@ def get_parent_material_permutation_path(is_alpha = False, is_skeletal = False, 
     return getattr(UE_Material_Permutations, '_'.join(name))
 
 
-@dataclasses.dataclass
-class Settings_Unreal_Material_Instance(tool_settings.Settings):
+class Material_Parameter:
 
-    name: str = ''
-    dir: str = ''
-
-    base_color_filepath: str = ''
-    _base_color_param_name: str = 'BaseColor'
-
-    orma_filepath: str = ''
-    _orma_param_name: str = 'ORMA'
-
-    normal_filepath: str = ''
-    _normal_param_name: str = 'Normal'
-
-    emission_filepath: str = ''
-    _emission_param_name: str = 'Emission'
-
-    is_alpha: bool = False
-    is_skeletal: bool = False
+    BASE_COLOR = 'BaseColor'
+    ORMA = 'ORMA'
+    NORMAL = 'Normal'
+    EMISSION = 'Emission'
 
 
-    @property
-    def _asset_path(self):
-        return unreal.Paths.combine([self.dir, self.name])
+def create_material_instance(*,
+            asset_name: str,
+            package_path: str,
+            base_color_filepath = '',
+            orma_filepath = '',
+            normal_filepath = '',
+            emission_filepath = '',
+            is_alpha = False,
+            is_skeletal = False,
+        ) -> unreal.MaterialInstanceConstant:
+
+    unreal.EditorAssetLibrary.make_directory(package_path)
+
+    asset_path = unreal.Paths.combine([package_path, asset_name])  # TODO: might not be correct
+
+    if is_in_memory_asset(asset_path):
+        raise Exception(f"In memory asset, restart Unreal Engine: {asset_path}")  # TODO: testing
 
 
-def create_material_instance(settings: Settings_Unreal_Material_Instance):
-
-    unreal.EditorAssetLibrary.make_directory(settings.dir)
-
-    if is_in_memory_asset(settings._asset_path):
-        raise Exception(f"In memory asset, restart Unreal Engine: {settings._asset_path}")  # TODO: testing
-
-
-    do_replace = unreal.EditorAssetLibrary.does_asset_exist(settings._asset_path)
+    do_replace = unreal.EditorAssetLibrary.does_asset_exist(asset_path)
     if do_replace:
-        asset_name = settings.name + f"_TEMP_{uuid.uuid1().hex}"
+        asset_name = asset_name + f"_TEMP_{uuid.uuid1().hex}"
     else:
-        asset_name = settings.name
+        asset_name = asset_name
 
 
     factory = unreal.MaterialInstanceConstantFactoryNew()
     material_instance: unreal.MaterialInstanceConstant = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
         asset_name=asset_name,
-        package_path=settings.dir,
+        package_path=package_path,
         asset_class=unreal.MaterialInstanceConstant,
         factory=factory,
     )
 
 
     if not material_instance:
-        raise Exception(f"Fail to create Material Instance: {settings._asset_path}")
+        raise Exception(f"Fail to create Material Instance: {asset_path}")
 
 
     has_manual_permutations = unreal.EditorAssetLibrary.does_directory_exist('/Game/Materials/manual_permutations')
 
     if has_manual_permutations:
         parent_material_path = get_parent_material_permutation_path(
-            is_alpha = settings.is_alpha,
-            is_skeletal = settings.is_skeletal,
-            has_normal = settings.normal_filepath,
-            has_emission = settings.emission_filepath,
+            is_alpha = is_alpha,
+            is_skeletal = is_skeletal,
+            has_normal = normal_filepath,
+            has_emission = emission_filepath,
         )
 
     else:
         parent_material_path = get_parent_material_path(
-            is_alpha = settings.is_alpha,
-            is_skeletal = settings.is_skeletal,
-            has_normal = settings.normal_filepath,
-            has_emission = settings.emission_filepath,
+            is_alpha = is_alpha,
+            is_skeletal = is_skeletal,
+            has_normal = normal_filepath,
+            has_emission = emission_filepath,
         )
 
     parent_material = unreal.load_asset(parent_material_path)
@@ -359,58 +387,58 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
     material_instance.set_editor_property('parent', parent_material)
 
 
-    if settings.normal_filepath:
+    if normal_filepath:
         texture = import_texture(
-            settings.normal_filepath,
-            settings.dir,
+            normal_filepath,
+            package_path,
             compression_settings = unreal.TextureCompressionSettings.TC_NORMALMAP,
             flip_green_channel = True,
             srgb = False,
         )
-        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._normal_param_name, texture)
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, Material_Parameter.NORMAL, texture)
 
         try:
             if not has_manual_permutations:
                 unreal.MaterialEditingLibrary.set_material_instance_static_switch_parameter_value(material_instance, 'use_normal', True)
         except AttributeError as e:
-            message = f"The static switch 'use_normal' is not set for material: {settings.name}. Need UE 5.0+."
+            message = f"The static switch 'use_normal' is not set for material: {asset_name}. Need UE 5.0+."
             show_nt_message('Static switch not set!', message)
             print(message)
 
 
 
-    if settings.base_color_filepath:
+    if base_color_filepath:
         texture = import_texture(
-            settings.base_color_filepath,
-            settings.dir,
+            base_color_filepath,
+            package_path,
             compression_settings = unreal.TextureCompressionSettings.TC_DEFAULT,
         )
-        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._base_color_param_name, texture)
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, Material_Parameter.BASE_COLOR, texture)
 
 
-    if settings.orma_filepath:
+    if orma_filepath:
         texture = import_texture(
-            settings.orma_filepath,
-            settings.dir,
+            orma_filepath,
+            package_path,
             compression_settings = unreal.TextureCompressionSettings.TC_MASKS,
             srgb = False,
         )
-        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._orma_param_name, texture)
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, Material_Parameter.ORMA, texture)
 
 
-    if settings.emission_filepath:
+    if emission_filepath:
         texture = import_texture(
-            settings.emission_filepath,
-            settings.dir,
+            emission_filepath,
+            package_path,
             compression_settings = unreal.TextureCompressionSettings.TC_DEFAULT,
         )
-        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, settings._emission_param_name, texture)
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, Material_Parameter.EMISSION, texture)
 
         try:
             if not has_manual_permutations:
                 unreal.MaterialEditingLibrary.set_material_instance_static_switch_parameter_value(material_instance, 'use_emission', True)
         except AttributeError as e:
-            message = f"The static switch 'use_emission' is not set for material: {settings.name}. Need UE 5.0+."
+            message = f"The static switch 'use_emission' is not set for material: {asset_name}. Need UE 5.0+."
             show_nt_message('Static switch not set!', message)
             print(message)
 
@@ -418,43 +446,43 @@ def create_material_instance(settings: Settings_Unreal_Material_Instance):
     unreal.EditorAssetLibrary.save_loaded_asset(material_instance, only_if_is_dirty = False)
 
     if do_replace:
-        old_asset = unreal.load_asset(settings._asset_path)
+        old_asset = unreal.load_asset(asset_path)
         if old_asset:
             unreal.EditorAssetLibrary.consolidate_assets(material_instance, [old_asset])
             # https://forums.unrealengine.com/t/fix-redirectors-via-python/124785
-            unreal.EditorAssetLibrary.delete_asset(settings._asset_path)  # deleting redirect
-            unreal.EditorAssetLibrary.rename_asset(material_instance.get_full_name(), settings._asset_path)
+            unreal.EditorAssetLibrary.delete_asset(asset_path)  # deleting redirect
+            unreal.EditorAssetLibrary.rename_asset(material_instance.get_full_name(), asset_path)
         else:
             # not tested
-            unreal.EditorAssetLibrary.delete_asset(settings._asset_path)
-            unreal.EditorAssetLibrary.rename_asset(material_instance.get_full_name(), settings._asset_path)
+            unreal.EditorAssetLibrary.delete_asset(asset_path)
+            unreal.EditorAssetLibrary.rename_asset(material_instance.get_full_name(), asset_path)
 
-
-    unreal.log(f"Materials Instance created: {settings}")
 
     return material_instance
 
 
-def create_materials(material_definitions: typing.List[dict], result_dir: str, is_skeletal: bool):
+def create_materials(material_definitions: dict, package_path: str, is_skeletal: bool) -> typing.Dict[str, unreal.MaterialInstanceConstant]:
 
-    materials_settings: typing.List[unreal.MaterialInstanceConstant] = []
+    import_texture.cache_clear()
 
-    for definition in material_definitions:
+    name_to_material: typing.Dict[str, unreal.MaterialInstanceConstant] = {}
 
-        materials_settings.append(
-            Settings_Unreal_Material_Instance(
-                name = 'MI_' + definition['name'],
-                dir = result_dir,
-                base_color_filepath = definition['textures']['base_color'],
-                orma_filepath = definition['textures']['orma'],
-                normal_filepath =  definition['textures']['normal'],
-                emission_filepath= definition['textures']['emission'],
-                is_alpha = definition['is_alpha'],
-                is_skeletal = is_skeletal,
-            )
+    for key, value in material_definitions['name_to_definition'].items():
+
+        definition = S_Material_Definition._from_dict(value)
+
+        name_to_material[key] = create_material_instance(
+            asset_name = 'MI_' + key,
+            package_path = package_path,
+            base_color_filepath = definition.base_color,
+            orma_filepath = definition.orma,
+            normal_filepath = definition.normal,
+            emission_filepath = definition.emission,
+            is_alpha = definition.is_alpha,
+            is_skeletal = is_skeletal,
         )
 
-    return [create_material_instance(material_settings) for material_settings in materials_settings]
+    return {slot_name: name_to_material[name] for slot_name, name in material_definitions['slot_name_to_name'].items()}
 
 
 def set_static_mesh_materials(asset: unreal.StaticMesh, materials: typing.List[unreal.MaterialInstanceConstant]):
@@ -463,26 +491,19 @@ def set_static_mesh_materials(asset: unreal.StaticMesh, materials: typing.List[u
         unreal.StaticMesh.set_material(asset, index, material)
 
 
-def set_skeletal_mesh_materials(asset: unreal.SkeletalMesh, materials: typing.List[unreal.MaterialInstanceConstant]):
+def set_skeletal_mesh_materials(asset: unreal.SkeletalMesh, materials: typing.Dict[str, unreal.MaterialInstanceConstant]):
 
     array = unreal.Array(unreal.SkeletalMaterial)
 
-    skeletal_material: unreal.SkeletalMaterial
-    for skeletal_material in asset.get_editor_property('materials'):
+    skeletal_materials: typing.Dict[str, unreal.SkeletalMaterial] = {str(m.get_editor_property('imported_material_slot_name')): m for m in asset.get_editor_property('materials')}
+
+    for slot_name, material in materials.items():
 
         # to preserve imported_material_slot_name
-        copy: unreal.SkeletalMaterial = skeletal_material.copy()
+        copy: unreal.SkeletalMaterial = skeletal_materials[slot_name].copy()
 
-        imported_material_slot_name = str(skeletal_material.get_editor_property('imported_material_slot_name'))
-
-        for new_material in materials:
-
-            material_name = str(new_material.get_name()).split('_', maxsplit=1)[1]
-
-            if material_name == imported_material_slot_name:
-                copy.set_editor_property('material_slot_name', imported_material_slot_name)
-                copy.set_editor_property('material_interface', new_material)
-                break
+        copy.set_editor_property('material_slot_name', slot_name)
+        copy.set_editor_property('material_interface', material)
 
         array.append(copy)
 
@@ -545,7 +566,7 @@ class Settings_Unreal_Fbx(tool_settings.Settings):
     dist_dir: str = ''
     dist_name: str = ''
 
-    material_definitions: list = ()
+    material_definitions: dict = None
     has_custom_collisions: bool = False
 
     skeleton_asset_path: str = ''
@@ -573,9 +594,10 @@ def import_static_mesh(settings: Settings_Unreal_Fbx):
     options.set_editor_property('mesh_type_to_import', unreal.FBXImportType.FBXIT_STATIC_MESH)
 
     import_data = get_static_mesh_import_data(settings._asset_path)
-    options.set_editor_property('static_mesh_import_data', import_data)
     import_data.set_editor_property('combine_meshes', True)
     import_data.set_editor_property('auto_generate_collision', not settings.has_custom_collisions)
+    import_data.set_editor_property('reorder_material_to_fbx_order', True)
+    options.set_editor_property('static_mesh_import_data', import_data)
 
 
     task = get_import_task(options, settings.fbx_path, settings.dist_dir, settings.dist_name)
@@ -585,7 +607,7 @@ def import_static_mesh(settings: Settings_Unreal_Fbx):
     asset: unreal.StaticMesh = unreal.load_asset(settings._asset_path)
 
     materials = create_materials(settings.material_definitions, settings.dist_dir, is_skeletal = False)
-    set_static_mesh_materials(asset, materials)
+    set_static_mesh_materials(asset, materials.values())
 
     unreal.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty = False)
 
@@ -609,13 +631,16 @@ def import_skeletal_mesh(settings: Settings_Unreal_Fbx):
 
 
     import_data = get_skeletal_mesh_import_data(settings._asset_path)
+    import_data.set_editor_property('reorder_material_to_fbx_order', True)
     options.set_editor_property('skeletal_mesh_import_data', import_data)
 
 
     task = get_import_task(options, settings.fbx_path, settings.dist_dir, settings.dist_name)
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
-    asset: unreal.SkeletalMesh = unreal.load_asset(settings._asset_path)
+    assert len(task.imported_object_paths) == 1
+
+    asset: unreal.SkeletalMesh = unreal.load_asset(task.imported_object_paths[0])
 
     materials = create_materials(settings.material_definitions, settings.dist_dir, is_skeletal = True)
     set_skeletal_mesh_materials(asset, materials)
@@ -868,7 +893,7 @@ def ensure_bone_count_limit_per_material(limit = 75, max_attempts = 50):
 
                         mesh.data.materials.append(None)
                         new_slot = mesh.material_slots[-1]
-                        new_slot.material = material_slot.material.copy()
+                        new_slot.material = material_slot.material
 
 
                         sorted_groups = list(groups)
