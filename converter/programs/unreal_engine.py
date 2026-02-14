@@ -254,10 +254,7 @@ def get_unreal_kwargs(blender_executable: str, root: str):
 
     arguments = []
 
-    if os.path.exists(root):
-        asset_folders = [file for file in os.scandir(root) if file.is_dir()]
-    else:
-        asset_folders = []
+    asset_folders = configuration.get_folders(root)
 
     for folder in asset_folders:
 

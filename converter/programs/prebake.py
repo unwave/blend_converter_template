@@ -48,7 +48,7 @@ def get_prebake_kwargs(blender_executable: str, root = None):
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(root) if file.is_dir()]
+    asset_folders = configuration.get_folders(root)
 
     for folder in asset_folders:
 

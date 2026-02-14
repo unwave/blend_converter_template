@@ -308,7 +308,7 @@ def get_static_kwargs(
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(root) if file.is_dir()]
+    asset_folders = configuration.get_folders(root)
 
 
     def get_baked(path: os.PathLike, folder: str, resources_folder: str):
@@ -362,7 +362,7 @@ def get_skeletal_kwargs(
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(root) if file.is_dir()]
+    asset_folders = configuration.get_folders(root)
 
 
     def get_baked(path: os.PathLike, folder: str, resources_folder: str):

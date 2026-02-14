@@ -63,7 +63,7 @@ def get_skin_test_kwargs(
 
     arguments = []
 
-    asset_folders = [file for file in os.scandir(root) if file.is_dir()]
+    asset_folders = configuration.get_folders(root)
 
     for folder in asset_folders:
 
