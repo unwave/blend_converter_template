@@ -700,7 +700,7 @@ def import_anim_sequence(settings: Settings_Unreal_Fbx):
     options.set_editor_property('skeleton', skeleton)
 
     import_data = get_animation_import_data(settings._asset_path)
-    import_data.set_editor_property('import_uniform_scale', 100)
+
     options.set_editor_property('anim_sequence_import_data', import_data)
 
     task = get_import_task(options, settings.fbx_path, settings.dist_dir, settings.dist_name)
@@ -986,3 +986,34 @@ def join_all_mesh_objects(collection_name: str):
     bpy.data.batch_remove(bpy.data.collections)
 
     bpy_context.Focus(all_objects).__enter__().visible_collection.name = collection_name
+
+
+def scale_armature(factor = 100):
+
+    bpy.context.scene.tool_settings.use_keyframe_insert_auto = False  # this is for the inspection
+
+    bpy.context.scene.unit_settings.scale_length = 1/factor
+
+    for window_manager in bpy.data.window_managers:
+        for window in window_manager.windows:
+            for area in window.screen.areas:
+                if area.type == 'VIEW_3D':
+                    for region in area.regions:
+                        if region.type == 'WINDOW':
+                            space_data: bpy.types.SpaceView3D = area.spaces.active
+                            space_data.clip_start *= factor
+                            space_data.clip_end *= factor
+
+    with bpy_context.Focus(bpy.data.objects):
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+        bpy.ops.transform.resize(value=(factor, factor, factor))
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+
+    for action in bpy.data.actions:
+        for fcurve in action.fcurves:
+            if fcurve.data_path.endswith('location'):
+                for key in fcurve.keyframe_points:
+                    key.co.y *= factor
+                    key.handle_left.y *= factor
+                    key.handle_right.y *= factor
+

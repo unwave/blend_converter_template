@@ -156,6 +156,8 @@ def convert_to_unreal_skeletal_mesh(
     program.run(blender, scripts_unreal.limit_total_bone_weights)
     program.run(blender, scripts_unreal.ensure_bone_count_limit_per_material)
 
+    program.run(blender, scripts_unreal.scale_armature)
+
     material_definitions = program.run(blender, scripts_unreal.get_material_definitions_for_single_object)
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
@@ -224,6 +226,8 @@ def convert_to_unreal_animation(
     program.run(blender, scripts_export.rename_all_armatures)
 
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SK')
+
+    program.run(blender, scripts_unreal.scale_armature)
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 
