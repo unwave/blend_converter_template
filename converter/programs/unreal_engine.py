@@ -245,6 +245,7 @@ def convert_to_unreal_animation(
         dist_dir =  Hierarchy.join(Hierarchy.ANIM, rig_name),
         dist_name = f'A_{rig_name}_{animation_name}',
         skeleton_asset_path = Hierarchy.join(Hierarchy.SKELETAL, rig_name, f'{rig_name}_Skeleton'),
+        frame_rate = program.run(blender, scripts_unreal.get_frame_rate)
     )
 
     program.run(unreal, scripts_unreal.import_anim_sequence, ue_fbx_settings)

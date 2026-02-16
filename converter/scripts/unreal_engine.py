@@ -571,6 +571,7 @@ class Settings_Unreal_Fbx(tool_settings.Settings):
 
     skeleton_asset_path: str = ''
 
+    frame_rate: int = 0
 
     @property
     def _asset_path(self):
@@ -700,7 +701,8 @@ def import_anim_sequence(settings: Settings_Unreal_Fbx):
     options.set_editor_property('skeleton', skeleton)
 
     import_data = get_animation_import_data(settings._asset_path)
-
+    import_data.set_editor_property('use_default_sample_rate', False)
+    import_data.set_editor_property('custom_sample_rate', settings.frame_rate)
     options.set_editor_property('anim_sequence_import_data', import_data)
 
     task = get_import_task(options, settings.fbx_path, settings.dist_dir, settings.dist_name)
@@ -1017,3 +1019,6 @@ def scale_armature(factor = 100):
                     key.handle_left.y *= factor
                     key.handle_right.y *= factor
 
+
+def get_frame_rate():
+    return bpy.context.scene.render.fps / bpy.context.scene.render.fps_base
