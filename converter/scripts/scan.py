@@ -65,13 +65,15 @@ def the_bake(result_dir: str):
 
     uv_layer_name = bc_script.get_uuid1_hex()
 
+    max_ray_distance = max(bpy.data.objects['LOW'].evaluated_get(bpy.context.evaluated_depsgraph_get()).dimensions) * 1/3
+
     settings = tool_settings.Bake(
         resolution = 3000,
         image_dir = os.path.join(result_dir, 'textures'),
         bake_types = bake_types,
         use_selected_to_active=True,
         cage_object_name='CAGE',
-        max_ray_distance=0.3,
+        max_ray_distance = max_ray_distance,
         uv_layer_name = uv_layer_name,
     )
 
