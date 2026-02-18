@@ -19,7 +19,7 @@ if 'bpy' in sys.modules:
     from blend_converter.blender import blend_inspector
 
 
-def make_low_poly_and_cage():
+def make_low_poly_and_cage(target_triangles = 15000):
 
     high_poly = bpy_utils.get_view_layer_objects()[0]
     high_poly.name = 'HIGH'
@@ -29,13 +29,13 @@ def make_low_poly_and_cage():
 
     print()
     print('LOW POLY...')
-    low_poly = bpy_mesh.get_decimated_copy(high_poly, target_triangles = blend_inspector.get_value('target_triangles', 15000))
+    low_poly = bpy_mesh.get_decimated_copy(high_poly, target_triangles = target_triangles)
     apply_weighted_smooth(low_poly, sharp=False)
     low_poly.name = 'LOW'
 
     print()
     print('CAGE...')
-    bake_cage = bpy_mesh.make_bake_cage(low_poly, cage_offset = blend_inspector.get_value('cage_offset', 0.15))
+    bake_cage = bpy_mesh.make_bake_cage(low_poly)
     bake_cage.name = 'CAGE'
 
 
