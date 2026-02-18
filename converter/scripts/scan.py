@@ -99,3 +99,9 @@ def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Obje
         bpy.context.view_layer.objects.active = low
 
         bpy_bake.bake([high, low], settings)
+
+
+def delete_non_low_poly(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Object, bpy.types.Object]]'):
+
+    for high, _, cage in objects:
+        bpy.data.batch_remove([high, cage])

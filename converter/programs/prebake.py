@@ -39,6 +39,7 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
 
     program.run(blender, scripts_scan.the_bake, objects, result_dir)
 
+    program.run(blender, scripts_scan.delete_non_low_poly, objects)
 
     program.run(blender, save_as_mainfile, result_path)
 
