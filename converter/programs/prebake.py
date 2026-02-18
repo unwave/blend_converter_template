@@ -31,6 +31,8 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
         blender_executable = blender_executable
     )
 
+    program._prog_type = 'HIGH POLY ✂️'
+
     program.run(blender, open_mainfile, blend_path)
 
     program.run(blender, scripts_scan.make_low_poly_and_cage)
@@ -42,7 +44,11 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
     return program
 
 
-def get_prebake_kwargs(blender_executable: str, root = None):
+def get_prebake_kwargs(
+        blender_executable: str,
+        root = configuration.Folder.HIGH_POLY,
+        result_root = configuration.Folder.LOW_POLY,
+    ):
 
     from blend_converter import utils
 
@@ -52,31 +58,15 @@ def get_prebake_kwargs(blender_executable: str, root = None):
 
     for folder in asset_folders:
 
-        if folder.name.startswith('_'):  # temp or WIP assets to ignore
+        last_blend = utils.get_last_blend(folder)
+        if not last_blend:
             continue
 
-        high_poly_folder = os.path.join(folder, 'high_poly')
-        low_poly_folder = os.path.join(folder, 'low_poly')
-
-        if not os.path.exists(high_poly_folder):
-            continue
-
-        for file in os.scandir(high_poly_folder):
-
-            if not file.is_dir():
-                continue
-
-            last_blend = utils.get_last_blend(file.path)
-            if not last_blend:
-                continue
-
-            result_dir = os.path.join(low_poly_folder, file.name)
-
-            arguments.append(dict(
-                blender_executable = blender_executable,
-                blend_path = last_blend,
-                result_dir = result_dir,
-            ))
+        arguments.append(dict(
+            blender_executable = blender_executable,
+            blend_path = last_blend,
+            result_dir = os.path.join(result_root, folder.name),
+        ))
 
 
     return arguments
