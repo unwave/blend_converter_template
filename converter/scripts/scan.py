@@ -76,7 +76,7 @@ def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Obje
     uv_layer_name = bc_script.get_uuid1_hex()
 
     _settings = tool_settings.Bake(
-        resolution = 3000,
+        resolution = 4096,
         image_dir = os.path.join(result_dir, 'textures'),
         bake_types = bake_types,
         use_selected_to_active=True,
