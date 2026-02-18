@@ -38,7 +38,7 @@ def make_low_poly_and_cage(target_triangles = 15000):
 
         print(f"Creating low poly for: {name}")
         low = bpy_mesh.get_decimated_copy(high, target_triangles = target_triangles)
-        apply_weighted_smooth(low, sharp=False)
+        apply_weighted_smooth(low, sharp_degrees = 90 * 0.95)
         low.name = name + '(low poly)'
 
         print(f"Creating cage for: {name}")
