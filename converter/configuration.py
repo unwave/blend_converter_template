@@ -29,6 +29,9 @@ class Folder:
 
     ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
+    HIGH_POLY = os.path.join(ROOT, 'blends', 'high_poly')
+    LOW_POLY = os.path.join(ROOT, 'blends', 'low_poly')
+
     BLEND_STATIC = os.path.join(ROOT, 'blends', 'static')
     BLEND_SKELETAL = os.path.join(ROOT, 'blends', 'skeletal')
 
