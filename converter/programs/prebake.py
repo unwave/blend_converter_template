@@ -35,9 +35,10 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
 
     program.run(blender, open_mainfile, blend_path)
 
-    program.run(blender, scripts_scan.make_low_poly_and_cage)
+    objects = program.run(blender, scripts_scan.make_low_poly_and_cage)
 
-    program.run(blender, scripts_scan.the_bake, result_dir)
+    program.run(blender, scripts_scan.the_bake, objects, result_dir)
+
 
     program.run(blender, save_as_mainfile, result_path)
 

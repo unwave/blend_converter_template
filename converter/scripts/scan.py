@@ -1,5 +1,6 @@
 import sys
 import os
+import typing
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -21,22 +22,32 @@ if 'bpy' in sys.modules:
 
 def make_low_poly_and_cage(target_triangles = 15000):
 
-    high_poly = bpy_utils.get_view_layer_objects()[0]
-    high_poly.name = 'HIGH'
-    high_poly.color = (1, 0, 0, 1)
+    objects: typing.List[typing.Tuple[bpy.types.Object, bpy.types.Object, bpy.types.Object]] = []
 
-    bpy_context.call_for_object(high_poly, bpy.ops.object.shade_smooth, keep_sharp_edges = False)
+    for high in bpy_utils.get_view_layer_objects():
 
-    print()
-    print('LOW POLY...')
-    low_poly = bpy_mesh.get_decimated_copy(high_poly, target_triangles = target_triangles)
-    apply_weighted_smooth(low_poly, sharp=False)
-    low_poly.name = 'LOW'
+        if high.type != 'MESH':
+            continue
 
-    print()
-    print('CAGE...')
-    bake_cage = bpy_mesh.make_bake_cage(low_poly)
-    bake_cage.name = 'CAGE'
+        name = high.name
+
+        high.name = name + '(high poly)'
+        high.color = (1, 0, 0, 1)
+
+        bpy_context.call_for_object(high, bpy.ops.object.shade_smooth, keep_sharp_edges = False)
+
+        print(f"Creating low poly for: {name}")
+        low = bpy_mesh.get_decimated_copy(high, target_triangles = target_triangles)
+        apply_weighted_smooth(low, sharp=False)
+        low.name = name + '(low poly)'
+
+        print(f"Creating cage for: {name}")
+        cage = bpy_mesh.make_bake_cage(low)
+        cage.name = name + '(cage)'
+
+        objects.append((high, low, cage))
+
+    return objects
 
 
 def apply_weighted_smooth(object: 'bpy.types.Object', sharp = True, sharp_degrees = 45):
@@ -49,7 +60,7 @@ def apply_weighted_smooth(object: 'bpy.types.Object', sharp = True, sharp_degree
         bpy_modifier.apply_weighted_normal(object)
 
 
-def the_bake(result_dir: str):
+def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Object, bpy.types.Object]]', result_dir: str):
 
     from blend_converter.blender import bpy_bake
     from blend_converter.blender import bake_settings
@@ -64,25 +75,27 @@ def the_bake(result_dir: str):
 
     uv_layer_name = bc_script.get_uuid1_hex()
 
-    max_ray_distance = max(bpy.data.objects['LOW'].evaluated_get(bpy.context.evaluated_depsgraph_get()).dimensions) * 1/3
-
-    settings = tool_settings.Bake(
+    _settings = tool_settings.Bake(
         resolution = 3000,
         image_dir = os.path.join(result_dir, 'textures'),
         bake_types = bake_types,
         use_selected_to_active=True,
-        cage_object_name='CAGE',
-        max_ray_distance = max_ray_distance,
         uv_layer_name = uv_layer_name,
     )
 
-    bpy_uv.unwrap([bpy.data.objects['LOW']], uv_layer_name)
+    for high, low, cage in objects:
 
-    bpy_uv.pack([bpy.data.objects['LOW']], tool_settings.Pack_UVs(uv_layer_name=uv_layer_name))
+        settings = _settings._get_copy()
 
-    bpy_utils.convert_materials_to_principled([bpy.data.objects['LOW']])
+        settings.max_ray_distance = max(low.evaluated_get(bpy.context.evaluated_depsgraph_get()).dimensions) * 1/3
+        settings.cage_object_name = cage.name
 
-    bpy.context.view_layer.objects.active = bpy.data.objects['LOW']
-    objects = [bpy.data.objects['HIGH'], bpy.data.objects['LOW']]
+        bpy_uv.unwrap([low], uv_layer_name)
 
-    bpy_bake.bake(objects, settings)
+        bpy_uv.pack([low], tool_settings.Pack_UVs(uv_layer_name=uv_layer_name))
+
+        bpy_utils.convert_materials_to_principled([low])
+
+        bpy.context.view_layer.objects.active = low
+
+        bpy_bake.bake([high, low], settings)
