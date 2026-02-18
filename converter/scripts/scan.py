@@ -54,6 +54,7 @@ def the_bake(result_dir: str):
     from blend_converter.blender import bpy_bake
     from blend_converter.blender import bake_settings
     from blend_converter.blender import bpy_uv
+    from blend_converter.blender import bc_script
     import os
 
     bake_types = [
@@ -62,6 +63,8 @@ def the_bake(result_dir: str):
         [bake_settings.AO_Diffuse(), bake_settings.AOV(name='Inside_AO', is_color=False), bake_settings.AOV(name='Pointiness', is_color=False)]
     ]
 
+    uv_layer_name = bc_script.get_uuid1_hex()
+
     settings = tool_settings.Bake(
         resolution = 3000,
         image_dir = os.path.join(result_dir, 'textures'),
@@ -69,11 +72,12 @@ def the_bake(result_dir: str):
         use_selected_to_active=True,
         cage_object_name='CAGE',
         max_ray_distance=0.3,
+        uv_layer_name = uv_layer_name,
     )
 
-    bpy_uv.unwrap([bpy.data.objects['LOW']])
+    bpy_uv.unwrap([bpy.data.objects['LOW']], uv_layer_name)
 
-    bpy_uv.pack([bpy.data.objects['LOW']])
+    bpy_uv.pack([bpy.data.objects['LOW']], tool_settings.Pack_UVs(uv_layer_name=uv_layer_name))
 
     bpy_utils.convert_materials_to_principled([bpy.data.objects['LOW']])
 
