@@ -60,7 +60,6 @@ def the_bake(result_dir: str):
     bake_types = [
         bake_settings.Normal_Native(use_remove_inward_normals=True),
         bake_settings.Base_Color(),
-        [bake_settings.AO_Diffuse(), bake_settings.AOV(name='Inside_AO', is_color=False), bake_settings.AOV(name='Pointiness', is_color=False)]
     ]
 
     uv_layer_name = bc_script.get_uuid1_hex()
