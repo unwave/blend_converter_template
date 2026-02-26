@@ -40,12 +40,26 @@ def get_bone_custom_shapes():
     return shapes
 
 
+def get_mesh_deformers():
+
+    result: typing.Set[bpy.types.Object] = set()
+
+    for o in bpy.data.objects:
+        for modifier in o.modifiers:
+            if modifier.type == 'MESH_DEFORM' and modifier.object:
+                result.add(modifier.object)
+
+    return result
+
+
 def get_target_objects():
 
 
     objects: typing.List[bpy.types.Object] = []
 
     custom_shapes = get_bone_custom_shapes()
+
+    mesh_deformers = get_mesh_deformers()
 
 
     for o in bpy_utils.get_meshable_objects(bpy_utils.get_view_layer_objects()):
@@ -60,6 +74,9 @@ def get_target_objects():
             continue
 
         if o in custom_shapes:
+            continue
+
+        if o in mesh_deformers:
             continue
 
         if o.type == 'MESH' and not o.data.polygons:
