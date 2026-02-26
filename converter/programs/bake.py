@@ -186,6 +186,8 @@ def get_bake_program(
 
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bc_script
+    from blend_converter.blender import bpy_uv
+    from blend_converter.blender import bpy_utils
     from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
     from blend_converter import common
     from blend_converter import tool_settings
@@ -245,7 +247,7 @@ def get_bake_program(
 
     uv_layer_name = program.run(blender, bc_script.get_uuid1_hex)
 
-    program.run(blender, bc_script.unwrap,
+    program.run(blender, bpy_uv.unwrap,
         objects,
         uv_layer_name = uv_layer_name,
         uv_layer_reuse = 'REUSE',
@@ -257,14 +259,14 @@ def get_bake_program(
 
     program.run(blender, scripts_bake.convert_materials, objects)
 
-    pre_bake_labels = program.run(blender, bc_script.label_mix_shader_nodes, objects)
+    pre_bake_labels = program.run(blender, bpy_utils.label_mix_shader_nodes, objects)
 
     program.run(blender, bc_script.bisect_by_mirror_modifiers, objects)
 
-    program.run(blender, bc_script.scale_uv_to_world_per_uv_island, objects, uv_layer_name)
-    program.run(blender, bc_script.scale_uv_to_world_per_uv_layout, objects, uv_layer_name)
+    program.run(blender, bpy_uv.scale_uv_to_world_per_uv_island, objects, uv_layer_name)
+    program.run(blender, bpy_uv.scale_uv_to_world_per_uv_layout, objects, uv_layer_name)
 
-    objects = program.run(blender, bc_script.pack_copy_bake,
+    objects = program.run(blender, bpy_utils.pack_copy_bake,
         objects,
         get_bake_settings(
             config = program.config,
