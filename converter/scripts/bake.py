@@ -62,6 +62,9 @@ def get_target_objects():
         if o in custom_shapes:
             continue
 
+        if o.type == 'MESH' and not o.data.polygons:
+            continue
+
         objects.append(o)
 
     return objects
