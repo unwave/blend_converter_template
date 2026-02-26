@@ -21,7 +21,7 @@ if 'bpy' in sys.modules:
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_context
     from blend_converter.blender import bpy_action
-
+    from blend_converter.blender import bpy_material
 
 
 def get_bone_custom_shapes():
@@ -266,8 +266,8 @@ def delete_hidden_modifiers(objects: typing.List['bpy.types.Object']):
 
 def convert_materials(objects):
 
-    bpy_utils.convert_materials_to_principled(objects)
-    bpy_utils.make_material_independent_from_object(objects)
+    bpy_material.convert_materials_to_principled(objects)
+    bpy_material.make_material_independent_from_object(objects)
 
 
 def reveal_collections():

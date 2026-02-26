@@ -18,6 +18,7 @@ if 'bpy' in sys.modules:
     from blend_converter.blender import bpy_mesh
     from blend_converter.blender import bpy_modifier
     from blend_converter.blender import blend_inspector
+    from blend_converter.blender import bpy_material
 
 
 def make_low_poly_and_cage(target_triangles = 15000):
@@ -94,7 +95,7 @@ def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Obje
 
         bpy_uv.pack([low], tool_settings.Pack_UVs(uv_layer_name=uv_layer_name))
 
-        bpy_utils.convert_materials_to_principled([low])
+        bpy_material.convert_materials_to_principled([low])
 
         bpy.context.view_layer.objects.active = low
 

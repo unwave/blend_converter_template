@@ -22,6 +22,7 @@ if 'bpy' in sys.modules:
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_context
     from blend_converter import utils as bc_utils
+    from blend_converter.blender import bpy_material
 
 
 if 'unreal' in sys.modules:
@@ -150,7 +151,7 @@ def get_material_definitions_for_single_object():
 
 
     # standardize the materials
-    bpy_utils.convert_materials_to_principled([object])
+    bpy_material.convert_materials_to_principled([object])
     assert all(s.material and s.material.node_tree for s in object.material_slots)
 
 
