@@ -15,6 +15,7 @@ if 'bpy' in sys.modules:
     import bpy
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_context
+    from blend_converter.blender import bpy_modifier
 
 
 def is_using_uv_layer(node_tree: 'bpy.types.ShaderNodeTree', uv_layer_name: str):
@@ -193,7 +194,7 @@ def triangulate_geometry(objects: typing.Optional[typing.List['bpy.types.Object'
             modifier: bpy.types.TriangulateModifier = object.modifiers.new(name = 'triangulate_geometry', type='TRIANGULATE')
             modifier.quad_method = 'FIXED'  # says that this is the best for the keep normals
             modifier.keep_custom_normals = True
-            bpy.ops.object.modifier_apply(modifier=modifier.name)
+            bpy_modifier.apply_modifier(modifier)
 
 
 def get_top_layer_to_all_children_map():
