@@ -50,10 +50,10 @@ def get_target_objects():
 
     for o in bpy_utils.get_meshable_objects(bpy_utils.get_view_layer_objects()):
 
-        if o.name.startswith('#'):
+        if o.name.strip().startswith('#'):
             continue
 
-        if any(c.name.startswith('#') for c in o.users_collection):
+        if any(c.name.strip().startswith('#') for c in o.users_collection):
             continue
 
         if o.get(configuration.ATOOL_COLLISION_OBJECT_PROP_KEY) is not None:
