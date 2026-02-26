@@ -21,7 +21,7 @@ def convert_to_static_mesh(
     """ export as a fbx static mesh """
 
     from blend_converter.blender.executor import Blender
-    from blend_converter.blender import bc_script
+    from blend_converter.blender import bpy_utils
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter.blender.formats.gltf import export_gltf, S_GLTF
     from blend_converter import common
@@ -50,9 +50,9 @@ def convert_to_static_mesh(
     program.run(blender, scripts_export.convert_collisions_to_convex)
     program.run(blender, scripts_export.scene_clean_up)
     program.run(blender, scripts_export.remove_unused_uv_layouts)
-    program.run(blender, bc_script.remove_all_node_groups_from_materials)
+    program.run(blender, bpy_utils.remove_all_node_groups_from_materials)
     program.run(blender, scripts_export.remove_animations)
-    program.run(blender, bc_script.use_backface_culling)
+    program.run(blender, bpy_utils.use_backface_culling)
     program.run(blender, scripts_export.triangulate_geometry)
     program.run(blender, scripts_export.delete_unused_materials)
     program.run(blender, scripts_godot.rename_objects_for_godot, 'SM')
@@ -73,7 +73,7 @@ def convert_to_skeletal_mesh(
     """ export as a fbx skeletal mesh """
 
     from blend_converter.blender.executor import Blender
-    from blend_converter.blender import bc_script
+    from blend_converter.blender import bpy_utils
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter.blender.formats.gltf import export_gltf, S_GLTF
     from blend_converter import common
@@ -101,9 +101,9 @@ def convert_to_skeletal_mesh(
     program.run(blender, scripts_bake.reveal_collections)
     program.run(blender, scripts_export.scene_clean_up)
     program.run(blender, scripts_export.remove_unused_uv_layouts)
-    program.run(blender, bc_script.remove_all_node_groups_from_materials)
+    program.run(blender, bpy_utils.remove_all_node_groups_from_materials)
     program.run(blender, scripts_export.remove_animations)
-    program.run(blender, bc_script.use_backface_culling)
+    program.run(blender, bpy_utils.use_backface_culling)
     program.run(blender, scripts_export.triangulate_geometry)
     program.run(blender, scripts_export.delete_unused_materials)
     program.run(blender, scripts_bake.create_game_rig_and_bake_actions)
@@ -128,7 +128,6 @@ def convert_to_animation(
     """ export as an animation only fbx file """
 
     from blend_converter.blender.executor import Blender
-    from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter.blender.formats.gltf import export_gltf, S_GLTF
     from blend_converter import common

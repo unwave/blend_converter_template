@@ -66,7 +66,6 @@ def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Obje
     from blend_converter.blender import bpy_bake
     from blend_converter.blender import bake_settings
     from blend_converter.blender import bpy_uv
-    from blend_converter.blender import bc_script
     import os
 
     bake_types = [
@@ -74,7 +73,7 @@ def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Obje
         bake_settings.S_Base_Color(),
     ]
 
-    uv_layer_name = bc_script.get_uuid1_hex()
+    uv_layer_name = bpy_utils.get_uuid1_hex()
 
     _settings = tool_settings.S_Bake(
         resolution = 4096,

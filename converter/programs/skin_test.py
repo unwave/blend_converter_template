@@ -19,7 +19,7 @@ def get_skin_test(
     """ For iterative testing of skinning and weight panting quality, same as the baking but simplified and faster by disregarding materials """
 
     from blend_converter.blender.executor import Blender
-    from blend_converter.blender import bc_script
+    from blend_converter.blender import bpy_utils
     from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
     from blend_converter import common
     from blend_converter import utils
@@ -46,7 +46,7 @@ def get_skin_test(
 
     program.run(blender, scripts_bake.reset_timeline)
     program.run(blender, scripts_bake.apply_modifiers, objects, '.*', ignore_type = ['ARMATURE'])
-    program.run(blender, bc_script.apply_scale, objects)
+    program.run(blender, bpy_utils.apply_scale, objects)
     program.run(blender, scripts_bake.join_objects)
 
     program.run(blender, save_as_mainfile, result_path)

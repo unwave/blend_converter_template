@@ -185,7 +185,6 @@ def get_bake_program(
     """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
 
     from blend_converter.blender.executor import Blender
-    from blend_converter.blender import bc_script
     from blend_converter.blender import bpy_uv
     from blend_converter.blender import bpy_utils
     from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
@@ -243,9 +242,9 @@ def get_bake_program(
     program.run(blender, scripts_bake.apply_modifiers, objects, ignore_type = ignore_type)
 
 
-    program.run(blender, bc_script.clean_up_topology_and_triangulate_ngons, objects)
+    program.run(blender, bpy_utils.clean_up_topology_and_triangulate_ngons, objects)
 
-    uv_layer_name = program.run(blender, bc_script.get_uuid1_hex)
+    uv_layer_name = program.run(blender, bpy_utils.get_uuid1_hex)
 
     program.run(blender, bpy_uv.unwrap,
         objects,
@@ -261,7 +260,7 @@ def get_bake_program(
 
     pre_bake_labels = program.run(blender, bpy_utils.label_mix_shader_nodes, objects)
 
-    program.run(blender, bc_script.bisect_by_mirror_modifiers, objects)
+    program.run(blender, bpy_utils.bisect_by_mirror_modifiers, objects)
 
     program.run(blender, bpy_uv.scale_uv_to_world_per_uv_island, objects, uv_layer_name)
     program.run(blender, bpy_uv.scale_uv_to_world_per_uv_layout, objects, uv_layer_name)
@@ -282,13 +281,13 @@ def get_bake_program(
 
     program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE, ignore_type = ignore_type)
 
-    program.run(blender, bc_script.apply_scale, objects)
+    program.run(blender, bpy_utils.apply_scale, objects)
     program.run(blender, scripts_bake.join_objects)
 
     if is_skeletal:
          program.run(blender, scripts_bake.unassign_deform_bones_with_missing_weights)
 
-    program.run(blender, bc_script.select_uv_layer, objects, uv_layer_name)
+    program.run(blender, bpy_utils.select_uv_layer, objects, uv_layer_name)
     program.run(blender, scripts_bake.hide_non_target_objects)
 
     program.run(blender, scripts_bake.make_paths_relative)

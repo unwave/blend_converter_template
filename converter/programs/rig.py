@@ -20,7 +20,7 @@ def get_rig(
     """ for use a linked rig + mesh for creating animations """
 
     from blend_converter.blender.executor import Blender
-    from blend_converter.blender import bc_script
+    from blend_converter.blender import bpy_utils
     from blend_converter.blender.formats.blend import open_mainfile
     from blend_converter import common
 
@@ -43,8 +43,8 @@ def get_rig(
     program.run(blender, open_mainfile, blend_path)
 
     program.run(blender, scripts_export.remove_unused_uv_layouts)
-    program.run(blender, bc_script.remove_all_node_groups_from_materials)
-    program.run(blender, bc_script.use_backface_culling)
+    program.run(blender, bpy_utils.remove_all_node_groups_from_materials)
+    program.run(blender, bpy_utils.use_backface_culling)
     program.run(blender, scripts_bake.validate_root_bones)
 
     program.run(blender, scripts_export.save_blend_with_repack, result_path)
