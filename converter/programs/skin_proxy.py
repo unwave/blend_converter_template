@@ -21,7 +21,7 @@ def get_skin_proxy(
 
     from blend_converter.blender.executor import Blender
     from blend_converter.blender.formats.blend import open_mainfile
-    from blend_converter.blender.formats.fbx import export_fbx, Settings_Fbx
+    from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
     from blend_converter import common
     from blend_converter import utils
 
@@ -46,7 +46,7 @@ def get_skin_proxy(
     program.run(blender, scripts_rig.convert_rig_proxy)
     program.run(blender, scripts_export.scene_clean_up)
 
-    program.run(blender, export_fbx, result_path, Settings_Fbx(bake_anim = False, object_types = {'MESH'}, use_mesh_modifiers = False, use_selection = True))
+    program.run(blender, export_fbx, result_path, S_Fbx(bake_anim = False, object_types = {'MESH'}, use_mesh_modifiers = False, use_selection = True))
 
     return program
 

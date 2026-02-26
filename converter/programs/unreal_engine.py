@@ -38,7 +38,7 @@ def convert_to_unreal_static_mesh(
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
-    from blend_converter.blender.formats.fbx import export_fbx, Settings_Fbx
+    from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
     from blend_converter import common
     from blend_converter import utils
 
@@ -82,13 +82,13 @@ def convert_to_unreal_static_mesh(
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 
-    program.run(blender, export_fbx, fbx_path, Settings_Fbx(
+    program.run(blender, export_fbx, fbx_path, S_Fbx(
         mesh_smooth_type = 'SMOOTH_GROUP'
     ))
 
     _, stem, _ = utils.split_path(fbx_path)
 
-    fbx_settings = scripts_unreal.Settings_Unreal_Fbx(
+    fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
         dist_name = stem,
         dist_dir = Hierarchy.join(Hierarchy.STATIC, stem),
@@ -112,7 +112,7 @@ def convert_to_unreal_skeletal_mesh(
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
-    from blend_converter.blender.formats.fbx import export_fbx, Settings_Fbx
+    from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
     from blend_converter import common
     from blend_converter import utils
 
@@ -162,7 +162,7 @@ def convert_to_unreal_skeletal_mesh(
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 
-    program.run(blender, export_fbx, fbx_path, Settings_Fbx(
+    program.run(blender, export_fbx, fbx_path, S_Fbx(
         add_leaf_bones = False,
         bake_anim=False,
         mesh_smooth_type = 'SMOOTH_GROUP',
@@ -170,7 +170,7 @@ def convert_to_unreal_skeletal_mesh(
 
     _, stem, _ = utils.split_path(fbx_path)
 
-    fbx_settings = scripts_unreal.Settings_Unreal_Fbx(
+    fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
         dist_name = stem,
         dist_dir = Hierarchy.join(Hierarchy.SKELETAL, stem),
@@ -195,7 +195,7 @@ def convert_to_unreal_animation(
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
-    from blend_converter.blender.formats.fbx import export_fbx, Settings_Fbx
+    from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
     from blend_converter import common
 
     blend_path = common.File(blend_path)
@@ -231,7 +231,7 @@ def convert_to_unreal_animation(
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 
-    program.run(blender, export_fbx, fbx_path, Settings_Fbx(
+    program.run(blender, export_fbx, fbx_path, S_Fbx(
         add_leaf_bones = False,
         # bake_anim_force_startend_keying=True,
         # bake_anim_use_all_bones=False,
@@ -240,7 +240,7 @@ def convert_to_unreal_animation(
     ))
 
 
-    ue_fbx_settings = scripts_unreal.Settings_Unreal_Fbx(
+    ue_fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
         dist_dir =  Hierarchy.join(Hierarchy.ANIM, rig_name),
         dist_name = f'A_{rig_name}_{animation_name}',

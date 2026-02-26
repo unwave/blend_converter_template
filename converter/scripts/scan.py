@@ -70,13 +70,13 @@ def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Obje
     import os
 
     bake_types = [
-        bake_settings.Normal_Native(use_remove_inward_normals=True),
-        bake_settings.Base_Color(),
+        bake_settings.S_Normal_Native(use_remove_inward_normals=True),
+        bake_settings.S_Base_Color(),
     ]
 
     uv_layer_name = bc_script.get_uuid1_hex()
 
-    _settings = tool_settings.Bake(
+    _settings = tool_settings.S_Bake(
         resolution = 4096,
         image_dir = os.path.join(result_dir, 'textures'),
         bake_types = bake_types,
@@ -93,7 +93,7 @@ def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Obje
 
         bpy_uv.unwrap([low], uv_layer_name)
 
-        bpy_uv.pack([low], tool_settings.Pack_UVs(uv_layer_name=uv_layer_name))
+        bpy_uv.pack([low], tool_settings.S_Pack_UVs(uv_layer_name=uv_layer_name))
 
         bpy_material.convert_materials_to_principled([low])
 

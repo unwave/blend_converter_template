@@ -20,11 +20,11 @@ def get_unwrap_settings(config: gui_config.Config):
 
     if config.quality.preset == 'preview':
 
-        return tool_settings.Unwrap_UVs()
+        return tool_settings.S_Unwrap_UVs()
 
     else:
 
-        settings = tool_settings.Unwrap_UVs(
+        settings = tool_settings.S_Unwrap_UVs(
             use_brute_force_unwrap = False,
         )
 
@@ -51,13 +51,13 @@ def get_uv_pack_settings(config: gui_config.Config):
 
     if config.quality.preset == 'preview':
 
-        return tool_settings.Pack_UVs(
+        return tool_settings.S_Pack_UVs(
             # TODO: add use the efficient packer engine setting
         )
 
     else:
 
-        settings = tool_settings.Pack_UVs(
+        settings = tool_settings.S_Pack_UVs(
             use_uv_packer_for_pre_packing = config.blend_bake.uv_packer_pin,
             uv_packer_addon_pin_largest_island = config.blend_bake.uv_packer_pin,
         )
@@ -71,13 +71,13 @@ def get_ministry_of_flat_settings(config: gui_config.Config):
 
     if config.quality.preset == 'preview':
 
-        return tool_settings.Ministry_Of_Flat(
+        return tool_settings.S_Ministry_Of_Flat(
             ignore_default_settings = True,
             timeout = 10,
         )
 
     else:
-        return tool_settings.Ministry_Of_Flat(
+        return tool_settings.S_Ministry_Of_Flat(
             ignore_default_settings = True,
             timeout = config.uv_unwrap.timeout,
             use_normal = config.uv_unwrap.use_normal,
@@ -93,7 +93,7 @@ def get_texture_bake_settings(config: gui_config.Config, texture_name_prefix: st
 
     if config.quality.preset == 'preview':
 
-        return tool_settings.Bake(
+        return tool_settings.S_Bake(
             samples=1,
             texture_name_prefix = texture_name_prefix,
             use_smart_texture_interpolation = False,
@@ -101,7 +101,7 @@ def get_texture_bake_settings(config: gui_config.Config, texture_name_prefix: st
 
     else:
 
-        return tool_settings.Bake(
+        return tool_settings.S_Bake(
             resolution_multiplier = config.blend_bake.resolution_multiplier,
             samples = config.blend_bake.bake_samples,
             texture_name_prefix = texture_name_prefix
@@ -129,7 +129,7 @@ def get_bake_settings(*,
 
     if config.quality.preset == 'preview':
 
-        return tool_settings.Bake_Materials(
+        return tool_settings.S_Bake_Materials(
 
             ignore_default_settings = True,
             image_dir = textures_folder,
@@ -147,7 +147,7 @@ def get_bake_settings(*,
 
     else:
 
-        return tool_settings.Bake_Materials(
+        return tool_settings.S_Bake_Materials(
 
             ignore_default_settings = True,
             image_dir = textures_folder,

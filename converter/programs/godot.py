@@ -23,7 +23,7 @@ def convert_to_static_mesh(
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
-    from blend_converter.blender.formats.gltf import export_gltf, Settings_GLTF
+    from blend_converter.blender.formats.gltf import export_gltf, S_GLTF
     from blend_converter import common
 
 
@@ -58,7 +58,7 @@ def convert_to_static_mesh(
     program.run(blender, scripts_godot.rename_objects_for_godot, 'SM')
     program.run(blender, scripts_godot.add_export_timestamp)
 
-    program.run(blender, export_gltf, gltf_path, Settings_GLTF(export_format='GLTF_SEPARATE'))
+    program.run(blender, export_gltf, gltf_path, S_GLTF(export_format='GLTF_SEPARATE'))
 
     program.run(blender, scripts_godot.set_gd_import_script, gltf_path, 'res://test_import_script.gd')
 
@@ -75,7 +75,7 @@ def convert_to_skeletal_mesh(
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
-    from blend_converter.blender.formats.gltf import export_gltf, Settings_GLTF
+    from blend_converter.blender.formats.gltf import export_gltf, S_GLTF
     from blend_converter import common
     from blend_converter import utils
 
@@ -111,7 +111,7 @@ def convert_to_skeletal_mesh(
     program.run(blender, scripts_export.rename_all_armatures)
     program.run(blender, scripts_godot.add_export_timestamp)
 
-    program.run(blender, export_gltf, gltf_path, Settings_GLTF(export_format='GLTF_SEPARATE'))
+    program.run(blender, export_gltf, gltf_path, S_GLTF(export_format='GLTF_SEPARATE'))
 
     program.run(blender, scripts_godot.set_gd_import_script, gltf_path, 'res://test_import_script.gd')
 
@@ -130,7 +130,7 @@ def convert_to_animation(
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bc_script
     from blend_converter.blender.formats.blend import open_mainfile
-    from blend_converter.blender.formats.gltf import export_gltf, Settings_GLTF
+    from blend_converter.blender.formats.gltf import export_gltf, S_GLTF
     from blend_converter import common
 
     blend_path = common.File(blend_path)
@@ -158,7 +158,7 @@ def convert_to_animation(
     program.run(blender, scripts_export.delete_non_armature_objects)
     program.run(blender, scripts_export.rename_all_armatures)
 
-    program.run(blender, export_gltf, gltf_path, Settings_GLTF(export_format='GLTF_SEPARATE'))
+    program.run(blender, export_gltf, gltf_path, S_GLTF(export_format='GLTF_SEPARATE'))
 
     program.run(blender, scripts_godot.set_gd_import_script, gltf_path, 'res://test_import_script.gd')
 

@@ -560,7 +560,7 @@ def get_animation_import_data(asset_path: str) -> unreal.FbxAnimSequenceImportDa
 
 
 @dataclasses.dataclass
-class Settings_Unreal_Fbx(tool_settings.Settings):
+class S_Unreal_Fbx(tool_settings.Settings):
 
     fbx_path: str = ''
 
@@ -579,9 +579,9 @@ class Settings_Unreal_Fbx(tool_settings.Settings):
         return unreal.Paths.combine((self.dist_dir, self.dist_name))
 
 
-def import_static_mesh(settings: Settings_Unreal_Fbx):
+def import_static_mesh(settings: S_Unreal_Fbx):
 
-    settings = Settings_Unreal_Fbx._from_dict(settings)
+    settings = S_Unreal_Fbx._from_dict(settings)
 
 
     options = unreal.FbxImportUI()
@@ -616,9 +616,9 @@ def import_static_mesh(settings: Settings_Unreal_Fbx):
     unreal.log(f"Static Mesh imported: {settings}")
 
 
-def import_skeletal_mesh(settings: Settings_Unreal_Fbx):
+def import_skeletal_mesh(settings: S_Unreal_Fbx):
 
-    settings = Settings_Unreal_Fbx._from_dict(settings)
+    settings = S_Unreal_Fbx._from_dict(settings)
 
     options = unreal.FbxImportUI()
 
@@ -652,9 +652,9 @@ def import_skeletal_mesh(settings: Settings_Unreal_Fbx):
     unreal.log(f"Skeletal Mesh imported: {settings}")
 
 
-def import_skeleton(settings: Settings_Unreal_Fbx):
+def import_skeleton(settings: S_Unreal_Fbx):
 
-    settings = Settings_Unreal_Fbx._from_dict(settings)
+    settings = S_Unreal_Fbx._from_dict(settings)
 
     options = unreal.FbxImportUI()
 
@@ -679,9 +679,9 @@ def import_skeleton(settings: Settings_Unreal_Fbx):
     unreal.log(f"Skeletal Mesh imported: {settings}")
 
 
-def import_anim_sequence(settings: Settings_Unreal_Fbx):
+def import_anim_sequence(settings: S_Unreal_Fbx):
 
-    settings = Settings_Unreal_Fbx._from_dict(settings)
+    settings = S_Unreal_Fbx._from_dict(settings)
 
 
     options = unreal.FbxImportUI()
