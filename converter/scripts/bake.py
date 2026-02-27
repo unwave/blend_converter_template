@@ -52,6 +52,19 @@ def get_mesh_deformers():
     return result
 
 
+def will_have_polygons(object: 'bpy.types.Object'):
+
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+
+    evaluated_object = object.evaluated_get(depsgraph)
+
+    mesh = bpy.data.meshes.new_from_object(evaluated_object, depsgraph=depsgraph)
+    has_polygons = bool(len(mesh.polygons))
+    bpy.data.meshes.remove(mesh)
+
+    return has_polygons
+
+
 def get_target_objects():
 
 
@@ -80,6 +93,9 @@ def get_target_objects():
             continue
 
         if o.type == 'MESH' and not o.data.polygons:
+            continue
+
+        if o.type != 'MESH' and not will_have_polygons(o):
             continue
 
         objects.append(o)
