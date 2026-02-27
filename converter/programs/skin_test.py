@@ -47,7 +47,7 @@ def get_skin_test(
     program.run(blender, scripts_bake.reset_timeline)
     program.run(blender, scripts_bake.apply_modifiers, objects, '.*', ignore_type = ['ARMATURE'])
     program.run(blender, bpy_utils.apply_scale, objects)
-    program.run(blender, scripts_bake.join_objects)
+    program.run(blender, scripts_bake.join_objects, objects)
 
     program.run(blender, save_as_mainfile, result_path)
 

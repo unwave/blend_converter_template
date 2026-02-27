@@ -173,7 +173,7 @@ def ensure_name(object: 'bpy.types.Object', name: str):
     assert object.data.name == name
 
 
-def join_objects():
+def join_objects(objects: typing.List['bpy.types.Object']):
     """
     All mesh objects inside a collection will be joined into a single one, but if a collection starts with:
 
@@ -187,7 +187,7 @@ def join_objects():
 
     def traverse_passthrough_collection(layer_collection: bpy.types.LayerCollection):
 
-        objects = []
+        objects: typing.List[bpy.types.Object] = []
 
         if not layer_collection.name.startswith('-'):
             return objects
@@ -203,6 +203,20 @@ def join_objects():
         return objects
 
 
+    def get_target_objects(layer_collection: bpy.types.LayerCollection):
+
+        result: typing.List[bpy.types.Object] = []
+
+        result.extend(layer_collection.collection.objects)
+
+        for child_layer in layer_collection.children:
+            result.extend(traverse_passthrough_collection(child_layer))
+
+        result = [o for o in result if o in objects]
+
+        return bc_utils.deduplicate(result)
+
+
     def traverse(layer_collection: bpy.types.LayerCollection):
 
         result = []
@@ -210,21 +224,15 @@ def join_objects():
         if layer_collection.collection.name.startswith(configuration.IGNORE_PREFIX):
             return result
 
-        objects = list(layer_collection.collection.objects)
-
-        for child_layer in layer_collection.children:
-            objects.extend(traverse_passthrough_collection(child_layer))
-
-        meshable_objects = bpy_utils.get_meshable_objects(bc_utils.deduplicate(objects))
-
+        target_objects = get_target_objects(layer_collection)
 
         if layer_collection.name.startswith('!'):
-            result.extend(meshable_objects)
-        elif meshable_objects:
+            result.extend(target_objects)
+        elif target_objects:
             empty_origin = next((o for o in layer_collection.collection.objects if o.type == 'EMPTY' and o.name.startswith(configuration.ORIGIN_PREFIX)), None)
 
             armatures = []
-            for object in meshable_objects:
+            for object in target_objects:
                 for modifier in reversed(object.modifiers):
                     if modifier.type == 'ARMATURE':
                         modifier.show_viewport = False
@@ -239,9 +247,9 @@ def join_objects():
 
             if empty_origin:
                 origin = convert_empty_to_mesh(empty_origin)
-                joined_object = bpy_utils.join_objects(meshable_objects, join_into=origin, name=layer_collection.name)
+                joined_object = bpy_utils.join_objects(target_objects, join_into=origin, name=layer_collection.name)
             else:
-                joined_object = bpy_utils.join_objects(meshable_objects, name=layer_collection.name)
+                joined_object = bpy_utils.join_objects(target_objects, name=layer_collection.name)
 
             if armature:
                 joined_object.modifiers.new(name = 'Armature', type = 'ARMATURE').object = armature

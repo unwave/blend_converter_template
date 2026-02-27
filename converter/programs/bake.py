@@ -278,7 +278,7 @@ def get_bake_program(
     program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE, ignore_type = ignore_type)
 
     program.run(blender, bpy_utils.apply_scale, objects)
-    program.run(blender, scripts_bake.join_objects)
+    program.run(blender, scripts_bake.join_objects, objects)
 
     if is_skeletal:
          program.run(blender, scripts_bake.unassign_deform_bones_with_missing_weights)
