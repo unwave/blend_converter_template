@@ -284,12 +284,6 @@ def delete_hidden_modifiers(objects: typing.List['bpy.types.Object']):
                 object.modifiers.remove(modifier)
 
 
-def convert_materials(objects):
-
-    bpy_material.convert_materials_to_principled(objects)
-    bpy_material.make_material_independent_from_object(objects)
-
-
 def reveal_collections():
     """
     Recursively traverse and unhide collections according to the ignore prefix.

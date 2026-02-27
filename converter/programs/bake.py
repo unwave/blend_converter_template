@@ -112,7 +112,6 @@ def get_bake_settings(*,
             config: gui_config.Config,
             uv_layer_name: str,
             textures_folder: str,
-            pre_bake_labels: list,
             texel_density: int = None,
             max_resolution: int = None,
         ):
@@ -142,7 +141,6 @@ def get_bake_settings(*,
             ao_bake_use_normals = False,
 
             uv_layer_bake = uv_layer_name,
-            convert_materials = False,  # converting earlier
         )
 
     else:
@@ -159,10 +157,7 @@ def get_bake_settings(*,
             denoise_all = True,
             faster_ao_bake = config.blend_bake.faster_ao_bake,
 
-            pre_bake_labels = pre_bake_labels,
-
             uv_layer_bake = uv_layer_name,
-            convert_materials = False,  # converting earlier
         )
 
 
@@ -256,28 +251,29 @@ def get_bake_program(
 
     program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_UNWRAP, ignore_type = ignore_type)
 
-    program.run(blender, scripts_bake.convert_materials, objects)
-
-    pre_bake_labels = program.run(blender, bpy_utils.label_mix_shader_nodes, objects)
-
     program.run(blender, bpy_utils.bisect_by_mirror_modifiers, objects)
 
     program.run(blender, bpy_uv.scale_uv_to_world_per_uv_island, objects, uv_layer_name)
     program.run(blender, bpy_uv.scale_uv_to_world_per_uv_layout, objects, uv_layer_name)
 
-    objects = program.run(blender, bpy_utils.pack_copy_bake,
+    tasks = program.run(blender, bpy_utils.pack_and_task,
         objects,
         get_bake_settings(
             config = program.config,
             uv_layer_name = uv_layer_name,
             textures_folder = textures_folder,
-            pre_bake_labels = pre_bake_labels,
             texel_density = texel_density,
             max_resolution = max_resolution,
         ),
         bake_settings = get_texture_bake_settings(program.config, get_texture_prefix(blend_path.dir_name)),
         pack_settings = get_uv_pack_settings(program.config),
     )
+
+    pre_bake_labels = program.run(blender, bpy_utils.label_mix_shader_nodes, objects)
+
+    program.run(blender, bpy_utils.copy_and_bake, objects, tasks, pre_bake_labels = pre_bake_labels)
+
+    program.run(blender, bpy_utils.assign_new_materials, objects, tasks)
 
     program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE, ignore_type = ignore_type)
 
