@@ -43,9 +43,12 @@ def main(definitions: typing.List[common.Program_Definition]):
     ]
     app = updater_ui.Main_Frame.get_app(definitions, columns)
 
-    app.main_frame.updater.total_max_parallel_executions = os.cpu_count()
-    app.main_frame.updater.default_max_parallel_executions = os.cpu_count()
-    app.main_frame.updater.set_max_parallel_executions_per_program_tag('gltf', 8)
+    import psutil
+    physical_core_count = psutil.cpu_count(logical=False)
+
+    app.main_frame.updater.total_max_parallel_executions = physical_core_count
+    app.main_frame.updater.default_max_parallel_executions = physical_core_count
+    app.main_frame.updater.set_max_parallel_executions_per_program_tag('gltf', physical_core_count)
     app.main_frame.updater.set_max_parallel_executions_per_program_tag('unreal', 1)
 
     if not is_using_terminal:
