@@ -54,6 +54,10 @@ class Folder:
     INTERMEDIATE_UNREAL_SKELETAL = os.path.join(ROOT, 'intermediate', 'unreal', 'skeletal')
     INTERMEDIATE_UNREAL_ANIMATION = os.path.join(ROOT, 'intermediate', 'unreal', 'animation')
 
+    UNREAL_STATIC = '/Game/blend_converter/static/'
+    UNREAL_SKELETAL = '/Game/blend_converter/skeletal/'
+    UNREAL_ANIMATION = '/Game/blend_converter/animation/'
+
 
 def get_folders(folder: os.PathLike):
     if os.path.exists(folder):

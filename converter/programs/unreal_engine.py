@@ -15,9 +15,9 @@ from scripts import unreal_engine as scripts_unreal
 
 class Hierarchy:
 
-    STATIC = '/Game/static_meshes/'
-    SKELETAL = '/Game/skeletal_meshes/'
-    ANIM = '/Game/animations/'
+    STATIC = configuration.Folder.UNREAL_STATIC
+    SKELETAL = configuration.Folder.UNREAL_SKELETAL
+    ANIM = configuration.Folder.UNREAL_ANIMATION
 
     @staticmethod
     def join(*paths):
