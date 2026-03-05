@@ -98,7 +98,10 @@ def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Obje
 
         bpy.context.view_layer.objects.active = low
 
-        bpy_bake.bake([high, low], settings)
+        images = bpy_bake.bake([high, low], settings)
+
+        low.data.materials.clear()
+        low.data.materials.append(bpy_material.create_material(low.name, uv_layer_name, images, k_map_identifier=settings._K_MAP_IDENTIFIER))
 
 
 def delete_non_low_poly(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Object, bpy.types.Object]]'):
