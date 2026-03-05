@@ -50,9 +50,9 @@ class Folder:
     GODOT_GLTF_SKELETAL = os.path.join(ROOT, 'godot', 'gltf', 'skeletal')
     GODOT_GLTF_ANIMATION = os.path.join(ROOT, 'godot', 'gltf', 'animation')
 
-    INTERMEDIATE_UNREAL_SM = os.path.join(ROOT, 'intermediate', 'unreal', 'SM')
-    INTERMEDIATE_UNREAL_SK = os.path.join(ROOT, 'intermediate', 'unreal', 'SK')
-    INTERMEDIATE_UNREAL_A = os.path.join(ROOT, 'intermediate', 'unreal', 'A')
+    INTERMEDIATE_UNREAL_STATIC = os.path.join(ROOT, 'intermediate', 'unreal', 'static')
+    INTERMEDIATE_UNREAL_SKELETAL = os.path.join(ROOT, 'intermediate', 'unreal', 'skeletal')
+    INTERMEDIATE_UNREAL_ANIMATION = os.path.join(ROOT, 'intermediate', 'unreal', 'animation')
 
 
 def get_folders(folder: os.PathLike):
