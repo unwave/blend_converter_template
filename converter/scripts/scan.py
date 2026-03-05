@@ -105,3 +105,9 @@ def delete_non_low_poly(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy
 
     for high, _, cage in objects:
         bpy.data.batch_remove([high, cage])
+
+
+def convert_to_mesh():
+
+    for object in bpy_utils.get_meshable_objects(bpy_utils.get_view_layer_objects()):
+        bpy_utils.convert_to_mesh(object)
