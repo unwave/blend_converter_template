@@ -16,16 +16,21 @@ if 'bpy' in sys.modules:
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_context
     from blend_converter.blender import bpy_modifier
+    from blend_converter.blender import bpy_uv
 
 
-def is_using_uv_layer(node_tree: 'bpy.types.ShaderNodeTree', uv_layer_name: str):
+def is_using_uv_layer(object: 'bpy.types.Object', node_tree: 'bpy.types.ShaderNodeTree', uv_layer_name: str):
 
     from blend_converter.blender import bpy_node
 
     tree = bpy_node.Shader_Tree_Wrapper(node_tree)
 
     for node in tree.output.descendants:
+
         if node.be('ShaderNodeUVMap') and uv_layer_name == node.uv_map:
+            return True
+
+        if node.be('ShaderNodeTexImage') and not node.inputs[0].connections and uv_layer_name == bpy_uv.get_active_render_uv_layer(object).name:
             return True
 
     return False
@@ -52,7 +57,7 @@ def remove_unused_uv_layouts():
                 if not material.node_tree:
                     continue
 
-                if is_using_uv_layer(material.node_tree, uv_layer_name):
+                if is_using_uv_layer(object, material.node_tree, uv_layer_name):
                     break
             else:
                 object.data.uv_layers.remove(object.data.uv_layers[uv_layer_name])
