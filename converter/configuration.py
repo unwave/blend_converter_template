@@ -40,11 +40,11 @@ class Folder:
 
     BLEND_PROXY = os.path.join(ROOT, 'blends', 'proxy')
 
-    INTERMEDIATE_BLEND_STATIC = os.path.join(ROOT, 'intermediate', 'blend', 'static')
-    INTERMEDIATE_BLEND_SKELETAL = os.path.join(ROOT, 'intermediate', 'blend', 'skeletal')
+    INTERMEDIATE_BLEND_STATIC = os.path.join(ROOT, 'intermediate', 'blends', 'static')
+    INTERMEDIATE_BLEND_SKELETAL = os.path.join(ROOT, 'intermediate', 'blends', 'skeletal')
 
-    INTERMEDIATE_BLEND_SKIN_TEST = os.path.join(ROOT, 'intermediate', 'blend', 'skin_test')
-    INTERMEDIATE_BLEND_SKIN_PROXY = os.path.join(ROOT, 'intermediate', 'blend', 'skin_proxy')
+    INTERMEDIATE_BLEND_SKIN_TEST = os.path.join(ROOT, 'intermediate', 'blends', 'skin_test')
+    INTERMEDIATE_BLEND_SKIN_PROXY = os.path.join(ROOT, 'intermediate', 'blends', 'skin_proxy')
 
     GODOT_GLTF_STATIC = os.path.join(ROOT, 'godot', 'gltf', 'static')
     GODOT_GLTF_SKELETAL = os.path.join(ROOT, 'godot', 'gltf', 'skeletal')
