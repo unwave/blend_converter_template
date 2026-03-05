@@ -568,3 +568,30 @@ def convert_to_mesh_non_mesh_objects(objects: typing.List['bpy.types.Object']):
             mesh_objects.append(bpy_utils.convert_to_mesh(object))
 
     return mesh_objects
+
+
+def apply_particle_systems(objects: typing.List['bpy.types.Object']):
+
+    for object in objects:
+
+        for modifier in object.modifiers:
+
+            if modifier.type != 'PARTICLE_SYSTEM':
+                continue
+
+            with bpy_context.Focus(object), bpy_context.State() as state:
+
+                for other in object.modifiers:
+                    if other.name != modifier.name:
+                        state.set(other, 'show_viewport', False)
+
+                bpy.ops.object.duplicates_make_real()
+
+                object.modifiers.remove(modifier)
+
+
+def delete_empty_meshes(objects: typing.List['bpy.types.Object']):
+
+    for object in objects:
+        if object.type == 'MESH' and not object.data.vertices:
+            bpy.data.objects.remove(object)

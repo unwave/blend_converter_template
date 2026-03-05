@@ -222,6 +222,8 @@ def get_bake_program(
     program.run(blender, scripts_bake.find_missing)
     program.run(blender, scripts_bake.reveal_collections)
 
+    program.run(blender, scripts_bake.apply_particle_systems, program.run(blender, scripts_bake.get_target_objects))
+
     objects = program.run(blender, scripts_bake.get_target_objects)
 
 
@@ -236,6 +238,8 @@ def get_bake_program(
 
     program.run(blender, scripts_bake.apply_modifiers, objects, ignore_type = ignore_type)
 
+    program.run(blender, scripts_bake.delete_empty_meshes, program.run(blender, scripts_bake.get_target_objects))
+    objects = program.run(blender, scripts_bake.get_target_objects)
 
     program.run(blender, bpy_utils.clean_up_topology_and_triangulate_ngons, objects)
 
