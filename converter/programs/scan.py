@@ -31,7 +31,7 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
         blender_executable = blender_executable
     )
 
-    program._prog_type = 'HIGH POLY ✂️'
+    program._prog_type = 'SCAN 🗿'
 
     program.run(blender, open_mainfile, blend_path)
 
@@ -48,10 +48,10 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
     return program
 
 
-def get_prebake_kwargs(
+def get_scan_kwargs(
         blender_executable: str,
-        root = configuration.Folder.HIGH_POLY,
-        result_root = configuration.Folder.LOW_POLY,
+        root = configuration.Folder.SCAN,
+        result_root = configuration.Folder.INTERMEDIATE_SCAN,
     ):
 
     from blend_converter import utils

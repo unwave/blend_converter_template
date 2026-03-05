@@ -68,7 +68,7 @@ def get_program_paths():
         ue_animation = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'convert_to_unreal_animation', 'get_unreal_animation_kwargs'),
         skin_test = (os.path.join(ROOT, 'programs', 'skin_test.py'), 'get_skin_test', 'get_skin_test_kwargs'),
         skin_proxy = (os.path.join(ROOT, 'programs', 'skin_proxy.py'), 'get_skin_proxy', 'get_skin_proxy_kwargs'),
-        prebake = (os.path.join(ROOT, 'programs', 'prebake.py'), 'get_scan_program', 'get_prebake_kwargs'),
+        scan = (os.path.join(ROOT, 'programs', 'scan.py'), 'get_scan_program', 'get_scan_kwargs'),
         rig = (os.path.join(ROOT, 'programs', 'rig.py'), 'get_rig', 'get_rig_kwargs'),
     )
 
