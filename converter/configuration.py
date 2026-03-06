@@ -36,7 +36,7 @@ class Folder:
     BLEND_SKELETAL = os.path.join(ROOT, 'blends', 'skeletal')
 
     BLEND_RIG = os.path.join(ROOT, 'blends', 'rig')
-    BLEND_ANIM = os.path.join(ROOT, 'blends', 'anim')
+    BLEND_ANIMATION = os.path.join(ROOT, 'blends', 'animation')
 
     BLEND_PROXY = os.path.join(ROOT, 'blends', 'proxy')
 

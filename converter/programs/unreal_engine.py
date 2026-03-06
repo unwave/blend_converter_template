@@ -307,7 +307,7 @@ def get_skeletal_unreal_kwargs(
 
 def get_unreal_animation_kwargs(
             blender_executable: str,
-            root = configuration.Folder.BLEND_ANIM,
+            root = configuration.Folder.BLEND_ANIMATION,
             result_root = configuration.Folder.INTERMEDIATE_UNREAL_ANIMATION,
         ):
 

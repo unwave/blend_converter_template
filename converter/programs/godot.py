@@ -164,7 +164,7 @@ def convert_to_animation(
     return program
 
 
-def get_anim_programs(root = configuration.Folder.BLEND_ANIM):
+def get_anim_programs(root = configuration.Folder.BLEND_ANIMATION):
 
     from blend_converter import utils
     programs = utils.Appendable_Dict()
