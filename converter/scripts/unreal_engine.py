@@ -980,8 +980,6 @@ def join_all_mesh_objects(collection_name: str):
         bpy.context.view_layer.objects.active = list(mesh_objects)[0]
         bpy.ops.object.transform_apply()
         bpy.ops.object.join()
-
-    with bpy_context.Focus(bpy.context.view_layer.objects.active):
         bpy.ops.object.material_slot_remove_unused()
 
     all_objects = bpy_utils.get_view_layer_objects()
