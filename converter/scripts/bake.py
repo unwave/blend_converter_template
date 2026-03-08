@@ -421,12 +421,37 @@ def get_root_bones(armature: 'bpy.types.Object', k_deform_root = '__bc_deform_ro
     else:
         control_root_message = f"Assign a custom property of any type with name '{k_control_root}' to a single Edit bone to mark the control root bone."
 
-    raise Exception(
-        f"Fail to find a deform or a control root bones in a control armature."
+    bc_utils.print_in_color(bc_utils.get_color_code(224, 51, 29, 10, 10, 10),
+        f"Fail to find specified deform or control root bones in the control armature."
         "\n\t" f"Armature: '{armature.name_full}'"
         "\n\t" f"{deform_root_message}"
         "\n\t" f"{control_root_message}"
     )
+
+
+    tree = bpy_action.get_bone_tree(armature)
+
+    def get_descendants_count(bone: bpy.types.Bone):
+        return len(bpy_action.get_bone_descendants(tree, bone.name))
+
+    if not deform_root:
+        deform_bones = [b for b in armature.data.bones if b.use_deform]
+
+        deform_bones.sort(key=get_descendants_count)
+        deform_root = deform_bones[-1]
+
+    if not control_root:
+        control_parents = [b for b in deform_root.parent_recursive if not b.use_deform]
+        control_parents.sort(key=get_descendants_count)
+
+        if control_parents:
+            control_root = control_parents[-1]
+
+
+    if control_root:
+        return deform_root.name, control_root.name
+    else:
+        return deform_root.name, ''
 
 
 def validate_root_bones():
