@@ -351,7 +351,11 @@ def get_objects_for_armature(armature: 'bpy.types.Object'):
     objects: typing.List[bpy.types.Object] = []
 
     for object in bpy.data.objects:
-        if armature is object.parent:
+
+        if object.type != 'MESH':
+            continue
+
+        if armature is object.parent or any(m.type == 'ARMATURE' and m.object is armature for m in object.modifiers):
             objects.append(object)
 
     return objects
@@ -469,14 +473,15 @@ def create_game_rig_and_bake_actions():
         for action in bpy_utils.get_compatible_armature_actions([armature]):
             baked_actions.append(bpy_action.bake_single_action(armature, action, new))
 
+        with bpy_context.Focus(meshes + [new]):
+            bpy.context.view_layer.objects.active = new
+            bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+
         for mesh in meshes:
-
-            if mesh.parent == armature:
-                mesh.parent = new
-
             for modifier in mesh.modifiers:
                 if isinstance(modifier, bpy.types.ArmatureModifier):
-                    modifier.object = new
+                    if modifier.object == armature:
+                        modifier.object = new
 
         bpy.data.objects.remove(armature)
 
