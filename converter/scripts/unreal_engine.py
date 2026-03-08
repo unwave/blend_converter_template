@@ -993,7 +993,16 @@ def scale_armature(factor = 100):
 
     bpy.context.scene.tool_settings.use_keyframe_insert_auto = False  # this is for the inspection
 
+    if bpy.context.scene.unit_settings.system == 'NONE':
+        bpy.context.scene.unit_settings.scale_length = 1
+
+    bpy.context.scene.unit_settings.system = 'METRIC'
+
+    scale_length = bpy.context.scene.unit_settings.scale_length
+
     bpy.context.scene.unit_settings.scale_length = 1/factor
+
+    factor *= scale_length
 
     for window_manager in bpy.data.window_managers:
         for window in window_manager.windows:
