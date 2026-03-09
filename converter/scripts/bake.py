@@ -439,23 +439,33 @@ def get_root_bones(armature: 'bpy.types.Object', k_deform_root = '__bc_deform_ro
         return len(bpy_action.get_bone_descendants(tree, bone.name))
 
     if not deform_root:
-        deform_bones = [b for b in armature.data.bones if b.use_deform]
 
+        deform_bones = [b for b in armature.data.bones if b.use_deform]
         deform_bones.sort(key=get_descendants_count)
-        deform_root = deform_bones[-1]
+
+        if deform_bones:
+            deform_root_name = deform_bones[-1].name
+        else:
+            deform_root_name = ''
 
     if not control_root:
-        control_parents = [b for b in deform_root.parent_recursive if not b.use_deform]
+
+        if deform_root:
+            control_bones = deform_root.parent_recursive
+        else:
+            control_bones = armature.data.bones
+
+        control_parents = [b for b in control_bones if not b.use_deform]
         control_parents.sort(key=get_descendants_count)
 
         if control_parents:
-            control_root = control_parents[-1]
+            control_root_name = control_parents[-1].name
+        else:
+            control_root_name = ''
 
-
-    if control_root:
-        return deform_root.name, control_root.name
-    else:
-        return deform_root.name, ''
+    print("Deform root bone:", deform_root_name)
+    print("Control root bone:", control_root_name)
+    return deform_root_name, control_root_name
 
 
 def validate_root_bones():
@@ -488,6 +498,9 @@ def create_game_rig_and_bake_actions():
         meshes = get_objects_for_armature(armature)
 
         deform_root, control_root = get_root_bones(armature)
+
+        if not deform_root:
+            continue
 
         new = bpy_action.create_simplified_armature_and_constrain(armature, deform_root, control_root, meshes)
 
