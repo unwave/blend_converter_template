@@ -968,15 +968,9 @@ def limit_total_bone_weights(limit = 4):
                 bpy.ops.object.vertex_group_limit_total(group_select_mode='BONE_DEFORM', limit=limit)
 
 
-def join_all_mesh_objects(collection_name: str):
+def join_all_mesh_objects(collection_name: str, objects: typing.List['bpy.types.Object']):
 
-    view_layer_objects = bpy_utils.get_view_layer_objects()
-
-    collision_shapes = set(o for o in view_layer_objects if o.get(configuration.UNREAL_COLLISION_PROP_KEY))
-
-    mesh_objects = set(o for o in view_layer_objects if o.type == 'MESH')
-    mesh_objects -= get_bone_custom_shapes()
-    mesh_objects -= collision_shapes
+    mesh_objects = set(o for o in objects if o.type == 'MESH')
 
     with bpy_context.Focus(mesh_objects):
         bpy.context.view_layer.objects.active = list(mesh_objects)[0]
