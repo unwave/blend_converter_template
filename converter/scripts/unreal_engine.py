@@ -1016,6 +1016,8 @@ def scale_armature(factor = 100):
                             space_data.clip_start *= factor
                             space_data.clip_end *= factor
 
+    bpy_utils.make_object_data_unique(bpy.data.objects)
+
     with bpy_context.Focus(bpy.data.objects):
         bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
         bpy.ops.transform.resize(value=(factor, factor, factor))
