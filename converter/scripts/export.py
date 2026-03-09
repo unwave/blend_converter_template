@@ -166,40 +166,23 @@ def export_collections_as_fbx_static_meshes(result_dir: str):
             export_fbx(model_path, settings)
 
 
-def triangulate_geometry(objects: typing.Optional[typing.List['bpy.types.Object']] = None):
+def triangulate_geometry(objects: typing.Optional[typing.List['bpy.types.Object']]):
     """ Clean up and triangulate mesh objects in order to resolve an issue with complex N-gons being broken after FBX export. """
 
-    if objects is None:
-        objects = bpy_utils.get_view_layer_objects()
+    objects = bpy_utils.get_unique_mesh_objects(objects)
 
-    for object in bpy_utils.get_unique_mesh_objects(objects):
+    with bpy_context.Focus(objects, mode = 'EDIT'):
+        bpy.ops.mesh.reveal()
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.delete_loose()
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.dissolve_degenerate()
 
-        # the box collision must not be triangulated, Otherwise Unreal Engine doesn't recognize it
-        if object.get(configuration.UNREAL_COLLISION_PROP_KEY):
-            continue
-
-        if object.name.startswith('#'):
-            continue
-
-        if any(c.name.startswith('#') for c in object.users_collection):
-            continue
-
-        if object.get(configuration.ATOOL_COLLISION_OBJECT_PROP_KEY) is not None:
-            continue
-
-        with bpy_context.Focus(object):
-
-            with bpy_context.Focus(object, mode = 'EDIT'):
-                bpy.ops.mesh.reveal()
-                bpy.ops.mesh.select_all(action='SELECT')
-                bpy.ops.mesh.delete_loose()
-                bpy.ops.mesh.select_all(action='SELECT')
-                bpy.ops.mesh.dissolve_degenerate()
-
-            modifier: bpy.types.TriangulateModifier = object.modifiers.new(name = 'triangulate_geometry', type='TRIANGULATE')
-            modifier.quad_method = 'FIXED'  # says that this is the best for the keep normals
-            modifier.keep_custom_normals = True
-            bpy_modifier.apply_modifier(modifier)
+    for object in objects:
+        modifier: bpy.types.TriangulateModifier = object.modifiers.new(name = 'triangulate_geometry', type='TRIANGULATE')
+        modifier.quad_method = 'FIXED'  # says that this is the best for the keep normals
+        modifier.keep_custom_normals = True
+        bpy_modifier.apply_modifier(modifier)
 
 
 def get_top_layer_to_all_children_map():

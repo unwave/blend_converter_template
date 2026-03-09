@@ -86,6 +86,10 @@ def get_target_objects():
         if o.get(configuration.ATOOL_COLLISION_OBJECT_PROP_KEY) is not None:
             continue
 
+        # the box collision must not be triangulated, Otherwise Unreal Engine doesn't recognize it
+        if o.get(configuration.UNREAL_COLLISION_PROP_KEY) is not None:
+            continue
+
         if o in custom_shapes:
             continue
 
