@@ -23,6 +23,8 @@ if 'bpy' in sys.modules:
     from blend_converter.blender import bpy_context
     from blend_converter import utils as bc_utils
     from blend_converter.blender import bpy_material
+    from blend_converter.blender import bpy_action
+
 
 
 if 'unreal' in sys.modules:
@@ -1030,3 +1032,45 @@ def scale_armature(factor = 100):
 
 def get_frame_rate():
     return bpy.context.scene.render.fps / bpy.context.scene.render.fps_base
+
+
+def ensure_single_root_bone(name = f"__bc_root", assign_default_weights = False):
+    """ Create a default single root bone to satisfy the Unreal Engine's requirement. """
+
+    def are_all_vertices_have_groups(object: bpy.types.Object, bone_names: set[str]):
+        return all(not set(object.vertex_groups[group.group].name for group in v.groups).isdisjoint(bone_names) for v in object.data.vertices)
+
+    def create_root_vertex_group(object: bpy.types.Object, bone_names: set[str], root_bone_name: str):
+        default_group = object.vertex_groups.new(name = root_bone_name)
+        default_group.add([v.index for v in object.data.vertices if set(object.vertex_groups[group.group].name for group in v.groups).isdisjoint(bone_names)], 1, 'ADD')
+
+    for armature in bake_scripts.get_armature_objects():
+
+        tree = bpy_action.get_bone_tree(armature)
+
+        has_multiple_root_bones = len(tree[1]) > 1
+        if not has_multiple_root_bones:
+            continue
+
+        use_deform = False
+
+        if assign_default_weights:
+            meshes = bake_scripts.get_objects_for_armature(armature)
+            bone_names = {bone.name for bone in armature.data.bones}
+            for mesh in meshes:
+                if not are_all_vertices_have_groups(mesh, bone_names):
+                    create_root_vertex_group(mesh, bone_names, name)
+                    use_deform = use_deform or True
+
+        with bpy_context.Focus(armature, 'EDIT'):
+
+            edit_bones = armature.data.edit_bones
+
+            root_bone = edit_bones.new(name)
+            root_bone.use_deform = use_deform
+            root_bone.head = (0, 0, 0)
+            root_bone.tail = (0, 1, 0)
+
+            for bone in edit_bones:
+                if not bone.parent:
+                    bone.parent = root_bone
