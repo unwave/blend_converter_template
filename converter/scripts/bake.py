@@ -251,28 +251,11 @@ def join_objects(objects: typing.List['bpy.types.Object']):
         elif target_objects:
             empty_origin = next((o for o in layer_collection.collection.objects if o.type == 'EMPTY' and o.name.startswith(configuration.ORIGIN_PREFIX)), None)
 
-            armatures = []
-            for object in target_objects:
-                for modifier in reversed(object.modifiers):
-                    if modifier.type == 'ARMATURE':
-                        modifier.show_viewport = False
-                        armatures.append(modifier.object)
-                        break
-
-            if armatures:
-                assert len(set(armatures)) == 1
-                armature = armatures[0]
-            else:
-                armature = None
-
             if empty_origin:
                 origin = convert_empty_to_mesh(empty_origin)
                 joined_object = bpy_utils.join_objects(target_objects, join_into=origin, name=layer_collection.name)
             else:
                 joined_object = bpy_utils.join_objects(target_objects, name=layer_collection.name)
-
-            if armature:
-                joined_object.modifiers.new(name = 'Armature', type = 'ARMATURE').object = armature
 
             result.append(joined_object)
 
