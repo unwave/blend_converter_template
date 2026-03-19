@@ -81,7 +81,6 @@ def get_ministry_of_flat_settings(config: gui_config.Config):
             ignore_default_settings = True,
             timeout = config.uv_unwrap.timeout,
             use_normal = config.uv_unwrap.use_normal,
-            stretch = config.uv_unwrap.stretch,
             separate_hard_edges = config.uv_unwrap.separate_hard_edges,
         )
 

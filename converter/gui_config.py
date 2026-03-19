@@ -30,8 +30,6 @@ class UV_Unwrap:
 
     use_normal: bool = False
 
-    stretch: bool = True
-
     timeout: int = 10
 
     separate_hard_edges = False
