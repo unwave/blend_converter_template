@@ -11,6 +11,7 @@ import configuration
 import gui_config
 
 from scripts import bake as scripts_bake
+from scripts import custom_per_blend
 
 
 def get_unwrap_settings(config: gui_config.Config):
@@ -213,6 +214,8 @@ def get_bake_program(
 
     program.run(blender, scripts_bake.set_legacy_ik_solver)
     program.run(blender, scripts_bake.delete_undefined_nodes)
+
+    custom_per_blend.fix(blender, program)
 
     if is_skeletal:
         program.run(blender, scripts_bake.validate_root_bones)
