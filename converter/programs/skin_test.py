@@ -12,10 +12,11 @@ from scripts import bake as scripts_bake
 
 
 def get_skin_test(
-            blender_executable: str,
-            blend_path,
-            result_root = configuration.Folder.INTERMEDIATE_BLEND_SKIN_TEST,
-        ):
+        *,
+        blender_executable: str,
+        blend_path: str,
+        result_root: str,
+    ):
     """ For iterative testing of skinning and weight panting quality, same as the baking but simplified and faster by disregarding materials """
 
     from blend_converter.blender.executor import Blender
@@ -57,6 +58,7 @@ def get_skin_test(
 def get_skin_test_kwargs(
             blender_executable: str,
             root = configuration.Folder.BLEND_SKELETAL,
+            result_root = configuration.Folder.INTERMEDIATE_BLEND_SKIN_TEST,
         ):
 
     from blend_converter import utils
@@ -77,6 +79,7 @@ def get_skin_test_kwargs(
         arguments.append(dict(
             blender_executable = blender_executable,
             blend_path = last_blend,
+            result_root = result_root,
         ))
 
     return arguments

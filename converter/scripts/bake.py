@@ -77,6 +77,9 @@ def get_target_objects():
 
     for o in bpy_utils.get_meshable_objects(bpy_utils.get_view_layer_objects()):
 
+        if not o.visible_get():
+            continue
+
         if o.name.strip().startswith('#'):
             continue
 
