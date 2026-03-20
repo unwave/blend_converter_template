@@ -145,7 +145,7 @@ def convert_to_unreal_skeletal_mesh(
     program.run(blender, scripts_export.remove_animations)
     program.run(blender, bpy_utils.use_backface_culling)
     program.run(blender, scripts_export.delete_unused_materials)
-    program.run(blender, scripts_bake.create_game_rig_and_bake_actions)
+    program.run(blender, scripts_bake.create_game_rig_and_bake_actions, False)
     program.run(blender, scripts_unreal.ensure_single_root_bone)
 
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SK')

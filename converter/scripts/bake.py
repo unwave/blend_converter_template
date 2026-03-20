@@ -475,7 +475,50 @@ def add_copy_uniform_scale(bone: 'bpy.types.PoseBone', target: 'bpy.types.Object
     constraint.use_make_uniform = True
 
 
-def create_game_rig_and_bake_actions():
+
+def bake_animation(
+        armatures: typing.List['bpy.types.Object'],
+        frame_start: typing.Optional[int] = None,
+        frame_end: typing.Optional[int] = None,
+        step = 1,
+        do_reset_pose_to_rest = False,
+        settings: 'bpy_action.S_Action_Bake' = None
+    ):
+
+
+    with bpy_context.Focus(armatures):
+
+        if do_reset_pose_to_rest:
+            for object in armatures:
+                bpy_action.reset_pose_to_rest(object)
+
+        for object in armatures:
+            if not object.animation_data:
+                object.animation_data_create()
+
+
+        if frame_start is None:
+            frame_start = bpy.context.scene.frame_start
+
+        if frame_end is None:
+            frame_end = bpy.context.scene.frame_end
+
+
+        settings = bpy_action.S_Action_Bake()._update(settings)
+        for key in [key for key in bpy_action.S_Action_Bake.__dict__ if not key.startswith('_')]:
+            setattr(settings, key, getattr(settings, key))
+
+
+        from bpy_extras import anim_utils
+
+        return anim_utils.bake_action_objects(
+            [(a, None) for a in armatures],
+            frames = range(frame_start, frame_end + 1, step),
+            bake_options = anim_utils.BakeOptions(**settings._to_dict())
+        )[0]
+
+
+def create_game_rig_and_bake_actions(do_bake_animation = True):
 
     baked_actions = []
 
@@ -498,8 +541,12 @@ def create_game_rig_and_bake_actions():
         for collection in armature.users_collection:
             collection.objects.link(new)
 
-        for action in bpy_utils.get_compatible_armature_actions([armature]):
-            baked_actions.append(bpy_action.bake_single_action(armature, action, new))
+        if not bpy_utils.get_compatible_armature_actions([armature]):
+            print(f"No compatible animations found for the source armature: {armature.name_full}")
+
+        if do_bake_animation:
+            baked_actions.append(bake_animation([new]))
+
 
         with bpy_context.Focus(meshes + [new]):
             bpy.context.view_layer.objects.active = new
