@@ -18,12 +18,16 @@ from scripts import bake as bake_scripts
 
 
 if 'bpy' in sys.modules:
+
     import bpy
+    import mathutils
+
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_context
     from blend_converter import utils as bc_utils
     from blend_converter.blender import bpy_material
     from blend_converter.blender import bpy_action
+    from blend_converter.blender import bpy_uv
 
 
 
@@ -809,6 +813,42 @@ def get_face_group_map(mesh: 'bpy.types.Object'):
     return face_to_groups, group_to_faces
 
 
+def get_group_to_center(
+        mesh: 'bpy.types.Object',
+        names: typing.Set[str],
+        group_to_faces: typing.Dict[str, typing.Set[int]],
+        vertex_to_groups: typing.Dict[int, typing.Dict[int, float]]
+    ):
+
+    result: typing.Dict[str, mathutils.Vector] = {}
+
+    for name in names:
+
+        face_indexes = group_to_faces[name]
+        group_index = mesh.vertex_groups.get(name).index
+
+        locations: typing.List[mathutils.Vector] = []
+        weights: typing.List[float] = []
+
+        for index in face_indexes:
+            polygon = mesh.data.polygons[index]
+            locations.append(polygon.center)
+            weights.append(sum(vertex_to_groups[vertex].get(group_index, 0) for vertex in polygon.vertices) / len(polygon.vertices))
+
+        group_center = mathutils.Vector([
+            bpy_uv.get_weighted_percentile(tuple(map(operator.itemgetter(0), locations)), 0.5, weights),
+            bpy_uv.get_weighted_percentile(tuple(map(operator.itemgetter(1), locations)), 0.5, weights),
+            bpy_uv.get_weighted_percentile(tuple(map(operator.itemgetter(2), locations)), 0.5, weights),
+        ])
+
+        pairs = list(zip(face_indexes, locations))
+        pairs.sort(key = lambda x: (x[1] - group_center).length_squared)
+
+        result[name] = pairs[0][1]
+
+    return result
+
+
 def ensure_bone_count_limit_per_material(limit = 75, max_attempts = 50):
     """
     NOTE: Run `unassign_deform_bones_with_missing_weights` before this one.
@@ -852,6 +892,32 @@ def ensure_bone_count_limit_per_material(limit = 75, max_attempts = 50):
                 print(f"Bone count: {len(deform_group_names)}")
 
 
+                deform_groups = deform_group_names.intersection(group_to_faces)
+
+                vertex_to_groups: typing.Dict[int, typing.Dict[int, float]] = {vert.index: {g.group: g.weight for g in vert.groups} for vert in mesh.data.vertices}
+
+                group_to_center = get_group_to_center(mesh, deform_groups, group_to_faces, vertex_to_groups)
+
+                def get_sorted_face_indexes(group_name: str):
+                    group_center = group_to_center[group_name]
+                    polygons = mesh.data.polygons
+                    return sorted(group_to_faces[group_name], key = lambda i: (polygons[i].center - group_center).length_squared)
+
+                group_to_sorted_indexes = {name: get_sorted_face_indexes(name) for name in deform_groups}
+
+
+                def get_connected_groups(group_name: str):
+
+                    groups = set()
+
+                    for i in group_to_faces[group_name]:
+                        groups.update(deform_group_names.intersection(face_to_groups[i]))
+
+                    return len(groups)
+
+                group_to_connected_count = {name: get_connected_groups(name) for name in deform_groups}
+
+
                 has_over_limit_materials = True
                 attempt_count = 0
                 good_materials = set()
@@ -888,6 +954,7 @@ def ensure_bone_count_limit_per_material(limit = 75, max_attempts = 50):
 
                         bc_utils.print_in_color(bc_utils.get_color_code(224, 51, 29, 10, 10, 10),
                             f"Bone limit per material excited."
+                            "\n\t" f"Limit: {limit}"
                             "\n\t" f"Object: {mesh.name_full}"
                             "\n\t" f"Slot Index: {material_slot.slot_index}"
                             "\n\t" f"Material: {material_slot.material.name_full}"
@@ -902,23 +969,14 @@ def ensure_bone_count_limit_per_material(limit = 75, max_attempts = 50):
 
 
                         sorted_groups = list(groups)
-
-                        def get_connected_groups(group_name: str):
-
-                            groups = set()
-
-                            for i in group_to_faces[group_name]:
-                                groups.update(deform_group_names.intersection(face_to_groups[i]))
-
-                            return len(groups)
-
-                        sorted_groups.sort(key = get_connected_groups, reverse = True)
+                        sorted_groups.sort(key = group_to_connected_count.get, reverse = True)
 
 
                         def assign_new_material():
 
                             faces_assigned = 0
-                            half_of_faces = len(face_indexes) // 2
+                            groups_in_new_material = set()
+                            processed_faces = set()
 
                             for start in sorted_groups:
 
@@ -934,21 +992,29 @@ def ensure_bone_count_limit_per_material(limit = 75, max_attempts = 50):
 
                                     processed.add(group)
 
-                                    for i in sorted(group_to_faces[group]):
+                                    for i in group_to_sorted_indexes[group]:
 
                                         if not i in face_indexes:
+                                            continue
+
+                                        if i in processed_faces:
+                                            continue
+
+                                        processed_faces.add(i)
+
+                                        new_groups = deform_group_names.intersection(face_to_groups[i])
+
+                                        if len(new_groups | groups_in_new_material) > limit:
                                             continue
 
                                         mesh.data.polygons[i].material_index = new_slot.slot_index
                                         faces_assigned += 1
 
-                                        if faces_assigned >= half_of_faces:
-                                            return
+                                        groups_in_new_material.update(new_groups)
 
-                                        stack.extend(deform_group_names.intersection(face_to_groups[i]))
+                                        stack.extend(new_groups)
 
-                                    if len(processed) >= limit:
-                                        return
+
 
                         assign_new_material()
 
