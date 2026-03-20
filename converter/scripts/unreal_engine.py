@@ -835,11 +835,16 @@ def get_group_to_center(
             locations.append(polygon.center)
             weights.append(sum(vertex_to_groups[vertex].get(group_index, 0) for vertex in polygon.vertices) / len(polygon.vertices))
 
-        group_center = mathutils.Vector([
-            bpy_uv.get_weighted_percentile(tuple(map(operator.itemgetter(0), locations)), 0.5, weights),
-            bpy_uv.get_weighted_percentile(tuple(map(operator.itemgetter(1), locations)), 0.5, weights),
-            bpy_uv.get_weighted_percentile(tuple(map(operator.itemgetter(2), locations)), 0.5, weights),
-        ])
+        try:
+            group_center = mathutils.Vector([
+                bpy_uv.get_weighted_percentile(tuple(map(operator.itemgetter(0), locations)), 0.5, weights),
+                bpy_uv.get_weighted_percentile(tuple(map(operator.itemgetter(1), locations)), 0.5, weights),
+                bpy_uv.get_weighted_percentile(tuple(map(operator.itemgetter(2), locations)), 0.5, weights),
+            ])
+        except RuntimeWarning as e:
+            print(e)
+            group_center = sum((l for l in locations), start = mathutils.Vector()) / len(locations)
+
 
         pairs = list(zip(face_indexes, locations))
         pairs.sort(key = lambda x: (x[1] - group_center).length_squared)
@@ -849,7 +854,7 @@ def get_group_to_center(
     return result
 
 
-def ensure_bone_count_limit_per_material(limit = 75, max_attempts = 50):
+def ensure_bone_count_limit_per_material(limit = 75, max_attempts = 100):
     """
     NOTE: Run `unassign_deform_bones_with_missing_weights` before this one.
 
