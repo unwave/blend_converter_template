@@ -70,6 +70,7 @@ def get_program_paths():
         skin_proxy = (os.path.join(ROOT, 'programs', 'skin_proxy.py'), 'get_skin_proxy', 'get_skin_proxy_kwargs'),
         scan = (os.path.join(ROOT, 'programs', 'scan.py'), 'get_scan_program', 'get_scan_kwargs'),
         rig = (os.path.join(ROOT, 'programs', 'rig.py'), 'get_rig', 'get_rig_kwargs'),
+        panda3d = (os.path.join(ROOT, 'programs', 'panda3d_engine.py'), 'convert_to_static_mesh', 'get_panda3d_kwargs'),
     )
 
 

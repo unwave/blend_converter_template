@@ -29,8 +29,9 @@ class Folder:
 
     ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
+
+    ## blender source
     SCAN = os.path.join(ROOT, 'blends', 'scan')
-    INTERMEDIATE_SCAN = os.path.join(ROOT, 'intermediate', 'blends', 'scan')
 
     BLEND_STATIC = os.path.join(ROOT, 'blends', 'static')
     BLEND_SKELETAL = os.path.join(ROOT, 'blends', 'skeletal')
@@ -38,16 +39,23 @@ class Folder:
     BLEND_RIG = os.path.join(ROOT, 'blends', 'rig')
     BLEND_ANIMATION = os.path.join(ROOT, 'blends', 'animation')
 
+    # blender intermediate
+    INTERMEDIATE_SCAN = os.path.join(ROOT, 'intermediate', 'blends', 'scan')
+
     INTERMEDIATE_BLEND_STATIC = os.path.join(ROOT, 'intermediate', 'blends', 'static')
     INTERMEDIATE_BLEND_SKELETAL = os.path.join(ROOT, 'intermediate', 'blends', 'skeletal')
 
     INTERMEDIATE_BLEND_SKIN_TEST = os.path.join(ROOT, 'intermediate', 'blends', 'skin_test')
     INTERMEDIATE_BLEND_SKIN_PROXY = os.path.join(ROOT, 'intermediate', 'blends', 'skin_proxy')
 
+
+    ## godot
     GODOT_GLTF_STATIC = os.path.join(ROOT, 'godot', 'gltf', 'static')
     GODOT_GLTF_SKELETAL = os.path.join(ROOT, 'godot', 'gltf', 'skeletal')
     GODOT_GLTF_ANIMATION = os.path.join(ROOT, 'godot', 'gltf', 'animation')
 
+
+    ## unreal
     INTERMEDIATE_UNREAL_STATIC = os.path.join(ROOT, 'intermediate', 'unreal', 'static')
     INTERMEDIATE_UNREAL_SKELETAL = os.path.join(ROOT, 'intermediate', 'unreal', 'skeletal')
     INTERMEDIATE_UNREAL_ANIMATION = os.path.join(ROOT, 'intermediate', 'unreal', 'animation')
@@ -55,6 +63,17 @@ class Folder:
     UNREAL_STATIC = '/Game/blend_converter/static/'
     UNREAL_SKELETAL = '/Game/blend_converter/skeletal/'
     UNREAL_ANIMATION = '/Game/blend_converter/animation/'
+
+
+    ## panda3d
+    INTERMEDIATE_PANDA3D_STATIC = os.path.join(ROOT, 'intermediate', 'panda3d', 'static')
+    INTERMEDIATE_PANDA3D_SKELETAL = os.path.join(ROOT, 'intermediate', 'panda3d', 'skeletal')
+    INTERMEDIATE_PANDA3D_ANIMATION = os.path.join(ROOT, 'intermediate', 'panda3d', 'animation')
+
+    PANDA3D_STATIC = os.path.join(ROOT, 'panda3d', 'blend_converter', 'static')
+    PANDA3D_SKELETAL = os.path.join(ROOT, 'panda3d', 'blend_converter', 'skeletal')
+    PANDA3D_ANIMATION = os.path.join(ROOT, 'panda3d', 'blend_converter', 'animation')
+
 
 
 def get_folders(folder: os.PathLike):
@@ -72,8 +91,22 @@ IGNORE_PREFIX = ('#', '__bc')
 
 ORIGIN_PREFIX = 'ORIGIN'
 
+
 ATOOL_COLLISION_OBJECT_PROP_KEY = 'atool_collision_object_type'
 """ The property name of collision shape type in the Atool addon. """
+
+ATOOL_COLLISION_MASS_PROP_KEY = 'atool_collision_mass'
+
+class Atool_Collision_Shape:
+    SPHERE = 'SPHERE'
+    BOX = 'BOX'
+    CYLINDER = 'CYLINDER'
+    CAPSULE = 'CAPSULE'
+    CONE = 'CONE'
+    MESH = 'MESH'
+    CONVEX_HULL = 'CONVEX_HULL'
+    COMPOUND = 'COMPOUND'
+
 
 COLLISION_IDENTIFIER_PROP_KEY = '__bc_collision_shape'
 """ Collision shape types that would be used in this pipeline, matching the Atool's ones. """
