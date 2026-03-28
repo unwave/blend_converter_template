@@ -182,7 +182,7 @@ def get_bake_program(
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_uv
     from blend_converter.blender import bpy_utils
-    from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter import common
     from blend_converter import tool_settings
 
@@ -208,7 +208,7 @@ def get_bake_program(
 
     program.config = gui_config.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_bake.make_data_local)
 
@@ -293,7 +293,7 @@ def get_bake_program(
     program.run(blender, scripts_bake.hide_non_target_objects)
 
     program.run(blender, scripts_bake.make_paths_relative)
-    program.run(blender, save_as_mainfile, result_path)
+    program.run(blender, bpy_data.save_as_mainfile, result_path)
 
 
     return program

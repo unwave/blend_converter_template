@@ -21,7 +21,7 @@ def get_skin_test(
 
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_utils
-    from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter import common
     from blend_converter import utils
 
@@ -41,7 +41,7 @@ def get_skin_test(
 
     program._prog_type = 'SKIN TEST 🧐'
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     objects = program.run(blender, scripts_bake.get_target_objects)
 
@@ -50,7 +50,7 @@ def get_skin_test(
     program.run(blender, bpy_utils.apply_scale, objects)
     program.run(blender, scripts_bake.join_objects, objects)
 
-    program.run(blender, save_as_mainfile, result_path)
+    program.run(blender, bpy_data.save_as_mainfile, result_path)
 
     return program
 

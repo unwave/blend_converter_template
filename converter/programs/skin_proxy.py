@@ -20,7 +20,7 @@ def get_skin_proxy(
     """ a proxy to use in external tools like Mixamo and further re-integration, prioritizing a base clean topology """
 
     from blend_converter.blender.executor import Blender
-    from blend_converter.blender.formats.blend import open_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
     from blend_converter import common
     from blend_converter import utils
@@ -41,7 +41,7 @@ def get_skin_proxy(
 
     program._prog_type = 'SKIN PROXY 🤸'
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_rig.convert_rig_proxy)
     program.run(blender, scripts_export.scene_clean_up)

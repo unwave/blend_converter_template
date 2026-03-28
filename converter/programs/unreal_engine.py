@@ -37,7 +37,7 @@ def convert_to_unreal_static_mesh(
     from blend_converter.unreal import Unreal
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_utils
-    from blend_converter.blender.formats.blend import open_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
     from blend_converter import common
     from blend_converter import utils
@@ -62,7 +62,7 @@ def convert_to_unreal_static_mesh(
 
     program._prog_type = 'SM 👾'
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_bake.reveal_collections)
     has_custom_collisions = program.run(blender, scripts_export.convert_all_collision_shapes)
@@ -111,7 +111,7 @@ def convert_to_unreal_skeletal_mesh(
     from blend_converter.unreal import Unreal
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_utils
-    from blend_converter.blender.formats.blend import open_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
     from blend_converter import common
     from blend_converter import utils
@@ -136,7 +136,7 @@ def convert_to_unreal_skeletal_mesh(
 
     program._prog_type = 'SK 👾'
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_bake.reveal_collections)
     program.run(blender, scripts_export.scene_clean_up)
@@ -196,7 +196,7 @@ def convert_to_unreal_animation(
 
     from blend_converter.unreal import Unreal
     from blend_converter.blender.executor import Blender
-    from blend_converter.blender.formats.blend import open_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
     from blend_converter import common
 
@@ -220,7 +220,7 @@ def convert_to_unreal_animation(
 
     program._prog_type = 'A 👾'
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_export.make_local)
     program.run(blender, scripts_bake.create_game_rig_and_bake_actions)

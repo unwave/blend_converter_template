@@ -22,7 +22,7 @@ def convert_to_static_mesh(
 
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_utils
-    from blend_converter.blender.formats.blend import open_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter.blender.formats.gltf import export_gltf, S_GLTF
     from blend_converter import common
 
@@ -43,7 +43,7 @@ def convert_to_static_mesh(
 
     program._prog_type = 'STATIC 👾'
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_bake.reveal_collections)
     program.run(blender, scripts_export.convert_all_collision_shapes)
@@ -74,7 +74,7 @@ def convert_to_skeletal_mesh(
 
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_utils
-    from blend_converter.blender.formats.blend import open_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter.blender.formats.gltf import export_gltf, S_GLTF
     from blend_converter import common
     from blend_converter import utils
@@ -96,7 +96,7 @@ def convert_to_skeletal_mesh(
 
     program._prog_type = 'SKELETAL 👾'
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_bake.reveal_collections)
     program.run(blender, scripts_export.scene_clean_up)
@@ -128,7 +128,7 @@ def convert_to_animation(
     """ export as an animation only fbx file """
 
     from blend_converter.blender.executor import Blender
-    from blend_converter.blender.formats.blend import open_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter.blender.formats.gltf import export_gltf, S_GLTF
     from blend_converter import common
 
@@ -148,7 +148,7 @@ def convert_to_animation(
 
     program._prog_type = 'ANIMATION 👾'
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_godot.rename_objects_for_godot, 'SK')
     program.run(blender, scripts_export.make_local)

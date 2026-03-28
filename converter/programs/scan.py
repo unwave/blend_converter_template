@@ -13,7 +13,7 @@ from scripts import scan as scripts_scan
 
 def get_scan_program(blender_executable: str, blend_path, result_dir):
 
-    from blend_converter.blender.formats.blend import open_mainfile, save_as_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter.blender.executor import Blender
     from blend_converter import common
 
@@ -33,7 +33,7 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
 
     program._prog_type = 'SCAN 🗿'
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_scan.convert_to_mesh)
 
@@ -43,7 +43,7 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
 
     program.run(blender, scripts_scan.delete_non_low_poly, objects)
 
-    program.run(blender, save_as_mainfile, result_path)
+    program.run(blender, bpy_data.save_as_mainfile, result_path)
 
     return program
 

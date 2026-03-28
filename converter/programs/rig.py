@@ -21,7 +21,7 @@ def get_rig(
 
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_utils
-    from blend_converter.blender.formats.blend import open_mainfile
+    from blend_converter.blender import bpy_data
     from blend_converter import common
 
     blend_path = common.File(blend_path)
@@ -40,7 +40,7 @@ def get_rig(
 
     program._prog_type = 'RIG 🦴'
 
-    program.run(blender, open_mainfile, blend_path)
+    program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_export.remove_unused_uv_layouts)
     program.run(blender, bpy_utils.remove_all_node_groups_from_materials)
