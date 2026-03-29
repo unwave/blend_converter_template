@@ -15,7 +15,7 @@ from blend_converter import tool_settings
 
 
 if typing.TYPE_CHECKING:
-    from blend_converter.blender.formats.gltf import S_GLTF
+    from blend_converter.blender import bpy_export
 
 
 if 'panda3d' in sys.modules:
@@ -524,7 +524,7 @@ def validate_image_paths(gltf_data: dict, gltf_path: str):
         img['uri'] = quote(path)
 
 
-def export_gltf(filepath: str, gltf_settings: 'S_GLTF', gltf2bam_settings: S_Gltf_2_Bam):
+def export_gltf(filepath: str, gltf_settings: 'bpy_export.S_GLTF', gltf2bam_settings: S_Gltf_2_Bam):
 
     result_dir = os.path.dirname(filepath)
     os.makedirs(result_dir, exist_ok=True)
@@ -534,9 +534,9 @@ def export_gltf(filepath: str, gltf_settings: 'S_GLTF', gltf2bam_settings: S_Glt
     export_format_options = [item.identifier for item in rna_type.properties['export_format'].enum_items_static]
 
 
-    from blend_converter.blender.formats.gltf import S_GLTF
+    from blend_converter.blender import bpy_export
 
-    gltf_settings = S_GLTF._from_dict(gltf_settings)
+    gltf_settings = bpy_export.S_GLTF._from_dict(gltf_settings)
     gltf2bam_settings = S_Gltf_2_Bam._from_dict(gltf2bam_settings)
 
 

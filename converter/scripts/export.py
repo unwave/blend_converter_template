@@ -128,7 +128,7 @@ def remove_animations():
 
 def export_collections_as_fbx_static_meshes(result_dir: str):
 
-    from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
+    from blend_converter.blender import bpy_export
     from blend_converter.blender import bpy_context
     from blend_converter import utils as bc_utils
 
@@ -143,7 +143,7 @@ def export_collections_as_fbx_static_meshes(result_dir: str):
 
             bpy.ops.object.location_clear(clear_delta=False)
 
-            settings = S_Fbx(
+            settings = bpy_export.S_Fbx(
                 use_active_collection = False,
 
                 embed_textures = False,
@@ -163,7 +163,7 @@ def export_collections_as_fbx_static_meshes(result_dir: str):
 
             bpy.context.scene.name = collection.name
 
-            export_fbx(model_path, settings)
+            bpy_export.export_fbx(model_path, settings)
 
 
 def triangulate_geometry(objects: typing.Optional[typing.List['bpy.types.Object']]):

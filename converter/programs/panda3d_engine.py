@@ -15,9 +15,9 @@ from scripts import panda3d_engine as scripts_panda3d
 
 def get_gltf_settings():
 
-    from blend_converter.blender.formats.gltf import S_GLTF
+    from blend_converter.blender import bpy_export
 
-    return S_GLTF(
+    return bpy_export.S_GLTF(
         export_tangents = True,
         export_cameras = True,
         export_extras = True,
@@ -106,7 +106,6 @@ def convert_to_skeletal_mesh(
     from blend_converter.python.executor import Python
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_data
-    from blend_converter.blender.formats.gltf import export_gltf, S_GLTF
     from blend_converter import common
     from blend_converter import utils
 

@@ -38,7 +38,7 @@ def convert_to_unreal_static_mesh(
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_data
-    from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
+    from blend_converter.blender import bpy_export
     from blend_converter import common
     from blend_converter import utils
 
@@ -82,7 +82,7 @@ def convert_to_unreal_static_mesh(
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 
-    program.run(blender, export_fbx, fbx_path, S_Fbx(
+    program.run(blender, bpy_export.export_fbx, fbx_path, bpy_export.S_Fbx(
         mesh_smooth_type = 'SMOOTH_GROUP'
     ))
 
@@ -112,7 +112,7 @@ def convert_to_unreal_skeletal_mesh(
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_data
-    from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
+    from blend_converter.blender import bpy_export
     from blend_converter import common
     from blend_converter import utils
 
@@ -165,7 +165,7 @@ def convert_to_unreal_skeletal_mesh(
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 
-    program.run(blender, export_fbx, fbx_path, S_Fbx(
+    program.run(blender, bpy_export.export_fbx, fbx_path, bpy_export.S_Fbx(
         add_leaf_bones = False,
         bake_anim=False,
         mesh_smooth_type = 'SMOOTH_GROUP',
@@ -197,7 +197,7 @@ def convert_to_unreal_animation(
     from blend_converter.unreal import Unreal
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_data
-    from blend_converter.blender.formats.fbx import export_fbx, S_Fbx
+    from blend_converter.blender import bpy_export
     from blend_converter import common
 
     blend_path = common.File(blend_path)
@@ -234,7 +234,7 @@ def convert_to_unreal_animation(
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 
-    program.run(blender, export_fbx, fbx_path, S_Fbx(
+    program.run(blender, bpy_export.export_fbx, fbx_path, bpy_export.S_Fbx(
         add_leaf_bones = False,
         # bake_anim_force_startend_keying=True,
         # bake_anim_use_all_bones=False,
