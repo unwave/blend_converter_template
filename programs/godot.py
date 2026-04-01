@@ -16,7 +16,7 @@ from scripts import godot as scripts_godot
 def convert_to_static_mesh(
             blender_executable: str,
             blend_path: str,
-            result_root = configuration.Folder.GODOT_GLTF_STATIC,
+            result_root: str,
         ):
     """ export as a fbx static mesh """
 
@@ -68,7 +68,7 @@ def convert_to_static_mesh(
 def convert_to_skeletal_mesh(
             blender_executable: str,
             blend_path: str,
-            result_root = configuration.Folder.GODOT_GLTF_SKELETAL,
+            result_root: str,
         ):
     """ export as a fbx skeletal mesh """
 
@@ -123,7 +123,7 @@ def convert_to_animation(
             blend_path,
             rig_name: str,
             animation_name: str,
-            result_root = configuration.Folder.GODOT_GLTF_ANIMATION,
+            result_root: str,
         ):
     """ export as an animation only fbx file """
 
@@ -208,6 +208,7 @@ def get_godot_kwargs(
             arguments.append(dict(
                 blender_executable = blender_executable,
                 blend_path = last_blend,
+                result_root = configuration.Folder.GODOT_GLTF_STATIC,
             ))
 
 

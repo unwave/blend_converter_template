@@ -98,8 +98,8 @@ def convert_to_static_mesh(
 def convert_to_skeletal_mesh(
             blender_executable: str,
             blend_path: str,
-            intermediate_root = configuration.Folder.INTERMEDIATE_PANDA3D_SKELETAL,
-            result_root = configuration.Folder.PANDA3D_SKELETAL,
+            intermediate_root: str,
+            result_root: str,
         ):
 
     from blend_converter.blender.executor import Blender
@@ -158,8 +158,8 @@ def convert_to_skeletal_mesh(
 def convert_to_animation(
             blender_executable: str,
             blend_path,
-            intermediate_root = configuration.Folder.INTERMEDIATE_PANDA3D_ANIMATION,
-            result_root = configuration.Folder.PANDA3D_ANIMATION,
+            intermediate_root: str,
+            result_root: str,
         ):
 
 

@@ -30,7 +30,7 @@ class Hierarchy:
 def convert_to_unreal_static_mesh(
             blender_executable: str,
             blend_path: str,
-            result_root = configuration.Folder.INTERMEDIATE_UNREAL_STATIC,
+            result_root: str,
         ):
     """ export as a fbx static mesh """
 
@@ -104,7 +104,7 @@ def convert_to_unreal_static_mesh(
 def convert_to_unreal_skeletal_mesh(
             blender_executable: str,
             blend_path: str,
-            result_root = configuration.Folder.INTERMEDIATE_UNREAL_SKELETAL,
+            result_root: str,
         ):
     """ export as a fbx skeletal mesh """
 
@@ -190,7 +190,7 @@ def convert_to_unreal_animation(
             blend_path,
             rig_name: str,
             animation_name: str,
-            result_root = configuration.Folder.INTERMEDIATE_UNREAL_ANIMATION,
+            result_root: str,
         ):
     """ export as an animation only fbx file """
 

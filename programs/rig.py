@@ -15,7 +15,7 @@ from scripts import bake as scripts_bake
 def get_rig(
             blender_executable: str,
             blend_path,
-            result_root = configuration.Folder.BLEND_RIG
+            result_root: str,
         ):
     """ for use a linked rig + mesh for creating animations """
 

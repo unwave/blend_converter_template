@@ -15,7 +15,7 @@ from scripts import rig as scripts_rig
 def get_skin_proxy(
             blender_executable: str,
             blend_path,
-            result_root = configuration.Folder.INTERMEDIATE_BLEND_SKIN_PROXY,
+            result_root: str,
         ):
     """ a proxy to use in external tools like Mixamo and further re-integration, prioritizing a base clean topology """
 
@@ -74,6 +74,7 @@ def get_skin_proxy_kwargs(
         arguments.append(dict(
             blender_executable = blender_executable,
             blend_path = last_blend,
+            result_root = configuration.Folder.INTERMEDIATE_BLEND_SKIN_PROXY,
         ))
 
     return arguments
