@@ -4,6 +4,7 @@ import sys
 import os
 import time
 import typing
+import json
 
 
 from blend_converter import common
@@ -81,26 +82,35 @@ if __name__ == '__main__':
     print(sys.argv)
     print()
 
-    names = []
 
-    blender_executable = sys.argv[1]
+    try:
+        argument = sys.argv[1]
+    except IndexError:
+        argument = None
 
-    for arg in sys.argv[2:]:
+    import app_launcher
 
-        if arg.startswith('_'):
-            break
+    launch_options = None
 
-        names.append(arg)
+    if argument:
+        try:
+            launch_options = app_launcher.Launch_Options._from_json(argument)
+        except json.decoder.JSONDecodeError:
+            pass
 
-    if not names:
 
-        for name, path in programs.items():
-            print(name + "\n\t" + str(path))
+    if not launch_options:
+        launch_options = app_launcher.get_user_choice(list(programs))
+        sys.argv.append(launch_options._to_json())
 
-        print()
-        print("Must enter the names as the command line arguments. E.g.: static skeletal godot.")
-        print()
-        input("Press Enter to exit.")
 
-    else:
-        main([common.Program_Definition(*programs[n], kwargs=dict(blender_executable = blender_executable)) for n in names])
+    if not launch_options.blender_executable or not os.path.exists(launch_options.blender_executable):
+        raise Exception(f"The Blender executable path does not exists: {repr(launch_options.blender_executable)}")
+
+
+    main([
+        common.Program_Definition(*programs[n], kwargs=dict(
+            blender_executable = launch_options.blender_executable,
+        ))
+        for n in launch_options.program_names
+    ])
