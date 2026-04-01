@@ -287,9 +287,14 @@ def get_unreal_kwargs(*, blender_executable: str, root: str, result_root: str):
 
 def get_static_unreal_kwargs(
             blender_executable: str,
+            main_root: str,
             root = configuration.Folder.INTERMEDIATE_BLEND_STATIC,
             result_root = configuration.Folder.INTERMEDIATE_UNREAL_STATIC,
         ):
+
+    root = os.path.join(main_root, *root)
+    result_root = os.path.join(main_root, *result_root)
+
     return get_unreal_kwargs(
             blender_executable = blender_executable,
             root = root,
@@ -299,9 +304,14 @@ def get_static_unreal_kwargs(
 
 def get_skeletal_unreal_kwargs(
             blender_executable: str,
+            main_root: str,
             root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,
             result_root = configuration.Folder.INTERMEDIATE_UNREAL_SKELETAL,
         ):
+
+    root = os.path.join(main_root, *root)
+    result_root = os.path.join(main_root, *result_root)
+
     return get_unreal_kwargs(
             blender_executable = blender_executable,
             root = root,
@@ -311,9 +321,13 @@ def get_skeletal_unreal_kwargs(
 
 def get_unreal_animation_kwargs(
             blender_executable: str,
+            main_root: str,
             root = configuration.Folder.BLEND_ANIMATION,
             result_root = configuration.Folder.INTERMEDIATE_UNREAL_ANIMATION,
         ):
+
+    root = os.path.join(main_root, *root)
+    result_root = os.path.join(main_root, *result_root)
 
     from blend_converter import utils
 

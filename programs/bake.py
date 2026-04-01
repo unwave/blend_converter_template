@@ -301,11 +301,15 @@ def get_bake_program(
 
 def get_static_kwargs(
             blender_executable: str,
+            main_root: str,
             root = configuration.Folder.BLEND_STATIC,
             texel_density: int = None,
             max_resolution: int = None,
             result_root = configuration.Folder.INTERMEDIATE_BLEND_STATIC,
         ):
+
+    root = os.path.join(main_root, *root)
+    result_root = os.path.join(main_root, *result_root)
 
     from blend_converter import utils
 
@@ -355,11 +359,15 @@ def get_static_kwargs(
 
 def get_skeletal_kwargs(
             blender_executable: str,
+            main_root: str,
             root = configuration.Folder.BLEND_SKELETAL,
             texel_density: int = None,
             max_resolution: int = None,
             result_root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,
         ):
+
+    root = os.path.join(main_root, *root)
+    result_root = os.path.join(main_root, *result_root)
 
     from blend_converter import utils
 

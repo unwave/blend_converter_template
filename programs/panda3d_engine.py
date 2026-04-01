@@ -230,8 +230,11 @@ def get_anim_programs(root = configuration.Folder.BLEND_ANIMATION):
 
 def get_panda3d_kwargs(
             blender_executable: str,
+            main_root: str,
             root = configuration.Folder.INTERMEDIATE_BLEND_STATIC
         ):
+
+    root = os.path.join(main_root, *root)
 
     from blend_converter import utils
 
@@ -253,8 +256,8 @@ def get_panda3d_kwargs(
             arguments.append(dict(
                 blender_executable = blender_executable,
                 blend_path = last_blend,
-                intermediate_root = configuration.Folder.INTERMEDIATE_PANDA3D_STATIC,
-                result_root = configuration.Folder.PANDA3D_STATIC,
+                intermediate_root = os.path.join(main_root, *configuration.Folder.INTERMEDIATE_PANDA3D_STATIC),
+                result_root = os.path.join(main_root, *configuration.Folder.PANDA3D_STATIC),
             ))
 
 

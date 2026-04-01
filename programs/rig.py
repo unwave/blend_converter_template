@@ -54,9 +54,13 @@ def get_rig(
 
 def get_rig_kwargs(
             blender_executable: str,
+            main_root: str,
             root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,
             result_root = configuration.Folder.BLEND_RIG,
         ):
+
+    root = os.path.join(main_root, *root)
+    result_root = os.path.join(main_root, *result_root)
 
     from blend_converter import utils
 

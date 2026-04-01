@@ -50,9 +50,13 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
 
 def get_scan_kwargs(
         blender_executable: str,
+        main_root: str,
         root = configuration.Folder.SCAN,
         result_root = configuration.Folder.INTERMEDIATE_SCAN,
     ):
+
+    root = os.path.join(main_root, *root)
+    result_root = os.path.join(main_root, *result_root)
 
     from blend_converter import utils
 

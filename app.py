@@ -108,9 +108,14 @@ if __name__ == '__main__':
         raise Exception(f"The Blender executable path does not exists: {repr(launch_options.blender_executable)}")
 
 
+    if not launch_options.main_root or not os.path.exists(launch_options.main_root):
+        raise Exception(f"The root path does not exists: {repr(launch_options.main_root)}")
+
+
     main([
         common.Program_Definition(*programs[n], kwargs=dict(
             blender_executable = launch_options.blender_executable,
+            main_root = launch_options.main_root,
         ))
         for n in launch_options.program_names
     ])

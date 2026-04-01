@@ -57,9 +57,13 @@ def get_skin_test(
 
 def get_skin_test_kwargs(
             blender_executable: str,
+            main_root: str,
             root = configuration.Folder.BLEND_SKELETAL,
             result_root = configuration.Folder.INTERMEDIATE_BLEND_SKIN_TEST,
         ):
+
+    root = os.path.join(main_root, *root)
+    result_root = os.path.join(main_root, *result_root)
 
     from blend_converter import utils
 

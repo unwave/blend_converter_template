@@ -53,8 +53,11 @@ def get_skin_proxy(
 
 def get_skin_proxy_kwargs(
             blender_executable: str,
+            main_root: str,
             root = configuration.Folder.BLEND_SKELETAL,
         ):
+
+    root = os.path.join(main_root, *root)
 
     from blend_converter import utils
 
@@ -74,7 +77,7 @@ def get_skin_proxy_kwargs(
         arguments.append(dict(
             blender_executable = blender_executable,
             blend_path = last_blend,
-            result_root = configuration.Folder.INTERMEDIATE_BLEND_SKIN_PROXY,
+            result_root = os.path.join(main_root, *configuration.Folder.INTERMEDIATE_BLEND_SKIN_PROXY),
         ))
 
     return arguments

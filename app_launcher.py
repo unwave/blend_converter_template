@@ -20,6 +20,8 @@ class Launch_Options(tool_settings.Settings):
 
     blender_executable: str = ''
 
+    main_root: str = ''
+
 
 def get_user_choice(strings: typing.List[str]):
 
@@ -109,6 +111,14 @@ class Launcher(wx.Frame):
         self.blender_ctrl.SetDropTarget(File_Drop_Target(self.blender_ctrl))
 
 
+        sizer.Add(wx.StaticText(panel, label = 'Asset Root Folder:') , 0, wx.ALL | wx.EXPAND, 5)
+
+        self.root_ctrl = wx.DirPickerCtrl(panel)
+        sizer.Add(self.root_ctrl , 0, wx.ALL | wx.EXPAND, 5)
+
+        self.root_ctrl.SetDropTarget(File_Drop_Target(self.root_ctrl))
+
+
         sizer.Add(wx.StaticText(panel, label = 'Programs:') , 0, wx.ALL | wx.EXPAND, 5)
 
         self.programs_ctrl = wx.CheckListBox(panel)
@@ -136,6 +146,7 @@ class Launcher(wx.Frame):
         self.result =  Launch_Options(
             program_names = [self.program_names[i] for i in self.programs_ctrl.GetCheckedItems()],
             blender_executable = self.blender_ctrl.GetPath(),
+            main_root = self.root_ctrl.GetPath(),
         )
 
         self.Destroy()
