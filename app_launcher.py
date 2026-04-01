@@ -1,9 +1,16 @@
 import typing
 import os
+import sys
+import subprocess
 
 import wx
 
+
 from blend_converter import tool_settings
+from blend_converter import utils
+
+
+ROOT = os.path.dirname(os.path.realpath(__file__))
 
 
 if typing.TYPE_CHECKING:
@@ -23,20 +30,15 @@ class Launch_Options(tool_settings.Settings):
     main_root: str = ''
 
 
-def get_user_choice(strings: typing.List[str]):
+def start_launcher(strings: typing.List[str]):
 
     app = wx.App()
     frame = Launcher(strings)
     frame.Show()
     app.MainLoop()
-    app.Destroy()
-
-    return frame.result
 
 
 def get_shortcut_target(path: str):
-
-    import subprocess
 
     cmd = [
         'powershell',
@@ -50,7 +52,6 @@ def get_shortcut_target(path: str):
         "'" + path + "'",
     ]
 
-    from blend_converter import utils
 
     print("CLI:", utils.get_command_from_list(cmd))
 
@@ -133,20 +134,48 @@ class Launcher(wx.Frame):
         self.start_button.Enable(False)
 
 
+        self.copy_button = wx.Button(panel, label = 'Copy Start Command')
+        self.copy_button.Bind(wx.EVT_BUTTON, self.on_copy_command)
+        sizer.Add(self.copy_button, 0, wx.ALL | wx.EXPAND, 5)
+        self.copy_button.Enable(False)
+
+
         panel.SetSizerAndFit(sizer)
         self.Centre()
 
 
     def on_toggle(self, event):
         self.start_button.Enable(bool(self.programs_ctrl.GetCheckedItems()))
+        self.copy_button.Enable(bool(self.programs_ctrl.GetCheckedItems()))
 
 
-    def on_start(self, event):
+    def get_command(self):
 
-        self.result =  Launch_Options(
+        options =  Launch_Options(
             program_names = [self.program_names[i] for i in self.programs_ctrl.GetCheckedItems()],
             blender_executable = self.blender_ctrl.GetPath(),
             main_root = self.root_ctrl.GetPath(),
         )
 
-        self.Destroy()
+        return [
+            sys.executable,
+            os.path.join(ROOT, 'app.py'),
+            options._to_json(),
+        ]
+
+
+    def on_start(self, event):
+
+        env = os.environ.copy()
+
+        for name in 'PROMPT', 'TERM_PROGRAM', 'TERM', 'TERMINAL_EMULATOR':
+            env.pop(name, None)
+
+        subprocess.Popen(self.get_command(), creationflags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NEW_CONSOLE, start_new_session = True, env = env)
+
+
+    def on_copy_command(self, event):
+
+        import pyperclip
+
+        pyperclip.copy(utils.get_command_from_list(self.get_command()))

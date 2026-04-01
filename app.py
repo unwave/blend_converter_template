@@ -9,6 +9,13 @@ import json
 
 from blend_converter import common
 
+import app_launcher
+
+
+ROOT = os.path.join(os.path.dirname(__file__))
+
+IS_USING_TERMINAL = not {'PROMPT', 'TERM_PROGRAM', 'TERM', 'TERMINAL_EMULATOR'}.isdisjoint(os.environ)
+
 
 if typing.TYPE_CHECKING:
     from blend_converter import updater
@@ -29,11 +36,6 @@ def get_func_name(entry: 'updater.Program_Entry'):
 
 def main(definitions: typing.List[common.Program_Definition]):
 
-    is_using_terminal = not {'PROMPT', 'TERM_PROGRAM', 'TERM', 'TERMINAL_EMULATOR'}.isdisjoint(os.environ)
-
-    if not is_using_terminal:
-        sys.excepthook = except_hook
-
     from blend_converter.gui import updater_ui
     from blend_converter import updater
     updater.UPDATE_DELAY = 0
@@ -52,13 +54,12 @@ def main(definitions: typing.List[common.Program_Definition]):
     app.main_frame.updater.set_max_parallel_executions_per_program_tag('gltf', physical_core_count)
     app.main_frame.updater.set_max_parallel_executions_per_program_tag('unreal', 1)
 
-    if not is_using_terminal:
+    if not IS_USING_TERMINAL:
         sys.excepthook = sys.__excepthook__
 
     app.MainLoop()
 
 def get_program_paths():
-    ROOT = os.path.join(os.path.dirname(__file__))
 
     return dict(
         static = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_program', 'get_static_kwargs'),
@@ -75,6 +76,30 @@ def get_program_paths():
     )
 
 
+def start(programs: dict, launch_options: app_launcher.Launch_Options):
+
+
+    if not IS_USING_TERMINAL:
+        sys.excepthook = except_hook
+
+
+    if not launch_options.blender_executable or not os.path.exists(launch_options.blender_executable):
+        raise Exception(f"The Blender executable path does not exist: {repr(launch_options.blender_executable)}")
+
+
+    if not launch_options.main_root or not os.path.exists(launch_options.main_root):
+        raise Exception(f"The root path does not exist: {repr(launch_options.main_root)}")
+
+
+    main([
+        common.Program_Definition(*programs[n], kwargs=dict(
+            blender_executable = launch_options.blender_executable,
+            main_root = launch_options.main_root,
+        ))
+        for n in launch_options.program_names
+    ])
+
+
 if __name__ == '__main__':
 
     programs = get_program_paths()
@@ -88,34 +113,17 @@ if __name__ == '__main__':
     except IndexError:
         argument = None
 
-    import app_launcher
 
     launch_options = None
 
     if argument:
         try:
             launch_options = app_launcher.Launch_Options._from_json(argument)
-        except json.decoder.JSONDecodeError:
-            pass
+        except json.decoder.JSONDecodeError as e:
+            print(e)
 
 
-    if not launch_options:
-        launch_options = app_launcher.get_user_choice(list(programs))
-        sys.argv.append(launch_options._to_json())
-
-
-    if not launch_options.blender_executable or not os.path.exists(launch_options.blender_executable):
-        raise Exception(f"The Blender executable path does not exists: {repr(launch_options.blender_executable)}")
-
-
-    if not launch_options.main_root or not os.path.exists(launch_options.main_root):
-        raise Exception(f"The root path does not exists: {repr(launch_options.main_root)}")
-
-
-    main([
-        common.Program_Definition(*programs[n], kwargs=dict(
-            blender_executable = launch_options.blender_executable,
-            main_root = launch_options.main_root,
-        ))
-        for n in launch_options.program_names
-    ])
+    if launch_options:
+        start(programs, launch_options)
+    else:
+        app_launcher.start_launcher(list(programs))
