@@ -255,6 +255,8 @@ def get_bake_program(
         ministry_of_flat_settings = get_ministry_of_flat_settings(program.config)
     )
 
+    program.run(blender, bpy_uv.reunwrap_bad_uvs, objects, uv_layer_name = uv_layer_name)
+
     program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_UNWRAP, ignore_type = ignore_type)
 
     program.run(blender, bpy_utils.bisect_by_mirror_modifiers, objects)
