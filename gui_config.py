@@ -7,13 +7,14 @@ if not hasattr(typing, 'Literal'):
 
 
 from blend_converter import common
+from blend_converter.tool_settings import S_Bake
 
 
 class Blend_Bake:
 
     resolution_multiplier: float = 1.0
 
-    bake_samples: int = 1
+    bake_samples: int = S_Bake.samples
 
     uv_packer_pin: bool = False
 
