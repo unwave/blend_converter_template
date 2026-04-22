@@ -29,48 +29,48 @@ class Folder:
 
 
     ## blender source
-    SCAN = ['blends', 'scan']
+    SCAN = ['blends', 'scans']
 
     BLEND_STATIC = ['blends', 'static']
     BLEND_SKELETAL = ['blends', 'skeletal']
 
-    BLEND_RIG = ['blends', 'rig']
-    BLEND_ANIMATION = ['blends', 'animation']
+    BLEND_RIG = ['blends', 'rigs']
+    BLEND_ANIMATION = ['blends', 'animations']
 
     # blender intermediate
-    INTERMEDIATE_SCAN = ['intermediate', 'blends', 'scan']
+    INTERMEDIATE_SCAN = ['intermediate', 'blends', 'scans']
 
     INTERMEDIATE_BLEND_STATIC = ['intermediate', 'blends', 'static']
     INTERMEDIATE_BLEND_SKELETAL = ['intermediate', 'blends', 'skeletal']
 
-    INTERMEDIATE_BLEND_SKIN_TEST = ['intermediate', 'blends', 'skin_test']
-    INTERMEDIATE_BLEND_SKIN_PROXY = ['intermediate', 'blends', 'skin_proxy']
+    INTERMEDIATE_BLEND_SKIN_TEST = ['intermediate', 'blends', 'skin_tests']
+    INTERMEDIATE_BLEND_SKIN_PROXY = ['intermediate', 'blends', 'skin_proxies']
 
 
     ## godot
     GODOT_GLTF_STATIC = ['godot', 'gltf', 'static']
     GODOT_GLTF_SKELETAL = ['godot', 'gltf', 'skeletal']
-    GODOT_GLTF_ANIMATION = ['godot', 'gltf', 'animation']
+    GODOT_GLTF_ANIMATION = ['godot', 'gltf', 'animations']
 
 
     ## unreal
     INTERMEDIATE_UNREAL_STATIC = ['intermediate', 'unreal', 'static']
     INTERMEDIATE_UNREAL_SKELETAL = ['intermediate', 'unreal', 'skeletal']
-    INTERMEDIATE_UNREAL_ANIMATION = ['intermediate', 'unreal', 'animation']
+    INTERMEDIATE_UNREAL_ANIMATION = ['intermediate', 'unreal', 'animations']
 
     UNREAL_STATIC = '/Game/blend_converter/static/'
     UNREAL_SKELETAL = '/Game/blend_converter/skeletal/'
-    UNREAL_ANIMATION = '/Game/blend_converter/animation/'
+    UNREAL_ANIMATION = '/Game/blend_converter/animations/'
 
 
     ## panda3d
     INTERMEDIATE_PANDA3D_STATIC = ['intermediate', 'panda3d', 'static']
     INTERMEDIATE_PANDA3D_SKELETAL = ['intermediate', 'panda3d', 'skeletal']
-    INTERMEDIATE_PANDA3D_ANIMATION = ['intermediate', 'panda3d', 'animation']
+    INTERMEDIATE_PANDA3D_ANIMATION = ['intermediate', 'panda3d', 'animations']
 
     PANDA3D_STATIC = ['panda3d', 'blend_converter', 'static']
     PANDA3D_SKELETAL = ['panda3d', 'blend_converter', 'skeletal']
-    PANDA3D_ANIMATION = ['panda3d', 'blend_converter', 'animation']
+    PANDA3D_ANIMATION = ['panda3d', 'blend_converter', 'animations']
 
 
 
