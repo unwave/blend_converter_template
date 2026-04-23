@@ -514,7 +514,7 @@ def bake_animation(
         return anim_utils.bake_action_objects(
             [(a, None) for a in armatures],
             frames = range(frame_start, frame_end + 1, step),
-            bake_options = anim_utils.BakeOptions(**settings._to_dict())
+            bake_options = anim_utils.BakeOptions(**settings)
         )[0]
 
 

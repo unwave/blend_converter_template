@@ -372,7 +372,7 @@ class S_Gltf_2_Bam(tool_settings.Settings):
     """
     Name of a collection in blender whose collision objects will be exported without a visible geom node.
 
-    #### Default: `InvisibleCollisions`
+    #### Default: `'InvisibleCollisions'`
     """
 
 
@@ -380,18 +380,19 @@ class S_Gltf_2_Bam(tool_settings.Settings):
 
         command: typing.List[str] = []
 
-        for key, value in self._to_dict().items():
+        for key, value in self.items():
 
-            if key in ('invisible_collisions_collection', 'allow_double_sided_materials'):
+            spec = self._get_attribute_spec(key)
+
+            cmd = spec.cmd
+            if cmd is None:
                 continue
-
-            argument = f"--{key.replace('_', '-')}"
 
             if isinstance(value, bool):
                 if value:
-                    command.append(argument)
+                    command.append(cmd)
             elif isinstance(value, str):
-                command.append(argument)
+                command.append(cmd)
                 command.append(value)
             else:
                 raise Exception(f"Unexpected attribute: {key} {value}")
@@ -597,11 +598,9 @@ def export_gltf(filepath: str, gltf_settings: 'bpy_export.S_GLTF', gltf2bam_sett
     with warnings.catch_warnings():
         warnings.simplefilter('default')
 
-        gltf_settings_dict = gltf_settings._to_dict()
+        print("GLTF:", gltf_settings)
 
-        print("GLTF:", gltf_settings_dict)
-
-        bpy.ops.export_scene.gltf(filepath = filepath, **gltf_settings_dict)
+        bpy.ops.export_scene.gltf(filepath = filepath, **gltf_settings)
 
 
     with open(filepath) as gltf_file:
