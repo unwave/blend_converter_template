@@ -56,6 +56,7 @@ def convert_to_unreal_static_mesh(
         blend_path = blend_path,
         result_path = fbx_path,
         blender_executable = blender.binary_path,
+        settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
     program.tags.add('unreal')
@@ -130,6 +131,7 @@ def convert_to_unreal_skeletal_mesh(
         blend_path = blend_path,
         result_path = fbx_path,
         blender_executable = blender.binary_path,
+        settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
     program.tags.add('unreal')
@@ -214,6 +216,7 @@ def convert_to_unreal_animation(
         blend_path = blend_path,
         result_path = fbx_path,
         blender_executable = blender.binary_path,
+        settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
     program.tags.add('unreal')

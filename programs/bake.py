@@ -199,6 +199,7 @@ def get_bake_program(
         blend_path = blend_path,
         result_path = result_path,
         blender_executable = blender.binary_path,
+        settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
     if is_skeletal:

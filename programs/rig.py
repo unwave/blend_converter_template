@@ -36,6 +36,7 @@ def get_rig(
         blend_path = blend_path,
         result_path = result_path,
         blender_executable = blender_executable,
+        settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
     program._prog_type = 'RIG 🦴'

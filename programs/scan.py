@@ -28,7 +28,8 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
     program = common.Program(
         blend_path = blend_path,
         result_path = result_path,
-        blender_executable = blender_executable
+        blender_executable = blender_executable,
+        settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
     program._prog_type = 'SCAN 🗿'

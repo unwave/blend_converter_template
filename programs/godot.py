@@ -37,6 +37,7 @@ def convert_to_static_mesh(
         blend_path = blend_path,
         result_path = gltf_path,
         blender_executable = blender.binary_path,
+        settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
     program.tags.add('gltf')
@@ -90,6 +91,7 @@ def convert_to_skeletal_mesh(
         blend_path = blend_path,
         result_path = gltf_path,
         blender_executable = blender.binary_path,
+        settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
     program.tags.add('gltf')
@@ -142,6 +144,7 @@ def convert_to_animation(
         blend_path = blend_path,
         result_path = gltf_path,
         blender_executable = blender.binary_path,
+        settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
     program.tags.add('gltf')
