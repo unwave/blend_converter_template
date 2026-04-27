@@ -7,34 +7,8 @@ if not hasattr(typing, 'Literal'):
 
 
 from blend_converter import common
-from blend_converter.tool_settings import S_Bake
-
-
-class Blend_Bake:
-
-    resolution_multiplier: float = 1.0
-
-    bake_samples: int = S_Bake.samples
-
-    uv_packer_pin: bool = False
-
-    faster_ao_bake: bool = True
-
-    texel_density: int = 512
-
-    min_resolution: int = 128
-
-    max_resolution: int = 4096
-
 
 class UV_Unwrap:
-
-    use_normal: bool = False
-
-    timeout: int = 10
-
-    separate_hard_edges = False
-
 
     bfu_preset: typing.Literal[
 
@@ -66,11 +40,6 @@ class UV_Unwrap:
         ] = 'NONE'
 
 
-class Gltf_Export:
-
-    export_animation_mode: typing.Literal['NLA_TRACKS', 'ACTIONS'] = 'ACTIONS'
-
-
 class Quality:
 
     preset: typing.Literal['manual', 'preview'] = 'manual'
@@ -79,9 +48,5 @@ class Quality:
 class Config(common.Config_Base):
 
     quality: Quality
-
-    blend_bake: Blend_Bake
-
-    gltf_export: Gltf_Export
 
     uv_unwrap: UV_Unwrap
