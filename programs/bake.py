@@ -136,7 +136,7 @@ def get_bake_settings(*,
 
 def get_texture_prefix(folder_name: str):
 
-    folder_name = str(folder_name).removeprefix('GROUP_')
+    folder_name = str(folder_name)
 
     return configuration.get_ascii_underscored(folder_name)
 
@@ -314,10 +314,7 @@ def get_static_kwargs(
         if not last_blend:
             continue
 
-        if folder.name.startswith('GROUP_'):
-            raise NotImplementedError("split into multiple fbx with shared materials")
-        else:
-            arguments.append(get_baked(last_blend, result_root, result_root))
+        arguments.append(get_baked(last_blend, result_root, result_root))
 
 
     return arguments

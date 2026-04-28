@@ -273,14 +273,11 @@ def get_unreal_kwargs(*, blender_executable: str, root: str, result_root: str):
         if not last_blend:
             continue
 
-        if folder.name.startswith('GROUP_'):
-            raise NotImplementedError("split into multiple fbx with shared materials")
-        else:
-            arguments.append(dict(
-                blender_executable = blender_executable,
-                blend_path = last_blend,
-                result_root = result_root,
-            ))
+        arguments.append(dict(
+            blender_executable = blender_executable,
+            blend_path = last_blend,
+            result_root = result_root,
+        ))
 
 
     return arguments

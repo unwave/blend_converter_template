@@ -251,15 +251,12 @@ def get_panda3d_kwargs(
         if not last_blend:
             continue
 
-        if folder.name.startswith('GROUP_'):
-            raise NotImplementedError("split into multiple fbx with shared materials")
-        else:
-            arguments.append(dict(
-                blender_executable = blender_executable,
-                blend_path = last_blend,
-                intermediate_root = os.path.join(main_root, *configuration.Folder.INTERMEDIATE_PANDA3D_STATIC),
-                result_root = os.path.join(main_root, *configuration.Folder.PANDA3D_STATIC),
-            ))
+        arguments.append(dict(
+            blender_executable = blender_executable,
+            blend_path = last_blend,
+            intermediate_root = os.path.join(main_root, *configuration.Folder.INTERMEDIATE_PANDA3D_STATIC),
+            result_root = os.path.join(main_root, *configuration.Folder.PANDA3D_STATIC),
+        ))
 
 
     return arguments

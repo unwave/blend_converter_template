@@ -206,14 +206,11 @@ def get_godot_kwargs(
         if not last_blend:
             continue
 
-        if folder.name.startswith('GROUP_'):
-            raise NotImplementedError("split into multiple fbx with shared materials")
-        else:
-            arguments.append(dict(
-                blender_executable = blender_executable,
-                blend_path = last_blend,
-                result_root = os.path.join(main_root, *configuration.Folder.GODOT_GLTF_STATIC),
-            ))
+        arguments.append(dict(
+            blender_executable = blender_executable,
+            blend_path = last_blend,
+            result_root = os.path.join(main_root, *configuration.Folder.GODOT_GLTF_STATIC),
+        ))
 
 
     return arguments
