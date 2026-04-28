@@ -253,8 +253,6 @@ def get_panda3d_kwargs(
 
         if folder.name.startswith('GROUP_'):
             raise NotImplementedError("split into multiple fbx with shared materials")
-        elif folder.name.startswith('SPLIT_'):
-            raise NotImplementedError("split into multiple fbx with independent materials")
         else:
             arguments.append(dict(
                 blender_executable = blender_executable,
