@@ -45,6 +45,7 @@ class Folder:
 
     INTERMEDIATE_BLEND_SKIN_TEST = ['intermediate', 'blends', 'skin_tests']
     INTERMEDIATE_BLEND_SKIN_PROXY = ['intermediate', 'blends', 'skin_proxies']
+    INTERMEDIATE_BLEND_TEST_DEFORM_RIG = ['intermediate', 'blends', 'test_deform_rig']
 
 
     ## godot
