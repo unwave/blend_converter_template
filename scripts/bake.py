@@ -313,6 +313,7 @@ def reveal_collections():
 
             layer.exclude = False
             layer.hide_viewport = False
+            layer.collection.hide_viewport = False
 
             traverse(layer)
 
