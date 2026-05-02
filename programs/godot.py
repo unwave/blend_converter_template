@@ -1,16 +1,12 @@
 import os
-import sys
-
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-if not ROOT in sys.path:
-    sys.path.append(ROOT)
 
 
-import configuration
 
-from scripts import bake as scripts_bake
-from scripts import export as scripts_export
-from scripts import godot as scripts_godot
+from .. import configuration
+
+from ..scripts import bake as scripts_bake
+from ..scripts import export as scripts_export
+from ..scripts import godot as scripts_godot
 
 
 def convert_to_static_mesh(

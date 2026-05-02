@@ -1,16 +1,11 @@
 import os
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-if not ROOT in sys.path:
-    sys.path.append(ROOT)
+from .. import configuration
 
-
-import configuration
-
-from scripts import bake as scripts_bake
-from scripts import export as scripts_export
-from scripts import panda3d_engine as scripts_panda3d
+from ..scripts import bake as scripts_bake
+from ..scripts import export as scripts_export
+from ..scripts import panda3d_engine as scripts_panda3d
 
 
 def get_gltf_settings():

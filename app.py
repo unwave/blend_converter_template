@@ -9,7 +9,7 @@ import json
 
 from blend_converter import common
 
-import app_launcher
+from . import app_launcher
 
 
 ROOT = os.path.join(os.path.dirname(__file__))
@@ -34,7 +34,7 @@ def get_func_name(entry: 'updater.Program_Entry'):
     return getattr(entry.program, '_prog_type', 'NONE')
 
 
-def main(definitions: typing.List[common.Program_Definition]):
+def launch_converter(definitions: typing.List[common.Program_Definition]):
 
     from blend_converter.gui import updater_ui
     from blend_converter import updater
@@ -59,21 +59,32 @@ def main(definitions: typing.List[common.Program_Definition]):
 
     app.MainLoop()
 
+
 def get_program_paths():
 
+    from .programs import bake
+    from .programs import godot
+    from .programs import unreal_engine
+    from .programs import skin_test
+    from .programs import skin_proxy
+    from .programs import test_deform_rig
+    from .programs import scan
+    from .programs import rig
+    from .programs import panda3d_engine
+
     return dict(
-        static = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_program', 'get_static_kwargs'),
-        skeletal = (os.path.join(ROOT, 'programs', 'bake.py'), 'get_bake_program', 'get_skeletal_kwargs'),
-        godot = (os.path.join(ROOT, 'programs', 'godot.py'), 'convert_to_static_mesh', 'get_godot_kwargs'),
-        ue_static = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'convert_to_unreal_static_mesh', 'get_static_unreal_kwargs'),
-        ue_skeletal = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'convert_to_unreal_skeletal_mesh', 'get_skeletal_unreal_kwargs'),
-        ue_animation = (os.path.join(ROOT, 'programs', 'unreal_engine.py'), 'convert_to_unreal_animation', 'get_unreal_animation_kwargs'),
-        skin_test = (os.path.join(ROOT, 'programs', 'skin_test.py'), 'get_skin_test', 'get_skin_test_kwargs'),
-        skin_proxy = (os.path.join(ROOT, 'programs', 'skin_proxy.py'), 'get_skin_proxy', 'get_skin_proxy_kwargs'),
-        test_deform_rig = (os.path.join(ROOT, 'programs', 'test_deform_rig.py'), 'get_program', 'get_arguments'),
-        scan = (os.path.join(ROOT, 'programs', 'scan.py'), 'get_scan_program', 'get_scan_kwargs'),
-        rig = (os.path.join(ROOT, 'programs', 'rig.py'), 'get_rig', 'get_rig_kwargs'),
-        panda3d = (os.path.join(ROOT, 'programs', 'panda3d_engine.py'), 'convert_to_static_mesh', 'get_panda3d_kwargs'),
+        static = [bake.get_bake_program, bake.get_static_kwargs],
+        skeletal = [bake.get_bake_program, bake.get_skeletal_kwargs],
+        godot = [godot.convert_to_static_mesh, godot.get_godot_kwargs],
+        ue_static = [unreal_engine.convert_to_unreal_static_mesh, unreal_engine.get_static_unreal_kwargs],
+        ue_skeletal = [unreal_engine.convert_to_unreal_skeletal_mesh, unreal_engine.get_skeletal_unreal_kwargs],
+        ue_animation = [unreal_engine.convert_to_unreal_animation, unreal_engine.get_unreal_animation_kwargs],
+        skin_test = [skin_test.get_skin_test, skin_test.get_skin_test_kwargs],
+        skin_proxy = [skin_proxy.get_skin_proxy, skin_proxy.get_skin_proxy_kwargs],
+        test_deform_rig = [test_deform_rig.get_program, test_deform_rig.get_arguments],
+        scan = [scan.get_scan_program, scan.get_scan_kwargs],
+        rig = [rig.get_rig, rig.get_rig_kwargs],
+        panda3d = [panda3d_engine.convert_to_static_mesh, panda3d_engine.get_panda3d_kwargs],
     )
 
 
@@ -92,7 +103,7 @@ def start(programs: dict, launch_options: app_launcher.Launch_Options):
         raise Exception(f"The root path does not exist: {repr(launch_options.main_root)}")
 
 
-    main([
+    launch_converter([
         common.Program_Definition(*programs[n], kwargs=dict(
             blender_executable = launch_options.blender_executable,
             main_root = launch_options.main_root,
@@ -101,7 +112,7 @@ def start(programs: dict, launch_options: app_launcher.Launch_Options):
     ])
 
 
-if __name__ == '__main__':
+def main():
 
     programs = get_program_paths()
 

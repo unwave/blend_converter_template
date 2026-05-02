@@ -7,14 +7,9 @@ import collections
 import functools
 
 
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-if not ROOT in sys.path:
-    sys.path.append(ROOT)
+from .. import configuration
 
-
-import configuration
-
-from scripts import bake as bake_scripts
+from ..scripts import bake as bake_scripts
 
 
 if 'bpy' in sys.modules:

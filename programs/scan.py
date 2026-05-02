@@ -1,14 +1,8 @@
 import os
-import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-if not ROOT in sys.path:
-    sys.path.append(ROOT)
+from .. import configuration
 
-
-import configuration
-
-from scripts import scan as scripts_scan
+from ..scripts import scan as scripts_scan
 
 
 def get_scan_program(blender_executable: str, blend_path, result_dir):

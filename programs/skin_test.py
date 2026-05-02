@@ -1,14 +1,8 @@
 import os
-import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-if not ROOT in sys.path:
-    sys.path.append(ROOT)
+from .. import configuration
 
-
-import configuration
-
-from scripts import bake as scripts_bake
+from ..scripts import bake as scripts_bake
 
 
 def get_skin_test(

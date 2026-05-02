@@ -3,11 +3,8 @@ import sys
 import typing
 import re
 
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-if not ROOT in sys.path:
-    sys.path.append(ROOT)
 
-import configuration
+from .. import configuration
 
 
 if 'bpy' in sys.modules:

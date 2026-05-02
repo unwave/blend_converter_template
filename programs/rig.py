@@ -1,15 +1,10 @@
 import os
-import sys
-
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-if not ROOT in sys.path:
-    sys.path.append(ROOT)
 
 
-import configuration
+from .. import configuration
 
-from scripts import export as scripts_export
-from scripts import bake as scripts_bake
+from ..scripts import export as scripts_export
+from ..scripts import bake as scripts_bake
 
 
 def get_rig(

@@ -159,7 +159,7 @@ class Launcher(wx.Frame):
 
         return [
             sys.executable,
-            os.path.join(ROOT, 'app.py'),
+            os.path.join(ROOT, 'start.py'),
             options._to_json(),
         ]
 

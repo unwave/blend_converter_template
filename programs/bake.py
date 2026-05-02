@@ -1,17 +1,10 @@
 import os
-import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-if not ROOT in sys.path:
-    sys.path.append(ROOT)
+from .. import configuration
+from .. import gui_config
 
-
-import configuration
-
-import gui_config
-
-from scripts import bake as scripts_bake
-from scripts import custom_per_blend
+from ..scripts import bake as scripts_bake
+from ..scripts import custom_per_blend
 
 
 def get_unwrap_settings(config: gui_config.Config):

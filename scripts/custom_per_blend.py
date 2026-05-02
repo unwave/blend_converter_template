@@ -10,12 +10,6 @@ import sys
 import typing
 
 
-ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-if not ROOT in sys.path:
-    sys.path.append(ROOT)
-
-
-import configuration
 
 from blend_converter import common
 
