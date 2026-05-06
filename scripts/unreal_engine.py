@@ -1084,7 +1084,7 @@ def scale_armature(factor = 100):
         bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
 
     for action in bpy.data.actions:
-        for fcurve in action.fcurves:
+        for fcurve in bpy_action.iter_fcurves(action):
             if fcurve.data_path.endswith('location'):
                 for key in fcurve.keyframe_points:
                     key.co.y *= factor
