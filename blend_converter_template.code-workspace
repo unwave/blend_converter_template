@@ -9,7 +9,10 @@
 		"files.trimFinalNewlines": true,
 		"files.insertFinalNewline": true,
 		"files.exclude": {
-			"**/__pycache__": true
+			"**/__pycache__": true,
+			"dist/": true,
+			"build/": true,
+			"**.egg-info/": true,
 		},
 		"cSpell.words": [
 			"ORMA"

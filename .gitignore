@@ -1,2 +1,6 @@
 __pycache__/
 *.lnk
+
+*.egg-info/
+dist/
+build/
