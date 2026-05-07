@@ -85,6 +85,9 @@ class File_Drop_Target(wx.FileDropTarget):
             if path is None:
                 return False
 
+        if os.path.basename(path).lower() == 'blender-launcher.exe':
+            path = os.path.join(os.path.dirname(path), 'blender.exe')
+
         self.ctrl.SetValue(path)
 
         return True
