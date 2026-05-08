@@ -94,7 +94,7 @@ def get_bake_program(
         objects,
         uv_layer_name = uv_layer_name,
         uv_layer_reuse = 'REUSE',
-        settings = tool_settings.S_Unwrap_UVs(),
+        settings = tool_settings.S_Unwrap_UVs(uv_layer_name = uv_layer_name),
         ministry_of_flat_settings = tool_settings.S_Ministry_Of_Flat(timeout = 10),
     )
 
@@ -115,8 +115,11 @@ def get_bake_program(
         ),
         bake_settings = tool_settings.S_Bake(
             texture_name_prefix = get_texture_prefix(blend_path.dir_name),
+            uv_layer_name = uv_layer_name,
         ),
-        pack_settings = tool_settings.S_Pack_UVs(),
+        pack_settings = tool_settings.S_Pack_UVs(
+            uv_layer_name = uv_layer_name,
+        ),
     )
 
     pre_bake_labels = program.run(blender, bpy_utils.label_mix_shader_nodes, objects)
