@@ -13,6 +13,7 @@
 			"dist/": true,
 			"build/": true,
 			"**.egg-info/": true,
+			"launcher.ini": true,
 		},
 		"cSpell.words": [
 			"ORMA"

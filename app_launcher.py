@@ -165,7 +165,7 @@ class Launcher(wx.Frame):
         self.copy_button.Enable(False)
 
 
-        self.config = wx.FileConfig(appName = 'blend_converter_template')
+        self.config = wx.FileConfig(localFilename = os.path.join(ROOT, 'launcher.ini'))
         self.Bind(wx.EVT_CLOSE, self.on_close)
         self.apply_config()
 
