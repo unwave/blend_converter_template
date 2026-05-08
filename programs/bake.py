@@ -1,130 +1,9 @@
 import os
 
 from .. import configuration
-from .. import gui_config
 
 from ..scripts import bake as scripts_bake
 from ..scripts import custom_per_blend
-
-
-def get_unwrap_settings(config: gui_config.Config):
-
-
-    from blend_converter import tool_settings
-
-    if config.quality.preset == 'preview':
-
-        return tool_settings.S_Unwrap_UVs()
-
-    else:
-
-        settings = tool_settings.S_Unwrap_UVs(
-            use_brute_force_unwrap = False,
-        )
-
-        # unwrap methods
-        bfu_preset = config.uv_unwrap.bfu_preset
-        bfu_method = config.uv_unwrap.bfu_method
-
-        if bfu_method != 'NONE':
-            settings.brute_unwrap_methods = [bfu_method]
-        elif bfu_preset == 'active_render':
-            settings.brute_unwrap_methods = ['active_render', 'active_render_minimal_stretch']
-        elif bfu_preset == 'mof_only':
-            settings.brute_unwrap_methods = ['mof_default', 'mof_separate_hard_edges', 'mof_use_normal']
-        elif bfu_preset == 'just_unwrap':
-            settings.brute_unwrap_methods = ['just_minimal_stretch', 'just_conformal']
-
-        return settings
-
-
-def get_uv_pack_settings(config: gui_config.Config):
-
-
-    from blend_converter import tool_settings
-
-    if config.quality.preset == 'preview':
-
-        return tool_settings.S_Pack_UVs(
-            # TODO: add use the efficient packer engine setting
-        )
-
-    else:
-
-        settings = tool_settings.S_Pack_UVs(
-        )
-
-        return settings
-
-
-def get_ministry_of_flat_settings(config: gui_config.Config):
-
-    from blend_converter import tool_settings
-
-    if config.quality.preset == 'preview':
-
-        return tool_settings.S_Ministry_Of_Flat(
-            ignore_default_settings = True,
-            timeout = 10,
-        )
-
-    else:
-        return tool_settings.S_Ministry_Of_Flat(
-            ignore_default_settings = True,
-            timeout = 10,
-        )
-
-
-
-def get_texture_bake_settings(config: gui_config.Config, texture_name_prefix: str):
-
-    from blend_converter import tool_settings
-
-    if config.quality.preset == 'preview':
-
-        return tool_settings.S_Bake(
-            samples=1,
-            texture_name_prefix = texture_name_prefix,
-        )
-
-    else:
-
-        return tool_settings.S_Bake(
-            texture_name_prefix = texture_name_prefix
-        )
-
-
-def get_bake_settings(*,
-            config: gui_config.Config,
-            uv_layer_name: str,
-            textures_folder: str,
-        ):
-
-    from blend_converter import tool_settings
-
-    if config.quality.preset == 'preview':
-
-        return tool_settings.S_Bake_Materials(
-
-            ignore_default_settings = True,
-            image_dir = textures_folder,
-
-            denoise_all = False,
-
-            uv_layer_bake = uv_layer_name,
-        )
-
-    else:
-
-        return tool_settings.S_Bake_Materials(
-
-            ignore_default_settings = True,
-            image_dir = textures_folder,
-
-            denoise_all = True,
-
-            uv_layer_bake = uv_layer_name,
-        )
 
 
 def get_texture_prefix(folder_name: str):
@@ -171,7 +50,6 @@ def get_bake_program(
     else:
         program._prog_type = 'BAKE STATIC 🍪'
 
-    program.config = gui_config.Config(os.path.join(blend_path.dir, 'bc_config.ini'))
 
     program.run(blender, bpy_data.open_mainfile, blend_path)
 
@@ -216,8 +94,8 @@ def get_bake_program(
         objects,
         uv_layer_name = uv_layer_name,
         uv_layer_reuse = 'REUSE',
-        settings = get_unwrap_settings(program.config),
-        ministry_of_flat_settings = get_ministry_of_flat_settings(program.config)
+        settings = tool_settings.S_Unwrap_UVs(),
+        ministry_of_flat_settings = tool_settings.S_Ministry_Of_Flat(timeout = 10),
     )
 
     program.run(blender, bpy_uv.reunwrap_bad_uvs, objects, uv_layer_name = uv_layer_name)
@@ -231,13 +109,14 @@ def get_bake_program(
 
     tasks = program.run(blender, bpy_utils.pack_and_task,
         objects,
-        get_bake_settings(
-            config = program.config,
-            uv_layer_name = uv_layer_name,
-            textures_folder = textures_folder,
+        tool_settings.S_Bake_Materials(
+            image_dir = textures_folder,
+            uv_layer_bake = uv_layer_name,
         ),
-        bake_settings = get_texture_bake_settings(program.config, get_texture_prefix(blend_path.dir_name)),
-        pack_settings = get_uv_pack_settings(program.config),
+        bake_settings = tool_settings.S_Bake(
+            texture_name_prefix = get_texture_prefix(blend_path.dir_name),
+        ),
+        pack_settings = tool_settings.S_Pack_UVs(),
     )
 
     pre_bake_labels = program.run(blender, bpy_utils.label_mix_shader_nodes, objects)
