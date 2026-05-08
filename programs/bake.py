@@ -90,12 +90,15 @@ def get_bake_program(
 
     uv_layer_name = program.run(blender, bpy_utils.get_uuid1_hex)
 
+    x_resolution = program.run(blender, scripts_bake.get_x_resolution)
+    y_resolution = program.run(blender, scripts_bake.get_y_resolution)
+
     program.run(blender, bpy_uv.unwrap,
         objects,
         uv_layer_name = uv_layer_name,
         uv_layer_reuse = 'REUSE',
         settings = tool_settings.S_Unwrap_UVs(uv_layer_name = uv_layer_name),
-        ministry_of_flat_settings = tool_settings.S_Ministry_Of_Flat(timeout = 10),
+        ministry_of_flat_settings = tool_settings.S_Ministry_Of_Flat(timeout = 10, texture_resolution = y_resolution),
     )
 
     program.run(blender, bpy_uv.reunwrap_bad_uvs, objects, uv_layer_name = uv_layer_name)
@@ -112,13 +115,19 @@ def get_bake_program(
         tool_settings.S_Bake_Materials(
             image_dir = textures_folder,
             uv_layer_bake = uv_layer_name,
+            width = x_resolution,
+            height = y_resolution,
         ),
         bake_settings = tool_settings.S_Bake(
             texture_name_prefix = get_texture_prefix(blend_path.dir_name),
             uv_layer_name = uv_layer_name,
+            width = x_resolution,
+            height = y_resolution,
         ),
         pack_settings = tool_settings.S_Pack_UVs(
             uv_layer_name = uv_layer_name,
+            width = x_resolution,
+            height = y_resolution,
         ),
     )
 

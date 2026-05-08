@@ -665,3 +665,10 @@ def delete_empty_meshes(objects: typing.List['bpy.types.Object']):
     for object in objects:
         if object.type == 'MESH' and not object.data.vertices:
             bpy.data.objects.remove(object)
+
+
+def get_x_resolution(resolution: int = 1024):
+    return resolution
+
+def get_y_resolution(resolution: int = 1024):
+    return resolution
