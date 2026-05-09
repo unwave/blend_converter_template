@@ -497,15 +497,20 @@ def set_skeletal_mesh_materials(asset: unreal.SkeletalMesh, materials: typing.Di
 
     array = unreal.Array(unreal.SkeletalMaterial)
 
-    skeletal_materials: typing.Dict[str, unreal.SkeletalMaterial] = {str(m.get_editor_property('imported_material_slot_name')): m for m in asset.get_editor_property('materials')}
+    imported_skeletal_materials: typing.Dict[str, unreal.SkeletalMaterial] = {str(m.get_editor_property('imported_material_slot_name')): m for m in asset.get_editor_property('materials')}
 
-    for slot_name, material in materials.items():
+    for imported_material_slot_name, imported_skeletal_material in imported_skeletal_materials.items():
+
+        new_material = materials.get(imported_material_slot_name)
+        if not new_material:
+            print(f"Material does not exist: {imported_material_slot_name}")
+            continue
 
         # to preserve imported_material_slot_name
-        copy: unreal.SkeletalMaterial = skeletal_materials[slot_name].copy()
+        copy: unreal.SkeletalMaterial = imported_skeletal_material.copy()
 
-        copy.set_editor_property('material_slot_name', slot_name)
-        copy.set_editor_property('material_interface', material)
+        copy.set_editor_property('material_slot_name', imported_material_slot_name)
+        copy.set_editor_property('material_interface', new_material)
 
         array.append(copy)
 
