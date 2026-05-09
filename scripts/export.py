@@ -494,3 +494,7 @@ def check_if_writable(path: str):
                 f"Fail to write: {path}"
                 "\n\n" f"{process.stderr.read().decode()}"
             ) from e
+
+
+def remove_other_object_types(types: typing.Set[str]):
+    bpy.data.batch_remove([o for o in bpy_utils.get_view_layer_objects() if not o.type in types])

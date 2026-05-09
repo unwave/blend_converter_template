@@ -74,6 +74,12 @@ class Folder:
     PANDA3D_ANIMATION = ['panda3d', 'blend_converter', 'animations']
 
 
+    ## fbx
+    FBX_STATIC = ['fbx', 'static']
+    FBX_SKELETAL = ['fbx', 'skeletal']
+    FBX_ANIMATION = ['fbx', 'animations']
+
+
 
 def get_folders(folder: os.PathLike):
     if os.path.exists(folder):

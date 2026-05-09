@@ -71,6 +71,9 @@ def get_program_paths():
     from .programs import scan
     from .programs import rig
     from .programs import panda3d_engine
+    from .programs import fbx_static
+    from .programs import fbx_skeletal
+    from .programs import fbx_animation
 
     return dict(
         static = [bake.get_bake_program, bake.get_static_kwargs],
@@ -85,6 +88,9 @@ def get_program_paths():
         scan = [scan.get_scan_program, scan.get_scan_kwargs],
         rig = [rig.get_rig, rig.get_rig_kwargs],
         panda3d = [panda3d_engine.convert_to_static_mesh, panda3d_engine.get_panda3d_kwargs],
+        fbx_static = [fbx_static.get_program, fbx_static.get_arguments],
+        fbx_skeletal = [fbx_skeletal.get_program, fbx_skeletal.get_arguments],
+        fbx_animation = [fbx_animation.get_program, fbx_animation.get_arguments],
     )
 
 
