@@ -57,7 +57,7 @@ def get_program(
 
     program.run(blender, bpy_export.export_gltf, gltf_path, bpy_export.S_GLTF(export_format='GLTF_SEPARATE'))
 
-    program.run(blender, scripts_godot.set_gd_import_script, gltf_path, '')
+    program.run(blender, scripts_godot.set_gd_import_script, gltf_path, '', is_instruction_enabled = False)
 
     return program
 
