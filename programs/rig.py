@@ -7,7 +7,7 @@ from ..scripts import export as scripts_export
 from ..scripts import bake as scripts_bake
 
 
-def get_rig(
+def get_program(
             blender_executable: str,
             blend_path,
             result_root: str,
@@ -48,7 +48,7 @@ def get_rig(
     return program
 
 
-def get_rig_kwargs(
+def get_arguments(
             blender_executable: str,
             main_root: str,
             root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,

@@ -5,7 +5,7 @@ from .. import configuration
 from ..scripts import bake as scripts_bake
 
 
-def get_skin_test(
+def get_program(
         *,
         blender_executable: str,
         blend_path: str,
@@ -50,7 +50,7 @@ def get_skin_test(
     return program
 
 
-def get_skin_test_kwargs(
+def get_arguments(
             blender_executable: str,
             main_root: str,
             root = configuration.Folder.BLEND_SKELETAL,

@@ -6,7 +6,7 @@ from ..scripts import export as scripts_export
 from ..scripts import rig as scripts_rig
 
 
-def get_skin_proxy(
+def get_program(
             blender_executable: str,
             blend_path,
             result_root: str,
@@ -46,7 +46,7 @@ def get_skin_proxy(
     return program
 
 
-def get_skin_proxy_kwargs(
+def get_arguments(
             blender_executable: str,
             main_root: str,
             root = configuration.Folder.BLEND_SKELETAL,

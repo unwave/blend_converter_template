@@ -13,7 +13,7 @@ def get_texture_prefix(folder_name: str):
     return configuration.get_ascii_underscored(folder_name)
 
 
-def get_bake_program(
+def get_program(
             blender_executable: str,
             blend_path,
             top_folder: str,
@@ -155,7 +155,7 @@ def get_bake_program(
     return program
 
 
-def get_static_kwargs(
+def get_static_arguments(
             blender_executable: str,
             main_root: str,
             root = configuration.Folder.BLEND_STATIC,
@@ -204,7 +204,7 @@ def get_static_kwargs(
     return arguments
 
 
-def get_skeletal_kwargs(
+def get_skeletal_arguments(
             blender_executable: str,
             main_root: str,
             root = configuration.Folder.BLEND_SKELETAL,

@@ -76,17 +76,17 @@ def get_program_paths():
     from .programs import fbx_animation
 
     return dict(
-        static = [bake.get_bake_program, bake.get_static_kwargs],
-        skeletal = [bake.get_bake_program, bake.get_skeletal_kwargs],
+        static = [bake.get_program, bake.get_static_arguments],
+        skeletal = [bake.get_program, bake.get_skeletal_arguments],
         godot = [godot.convert_to_static_mesh, godot.get_godot_kwargs],
         ue_static = [unreal_engine.convert_to_unreal_static_mesh, unreal_engine.get_static_unreal_kwargs],
         ue_skeletal = [unreal_engine.convert_to_unreal_skeletal_mesh, unreal_engine.get_skeletal_unreal_kwargs],
         ue_animation = [unreal_engine.convert_to_unreal_animation, unreal_engine.get_unreal_animation_kwargs],
-        skin_test = [skin_test.get_skin_test, skin_test.get_skin_test_kwargs],
-        skin_proxy = [skin_proxy.get_skin_proxy, skin_proxy.get_skin_proxy_kwargs],
+        skin_test = [skin_test.get_program, skin_test.get_arguments],
+        skin_proxy = [skin_proxy.get_program, skin_proxy.get_arguments],
         test_deform_rig = [test_deform_rig.get_program, test_deform_rig.get_arguments],
-        scan = [scan.get_scan_program, scan.get_scan_kwargs],
-        rig = [rig.get_rig, rig.get_rig_kwargs],
+        scan = [scan.get_program, scan.get_arguments],
+        rig = [rig.get_program, rig.get_arguments],
         panda3d = [panda3d_engine.convert_to_static_mesh, panda3d_engine.get_panda3d_kwargs],
         fbx_static = [fbx_static.get_program, fbx_static.get_arguments],
         fbx_skeletal = [fbx_skeletal.get_program, fbx_skeletal.get_arguments],

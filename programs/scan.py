@@ -5,7 +5,7 @@ from .. import configuration
 from ..scripts import scan as scripts_scan
 
 
-def get_scan_program(blender_executable: str, blend_path, result_dir):
+def get_program(blender_executable: str, blend_path, result_dir):
 
     from blend_converter.blender import bpy_data
     from blend_converter.blender.executor import Blender
@@ -43,7 +43,7 @@ def get_scan_program(blender_executable: str, blend_path, result_dir):
     return program
 
 
-def get_scan_kwargs(
+def get_arguments(
         blender_executable: str,
         main_root: str,
         root = configuration.Folder.SCAN,
