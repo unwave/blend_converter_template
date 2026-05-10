@@ -7,19 +7,6 @@ from ..scripts import export as scripts_export
 from ..scripts import unreal_engine as scripts_unreal
 
 
-class Hierarchy:
-
-    STATIC = configuration.Folder.UNREAL_STATIC
-    SKELETAL = configuration.Folder.UNREAL_SKELETAL
-    ANIM = configuration.Folder.UNREAL_ANIMATION
-
-    @staticmethod
-    def join(*paths):
-        path = os.path.join(*paths).replace(os.sep, '/')
-        path = path.lstrip('/')
-        return '/' + path
-
-
 
 def convert_to_unreal_static_mesh(
             blender_executable: str,
@@ -86,7 +73,7 @@ def convert_to_unreal_static_mesh(
     fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
         dist_name = stem,
-        dist_dir = Hierarchy.join(Hierarchy.STATIC, stem),
+        dist_dir = scripts_unreal.join_path(configuration.Folder.UNREAL_STATIC, stem),
         material_definitions = material_definitions,
         has_custom_collisions = has_custom_collisions
     )
@@ -172,7 +159,7 @@ def convert_to_unreal_skeletal_mesh(
     fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
         dist_name = stem,
-        dist_dir = Hierarchy.join(Hierarchy.SKELETAL, stem),
+        dist_dir = scripts_unreal.join_path(configuration.Folder.UNREAL_SKELETAL, stem),
         material_definitions = material_definitions,
     )
 
@@ -242,9 +229,9 @@ def convert_to_unreal_animation(
 
     ue_fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
-        dist_dir =  Hierarchy.join(Hierarchy.ANIM, rig_name),
+        dist_dir =  scripts_unreal.join_path(configuration.Folder.UNREAL_ANIMATION, rig_name),
         dist_name = f'A_{rig_name}_{animation_name}',
-        skeleton_asset_path = Hierarchy.join(Hierarchy.SKELETAL, rig_name, f'{rig_name}_Skeleton'),
+        skeleton_asset_path = scripts_unreal.join_path(configuration.Folder.UNREAL_SKELETAL, rig_name, f'{rig_name}_Skeleton'),
         frame_rate = program.run(blender, scripts_unreal.get_frame_rate)
     )
 

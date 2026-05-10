@@ -1141,3 +1141,9 @@ def ensure_single_root_bone(name = f"__bc_root", assign_default_weights = False)
             for bone in edit_bones:
                 if not bone.parent:
                     bone.parent = root_bone
+
+
+def join_path(*paths):
+    path = os.path.join(*paths).replace(os.sep, '/')
+    path = path.lstrip('/')
+    return '/' + path
