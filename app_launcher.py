@@ -43,31 +43,6 @@ def start_launcher(strings: typing.List[str]):
     frame.Show()
     app.MainLoop()
 
-
-def get_shortcut_target(path: str):
-
-    cmd = [
-        'powershell',
-        '-NoProfile',
-        '-NonInteractive',
-        '-WindowStyle',
-        'Hidden',
-        '-Command',
-        '& { param($p); (new-object -com wscript.shell).CreateShortCut($p).Targetpath }',
-        '-p',
-        "'" + path + "'",
-    ]
-
-
-    print("CLI:", utils.get_command_from_list(cmd))
-
-    try:
-        return subprocess.check_output(cmd, text = True, creationflags = subprocess.CREATE_NO_WINDOW).strip()
-    except subprocess.CalledProcessError as e:
-        print(e)
-        return None
-
-
 class File_Drop_Target(wx.FileDropTarget):
 
 
@@ -81,8 +56,11 @@ class File_Drop_Target(wx.FileDropTarget):
         path: str = filenames[0]
 
         if os.name == 'nt' and path.lower().endswith('.lnk'):
-            path = get_shortcut_target(path)
-            if path is None:
+
+            from blend_converter.windows import win_utils
+
+            path = win_utils.get_shortcut_target(path)
+            if not path:
                 return False
 
         if os.path.basename(path).lower() == 'blender-launcher.exe':
