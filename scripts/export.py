@@ -175,11 +175,13 @@ def triangulate_geometry(objects: typing.Optional[typing.List['bpy.types.Object'
         bpy.ops.mesh.select_all(action='SELECT')
         bpy.ops.mesh.dissolve_degenerate()
 
-    for object in objects:
-        modifier: bpy.types.TriangulateModifier = object.modifiers.new(name = 'triangulate_geometry', type='TRIANGULATE')
-        modifier.quad_method = 'FIXED'  # says that this is the best for the keep normals
-        modifier.keep_custom_normals = True
-        bpy_modifier.apply_modifier(modifier)
+    with bpy_context.Focus(objects):
+
+        for object in objects:
+            modifier: bpy.types.TriangulateModifier = object.modifiers.new(name = 'triangulate_geometry', type='TRIANGULATE')
+            modifier.quad_method = 'FIXED'  # says that this is the best for the keep normals
+            modifier.keep_custom_normals = True
+            bpy_modifier.apply_modifier(modifier)
 
 
 def get_top_layer_to_all_children_map():
