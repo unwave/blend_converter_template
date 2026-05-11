@@ -49,9 +49,9 @@ class Folder:
 
 
     ## godot
-    GODOT_GLTF_STATIC = ['godot', 'gltf', 'static']
-    GODOT_GLTF_SKELETAL = ['godot', 'gltf', 'skeletal']
-    GODOT_GLTF_ANIMATION = ['godot', 'gltf', 'animations']
+    GODOT_GLTF_STATIC = ['godot', 'blend_converter', 'static']
+    GODOT_GLTF_SKELETAL = ['godot', 'blend_converter', 'skeletal']
+    GODOT_GLTF_ANIMATION = ['godot', 'blend_converter', 'animations']
 
 
     ## unreal
