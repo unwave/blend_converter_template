@@ -8,7 +8,7 @@ from ..scripts import unreal_engine as scripts_unreal
 
 
 
-def convert_to_unreal_skeletal_mesh(
+def get_program(
             blender_executable: str,
             blend_path: str,
             result_root: str,
@@ -117,7 +117,7 @@ def get_unreal_kwargs(*, blender_executable: str, root: str, result_root: str):
     return arguments
 
 
-def get_skeletal_unreal_kwargs(
+def get_arguments(
             blender_executable: str,
             main_root: str,
             root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,

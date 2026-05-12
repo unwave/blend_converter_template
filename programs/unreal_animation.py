@@ -8,7 +8,7 @@ from ..scripts import unreal_engine as scripts_unreal
 
 
 
-def convert_to_unreal_animation(
+def get_program(
             blender_executable: str,
             blend_path,
             rig_name: str,
@@ -80,7 +80,7 @@ def convert_to_unreal_animation(
     return program
 
 
-def get_unreal_animation_kwargs(
+def get_arguments(
             blender_executable: str,
             main_root: str,
             root = configuration.Folder.BLEND_ANIMATION,
