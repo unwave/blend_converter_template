@@ -74,7 +74,7 @@ def get_program_paths():
     from .programs import test_deform_rig
     from .programs import scan
     from .programs import rig
-    from .programs import panda3d_engine
+    from .programs import panda3d_static
     from .programs import fbx_static
     from .programs import fbx_skeletal
     from .programs import fbx_animation
@@ -93,7 +93,7 @@ def get_program_paths():
         test_deform_rig = [test_deform_rig.get_program, test_deform_rig.get_arguments],
         scan = [scan.get_program, scan.get_arguments],
         rig = [rig.get_program, rig.get_arguments],
-        panda3d = [panda3d_engine.convert_to_static_mesh, panda3d_engine.get_panda3d_kwargs],
+        panda3d = [panda3d_static.convert_to_static_mesh, panda3d_static.get_panda3d_kwargs],
         fbx_static = [fbx_static.get_program, fbx_static.get_arguments],
         fbx_skeletal = [fbx_skeletal.get_program, fbx_skeletal.get_arguments],
         fbx_animation = [fbx_animation.get_program, fbx_animation.get_arguments],
