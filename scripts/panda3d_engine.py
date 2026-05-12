@@ -397,6 +397,21 @@ class S_Gltf_2_Bam(tool_settings.Settings):
         return command
 
 
+def get_gltf_settings():
+
+    from blend_converter.blender import bpy_export
+
+    return bpy_export.S_GLTF(
+        export_tangents = True,
+        export_cameras = True,
+        export_extras = True,
+        export_yup = False,
+        export_apply = True,
+        export_force_sampling = True,
+        export_lights = True,
+    )
+
+
 def export_physics(gltf_data, invisible_collisions_collection: str):
     """ https://github.com/Moguri/blend2bam/blob/master/blend2bam/blend2gltf/blender28_script.py """
 

@@ -8,21 +8,6 @@ from ..scripts import export as scripts_export
 from ..scripts import panda3d_engine as scripts_panda3d
 
 
-def get_gltf_settings():
-
-    from blend_converter.blender import bpy_export
-
-    return bpy_export.S_GLTF(
-        export_tangents = True,
-        export_cameras = True,
-        export_extras = True,
-        export_yup = False,
-        export_apply = True,
-        export_force_sampling = True,
-        export_lights = True,
-    )
-
-
 def convert_to_static_mesh(
             *,
             blender_executable: str,
@@ -81,7 +66,7 @@ def convert_to_static_mesh(
 
     settings = scripts_panda3d.S_Gltf_2_Bam(skip_axis_conversion = True)
 
-    program.run(blender, scripts_panda3d.export_gltf, gltf_path, get_gltf_settings(), settings)
+    program.run(blender, scripts_panda3d.export_gltf, gltf_path, scripts_panda3d.get_gltf_settings(), settings)
 
     program.run(python, scripts_panda3d.run_gltf2bam, gltf_path, bam_path, settings)
 
@@ -145,7 +130,7 @@ def convert_to_skeletal_mesh(
 
     settings = scripts_panda3d.S_Gltf_2_Bam(skip_axis_conversion = True)
 
-    program.run(blender, scripts_panda3d.export_gltf, gltf_path, get_gltf_settings(), settings)
+    program.run(blender, scripts_panda3d.export_gltf, gltf_path, scripts_panda3d.get_gltf_settings(), settings)
 
     program.run(python, scripts_panda3d.run_gltf2bam, gltf_path, bam_path, settings)
 
@@ -199,7 +184,7 @@ def convert_to_animation(
 
     settings = scripts_panda3d.S_Gltf_2_Bam(skip_axis_conversion = True)
 
-    program.run(blender, scripts_panda3d.export_gltf, gltf_path, get_gltf_settings(), settings)
+    program.run(blender, scripts_panda3d.export_gltf, gltf_path, scripts_panda3d.get_gltf_settings(), settings)
 
     program.run(python, scripts_panda3d.run_gltf2bam, gltf_path, bam_path, settings)
 
