@@ -9,7 +9,7 @@ from ..scripts import panda3d_engine as scripts_panda3d
 
 
 
-def convert_to_animation(
+def get_program(
             blender_executable: str,
             blend_path,
             intermediate_root: str,
@@ -77,13 +77,13 @@ def get_anim_programs(root = configuration.Folder.BLEND_ANIMATION):
 
             animation_name = os.path.splitext(os.path.basename(blend_file))[0]
 
-            programs.append(convert_to_animation(blend_file, rig_name, animation_name))
+            programs.append(get_program(blend_file, rig_name, animation_name))
 
 
     return programs
 
 
-def get_panda3d_kwargs(
+def get_arguments(
             blender_executable: str,
             main_root: str,
             root = configuration.Folder.INTERMEDIATE_BLEND_STATIC

@@ -9,7 +9,7 @@ from ..scripts import panda3d_engine as scripts_panda3d
 
 
 
-def convert_to_skeletal_mesh(
+def get_program(
             blender_executable: str,
             blend_path: str,
             intermediate_root: str,
@@ -70,7 +70,7 @@ def convert_to_skeletal_mesh(
     return program
 
 
-def get_panda3d_kwargs(
+def get_arguments(
             blender_executable: str,
             main_root: str,
             root = configuration.Folder.INTERMEDIATE_BLEND_STATIC
