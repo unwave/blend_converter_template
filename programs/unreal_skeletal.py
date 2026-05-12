@@ -44,6 +44,8 @@ def get_program(
 
     program._prog_type = 'SK 👾'
 
+    program.run(blender, scripts_export.check_if_writable, fbx_path)
+
     program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_bake.reveal_collections)
@@ -71,7 +73,6 @@ def get_program(
 
     material_definitions = program.run(blender, scripts_unreal.get_material_definitions_for_single_object)
 
-    program.run(blender, scripts_export.check_if_writable, fbx_path)
 
     program.run(blender, bpy_export.export_fbx, fbx_path, bpy_export.S_Fbx(
         add_leaf_bones = False,

@@ -44,6 +44,8 @@ def get_program(
 
     program._prog_type = 'A 👾'
 
+    program.run(blender, scripts_export.check_if_writable, fbx_path)
+
     program.run(blender, bpy_data.open_mainfile, blend_path)
 
     program.run(blender, scripts_export.make_local)
@@ -56,7 +58,6 @@ def get_program(
 
     program.run(blender, scripts_unreal.scale_armature)
 
-    program.run(blender, scripts_export.check_if_writable, fbx_path)
 
     program.run(blender, bpy_export.export_fbx, fbx_path, bpy_export.S_Fbx(
         add_leaf_bones = False,
