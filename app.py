@@ -66,7 +66,9 @@ def get_program_paths():
     from .programs import godot_static
     from .programs import godot_skeletal
     from .programs import godot_animation
-    from .programs import unreal_engine
+    from .programs import unreal_static
+    from .programs import unreal_skeletal
+    from .programs import unreal_animation
     from .programs import skin_test
     from .programs import skin_proxy
     from .programs import test_deform_rig
@@ -83,9 +85,9 @@ def get_program_paths():
         godot_static = [godot_static.get_program, godot_static.get_arguments],
         godot_skeletal = [godot_skeletal.get_program, godot_skeletal.get_arguments],
         godot_animation = [godot_animation.get_program, godot_animation.get_arguments],
-        ue_static = [unreal_engine.convert_to_unreal_static_mesh, unreal_engine.get_static_unreal_kwargs],
-        ue_skeletal = [unreal_engine.convert_to_unreal_skeletal_mesh, unreal_engine.get_skeletal_unreal_kwargs],
-        ue_animation = [unreal_engine.convert_to_unreal_animation, unreal_engine.get_unreal_animation_kwargs],
+        ue_static = [unreal_static.convert_to_unreal_static_mesh, unreal_static.get_static_unreal_kwargs],
+        ue_skeletal = [unreal_skeletal.convert_to_unreal_skeletal_mesh, unreal_skeletal.get_skeletal_unreal_kwargs],
+        ue_animation = [unreal_animation.convert_to_unreal_animation, unreal_animation.get_unreal_animation_kwargs],
         skin_test = [skin_test.get_program, skin_test.get_arguments],
         skin_proxy = [skin_proxy.get_program, skin_proxy.get_arguments],
         test_deform_rig = [test_deform_rig.get_program, test_deform_rig.get_arguments],
