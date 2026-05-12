@@ -39,7 +39,7 @@ def get_program(
 
     program = common.Program(
         blend_path = blend_path,
-        result_path = gltf_path,
+        result_path = bam_path,
         blender_executable = blender.binary_path,
         settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
@@ -73,7 +73,7 @@ def get_program(
 def get_arguments(
             blender_executable: str,
             main_root: str,
-            root = configuration.Folder.INTERMEDIATE_BLEND_STATIC
+            root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL
         ):
 
     root = os.path.join(main_root, *root)
@@ -93,8 +93,8 @@ def get_arguments(
         arguments.append(dict(
             blender_executable = blender_executable,
             blend_path = last_blend,
-            intermediate_root = os.path.join(main_root, *configuration.Folder.INTERMEDIATE_PANDA3D_STATIC),
-            result_root = os.path.join(main_root, *configuration.Folder.PANDA3D_STATIC),
+            intermediate_root = os.path.join(main_root, *configuration.Folder.INTERMEDIATE_PANDA3D_SKELETAL),
+            result_root = os.path.join(main_root, *configuration.Folder.PANDA3D_SKELETAL),
         ))
 
 
