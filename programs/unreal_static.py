@@ -42,7 +42,7 @@ def get_program(
 
     program.tags.add('unreal')
 
-    program._prog_type = 'SM 👾'
+    program._prog_type = 'UNREAL STATIC 👾'
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 
