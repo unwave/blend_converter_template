@@ -35,8 +35,7 @@ def get_func_name(entry: 'updater.Program_Entry'):
 def launch_converter(program_collections: typing.List[common.Program_Collection]):
 
     from blend_converter.gui import updater_ui
-    from blend_converter import updater
-    updater.UPDATE_DELAY = 0
+
 
     print('conversion app start:', time.strftime('%Y.%m.%d %H:%M:%S'))
     columns = [
