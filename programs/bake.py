@@ -16,7 +16,7 @@ def get_texture_prefix(folder_name: str):
 def get_program(
             blender_executable: str,
             blend_path,
-            top_folder: str,
+            result_root: str,
             textures_folder: str,
             is_skeletal: bool,
         ):
@@ -32,7 +32,7 @@ def get_program(
 
     blend_path = common.File(blend_path)
 
-    result_path = os.path.join(top_folder, blend_path.dir_name, blend_path.dir_name + '.blend')
+    result_path = os.path.join(result_root, blend_path.dir_name, blend_path.dir_name + '.blend')
 
     print(result_path)
 
@@ -155,18 +155,18 @@ def get_program(
     return program
 
 
-def get_kwargs(blender_executable: str, blend_path: os.PathLike, folder: str, resources_folder: str, is_skeletal: bool):
+def get_kwargs(blender_executable: str, blend_path: os.PathLike, result_root: str, resource_result_root: str, is_skeletal: bool):
 
     dir_name = os.path.basename(os.path.dirname(blend_path))
 
     # can store the textures in the final location to avoid copies
     # for glTF export_keep_originals=True can be used then
-    texture_folder = os.path.join(resources_folder, dir_name, 'textures')
+    texture_folder = os.path.join(resource_result_root, dir_name, 'textures')
 
     return dict(
         blender_executable = blender_executable,
         blend_path = blend_path,
-        top_folder = folder,
+        result_root = result_root,
         textures_folder = texture_folder,
         is_skeletal = is_skeletal,
     )
