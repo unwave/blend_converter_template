@@ -155,6 +155,23 @@ def get_program(
     return program
 
 
+def get_kwargs(blender_executable: str, blend_path: os.PathLike, folder: str, resources_folder: str, is_skeletal: bool):
+
+    dir_name = os.path.basename(os.path.dirname(blend_path))
+
+    # can store the textures in the final location to avoid copies
+    # for glTF export_keep_originals=True can be used then
+    texture_folder = os.path.join(resources_folder, dir_name, 'textures')
+
+    return dict(
+        blender_executable = blender_executable,
+        blend_path = blend_path,
+        top_folder = folder,
+        textures_folder = texture_folder,
+        is_skeletal = is_skeletal,
+    )
+
+
 def get_static_arguments(
             blender_executable: str,
             root: str,
@@ -167,30 +184,13 @@ def get_static_arguments(
     arguments = []
 
 
-    def get_baked(path: os.PathLike, folder: str, resources_folder: str):
-
-        dir_name = os.path.basename(os.path.dirname(path))
-
-        # can store the textures in the final location to avoid copies
-        # for glTF export_keep_originals=True can be used then
-        texture_folder = os.path.join(resources_folder, dir_name, 'textures')
-
-        return dict(
-            blender_executable = blender_executable,
-            blend_path = path,
-            top_folder = folder,
-            textures_folder = texture_folder,
-            is_skeletal = False,
-        )
-
-
     for folder in configuration.get_folders(root):
 
         last_blend = utils.get_last_blend(folder)
         if not last_blend:
             continue
 
-        arguments.append(get_baked(last_blend, result_root, result_root))
+        arguments.append(get_kwargs(blender_executable, last_blend, result_root, result_root, False))
 
 
     return arguments
@@ -207,31 +207,13 @@ def get_skeletal_arguments(
 
     arguments = []
 
-
-    def get_baked(path: os.PathLike, folder: str, resources_folder: str):
-
-        dir_name = os.path.basename(os.path.dirname(path))
-
-        # can store the textures in the final location to avoid copies
-        # for glTF export_keep_originals=True can be used then
-        texture_folder = os.path.join(resources_folder, dir_name, 'textures')
-
-        return dict(
-            blender_executable = blender_executable,
-            blend_path = path,
-            top_folder = folder,
-            textures_folder = texture_folder,
-            is_skeletal = True,
-        )
-
-
     for folder in configuration.get_folders(root):
 
         last_blend = utils.get_last_blend(folder)
         if not last_blend:
             continue
 
-        arguments.append(get_baked(last_blend, result_root, result_root))
+        arguments.append(get_kwargs(blender_executable, last_blend, result_root, result_root, True))
 
 
     return arguments
