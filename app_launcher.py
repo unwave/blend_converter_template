@@ -285,9 +285,9 @@ class Launcher(wx.Frame):
         self.copy_button.Enable(bool(self.scroll_panel_sizer.GetItemCount()))
 
 
-    def get_definitions(self):
+    def get_program_collections(self):
 
-        definitions: typing.List[common.Program_Definition] = []
+        result: typing.List[common.Program_Collection] = []
 
         sizer_item: wx.SizerItem
         for sizer_item in self.scroll_panel_sizer.GetChildren():
@@ -295,9 +295,9 @@ class Launcher(wx.Frame):
             panel: Program = sizer_item.GetWindow()
 
             kwargs = {key: value.GetValue() for key, value in panel.widget_map.items()}
-            definitions.append(common.Program_Definition.from_callable(*self.programs[panel.program_name], kwargs=kwargs))
+            result.append(common.Program_Collection.from_callable(*self.programs[panel.program_name], kwargs=kwargs))
 
-        return definitions
+        return result
 
 
     def get_command(self):
@@ -305,7 +305,7 @@ class Launcher(wx.Frame):
         return [
             sys.executable,
             os.path.join(ROOT, 'start.py'),
-            json.dumps(self.get_definitions(), default = lambda x: x._to_dict()),
+            json.dumps(self.get_program_collections(), default = lambda x: x._to_dict()),
         ]
 
 

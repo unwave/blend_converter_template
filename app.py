@@ -34,7 +34,7 @@ def get_func_name(entry: 'updater.Program_Entry'):
     return getattr(entry.program, '_prog_type', 'NONE')
 
 
-def launch_converter(definitions: typing.List[common.Program_Definition]):
+def launch_converter(program_collections: typing.List[common.Program_Collection]):
 
     from blend_converter.gui import updater_ui
     from blend_converter import updater
@@ -44,7 +44,7 @@ def launch_converter(definitions: typing.List[common.Program_Definition]):
     columns = [
         ('func', 170, get_func_name),
     ]
-    app = updater_ui.Main_Frame.get_app(definitions, columns)
+    app = updater_ui.Main_Frame.get_app(program_collections, columns)
 
     import psutil
     physical_core_count = psutil.cpu_count(logical=False)
@@ -102,7 +102,7 @@ def get_program_paths():
     )
 
 
-def load_definitions():
+def load_program_collections():
 
     try:
         raw_argument = sys.argv[1]
@@ -117,7 +117,7 @@ def load_definitions():
         return None
 
     try:
-        return [common.Program_Definition.from_dict(**raw_definition) for raw_definition in argument]
+        return [common.Program_Collection.from_dict(**x) for x in argument]
     except Exception as e:
         print(argument)
         print(e)
@@ -131,13 +131,13 @@ def main():
     print(sys.argv)
     print()
 
-    definitions = load_definitions()
+    program_collection = load_program_collections()
 
-    if definitions:
+    if program_collection:
 
         if not IS_USING_TERMINAL:
             sys.excepthook = except_hook
 
-        launch_converter(definitions)
+        launch_converter(program_collection)
     else:
         app_launcher.start_launcher(programs)
