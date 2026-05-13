@@ -166,8 +166,6 @@ def get_static_arguments(
 
     arguments = []
 
-    asset_folders = configuration.get_folders(root)
-
 
     def get_baked(path: os.PathLike, folder: str, resources_folder: str):
 
@@ -186,10 +184,7 @@ def get_static_arguments(
         )
 
 
-    for folder in asset_folders:
-
-        if folder.name.startswith('_'):  # temp or WIP assets to ignore
-            continue
+    for folder in configuration.get_folders(root):
 
         last_blend = utils.get_last_blend(folder)
         if not last_blend:
@@ -212,8 +207,6 @@ def get_skeletal_arguments(
 
     arguments = []
 
-    asset_folders = configuration.get_folders(root)
-
 
     def get_baked(path: os.PathLike, folder: str, resources_folder: str):
 
@@ -232,10 +225,7 @@ def get_skeletal_arguments(
         )
 
 
-    for folder in asset_folders:
-
-        if folder.name.startswith('_'):  # temp or WIP assets to ignore
-            continue
+    for folder in configuration.get_folders(root):
 
         last_blend = utils.get_last_blend(folder)
         if not last_blend:
