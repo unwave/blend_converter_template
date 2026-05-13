@@ -102,28 +102,26 @@ def get_program_paths():
     )
 
 
-def start(programs: dict, launch_options: app_launcher.Launch_Options):
+def load_definitions():
 
+    try:
+        raw_argument = sys.argv[1]
+    except IndexError:
+        return None
 
-    if not IS_USING_TERMINAL:
-        sys.excepthook = except_hook
+    try:
+        argument = json.loads(raw_argument)
+    except json.decoder.JSONDecodeError as e:
+        print(raw_argument)
+        print(e)
+        return None
 
-
-    if not launch_options.blender_executable or not os.path.exists(launch_options.blender_executable):
-        raise Exception(f"The Blender executable path does not exist: {repr(launch_options.blender_executable)}")
-
-
-    if not launch_options.main_root or not os.path.exists(launch_options.main_root):
-        raise Exception(f"The root path does not exist: {repr(launch_options.main_root)}")
-
-
-    launch_converter([
-        common.Program_Definition(*programs[n], kwargs=dict(
-            blender_executable = launch_options.blender_executable,
-            main_root = launch_options.main_root,
-        ))
-        for n in launch_options.program_names
-    ])
+    try:
+        return [common.Program_Definition.from_dict(**raw_definition) for raw_definition in argument]
+    except Exception as e:
+        print(argument)
+        print(e)
+        return None
 
 
 def main():
@@ -133,23 +131,13 @@ def main():
     print(sys.argv)
     print()
 
+    definitions = load_definitions()
 
-    try:
-        argument = sys.argv[1]
-    except IndexError:
-        argument = None
+    if definitions:
 
+        if not IS_USING_TERMINAL:
+            sys.excepthook = except_hook
 
-    launch_options = None
-
-    if argument:
-        try:
-            launch_options = app_launcher.Launch_Options._from_json(argument)
-        except json.decoder.JSONDecodeError as e:
-            print(e)
-
-
-    if launch_options:
-        start(programs, launch_options)
+        launch_converter(definitions)
     else:
-        app_launcher.start_launcher(list(programs))
+        app_launcher.start_launcher(programs)

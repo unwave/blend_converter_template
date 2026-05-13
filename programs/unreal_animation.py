@@ -14,6 +14,8 @@ def get_program(
             rig_name: str,
             animation_name: str,
             result_root: str,
+            root_dist_dir: str,
+            skeletal_root_dist_dir: str,
         ):
     """ export as an animation only fbx file """
 
@@ -70,9 +72,9 @@ def get_program(
 
     ue_fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
-        dist_dir =  scripts_unreal.join_path(configuration.Folder.UNREAL_ANIMATION, rig_name),
+        dist_dir =  scripts_unreal.join_path(root_dist_dir, rig_name),
         dist_name = f'A_{rig_name}_{animation_name}',
-        skeleton_asset_path = scripts_unreal.join_path(configuration.Folder.UNREAL_SKELETAL, rig_name, f'{rig_name}_Skeleton'),
+        skeleton_asset_path = scripts_unreal.join_path(skeletal_root_dist_dir, rig_name, f'{rig_name}_Skeleton'),
         frame_rate = program.run(blender, scripts_unreal.get_frame_rate)
     )
 
@@ -83,13 +85,12 @@ def get_program(
 
 def get_arguments(
             blender_executable: str,
-            main_root: str,
-            root = configuration.Folder.BLEND_ANIMATION,
-            result_root = configuration.Folder.INTERMEDIATE_UNREAL_ANIMATION,
+            root: str,
+            result_root: str,
+            root_dist_dir: str = configuration.Folder.UNREAL_ANIMATION,
+            skeletal_root_dist_dir: str = configuration.Folder.UNREAL_SKELETAL,
         ):
 
-    root = os.path.join(main_root, *root)
-    result_root = os.path.join(main_root, *result_root)
 
     from blend_converter import utils
 
@@ -113,6 +114,8 @@ def get_arguments(
                 rig_name = rig_name,
                 animation_name = animation_name,
                 result_root = result_root,
+                root_dist_dir = root_dist_dir,
+                skeletal_root_dist_dir = skeletal_root_dist_dir,
             ))
 
 

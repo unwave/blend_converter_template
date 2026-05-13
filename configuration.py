@@ -27,57 +27,9 @@ def get_ascii_underscored(string: str):
 
 class Folder:
 
-
-    ## blender source
-    SCAN = ['blends', 'scans']
-
-    BLEND_STATIC = ['blends', 'static']
-    BLEND_SKELETAL = ['blends', 'skeletal']
-
-    BLEND_RIG = ['blends', 'rigs']
-    BLEND_ANIMATION = ['blends', 'animations']
-
-    # blender intermediate
-    INTERMEDIATE_SCAN = ['intermediate', 'blends', 'scans']
-
-    INTERMEDIATE_BLEND_STATIC = ['intermediate', 'blends', 'static']
-    INTERMEDIATE_BLEND_SKELETAL = ['intermediate', 'blends', 'skeletal']
-
-    INTERMEDIATE_BLEND_SKIN_TEST = ['intermediate', 'blends', 'skin_tests']
-    INTERMEDIATE_BLEND_SKIN_PROXY = ['intermediate', 'blends', 'skin_proxies']
-    INTERMEDIATE_BLEND_TEST_DEFORM_RIG = ['intermediate', 'blends', 'test_deform_rig']
-
-
-    ## godot
-    GODOT_GLTF_STATIC = ['godot', 'blend_converter', 'static']
-    GODOT_GLTF_SKELETAL = ['godot', 'blend_converter', 'skeletal']
-    GODOT_GLTF_ANIMATION = ['godot', 'blend_converter', 'animations']
-
-
-    ## unreal
-    INTERMEDIATE_UNREAL_STATIC = ['intermediate', 'unreal', 'static']
-    INTERMEDIATE_UNREAL_SKELETAL = ['intermediate', 'unreal', 'skeletal']
-    INTERMEDIATE_UNREAL_ANIMATION = ['intermediate', 'unreal', 'animations']
-
     UNREAL_STATIC = '/Game/blend_converter/static/'
     UNREAL_SKELETAL = '/Game/blend_converter/skeletal/'
     UNREAL_ANIMATION = '/Game/blend_converter/animations/'
-
-
-    ## panda3d
-    INTERMEDIATE_PANDA3D_STATIC = ['intermediate', 'panda3d', 'static']
-    INTERMEDIATE_PANDA3D_SKELETAL = ['intermediate', 'panda3d', 'skeletal']
-    INTERMEDIATE_PANDA3D_ANIMATION = ['intermediate', 'panda3d', 'animations']
-
-    PANDA3D_STATIC = ['panda3d', 'blend_converter', 'static']
-    PANDA3D_SKELETAL = ['panda3d', 'blend_converter', 'skeletal']
-    PANDA3D_ANIMATION = ['panda3d', 'blend_converter', 'animations']
-
-
-    ## fbx
-    FBX_STATIC = ['fbx', 'static']
-    FBX_SKELETAL = ['fbx', 'skeletal']
-    FBX_ANIMATION = ['fbx', 'animations']
 
 
 

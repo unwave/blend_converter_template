@@ -12,6 +12,7 @@ def get_program(
             blender_executable: str,
             blend_path: str,
             result_root: str,
+            root_dist_dir: str,
         ):
     """ export as a fbx static mesh """
 
@@ -74,7 +75,7 @@ def get_program(
     fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
         dist_name = stem,
-        dist_dir = scripts_unreal.join_path(configuration.Folder.UNREAL_STATIC, stem),
+        dist_dir = scripts_unreal.join_path(root_dist_dir, stem),
         material_definitions = material_definitions,
         has_custom_collisions = has_custom_collisions
     )
@@ -84,7 +85,7 @@ def get_program(
     return program
 
 
-def get_unreal_kwargs(*, blender_executable: str, root: str, result_root: str):
+def get_unreal_kwargs(*, blender_executable: str, root: str, result_root: str, root_dist_dir: str):
 
     from blend_converter import utils
 
@@ -102,6 +103,7 @@ def get_unreal_kwargs(*, blender_executable: str, root: str, result_root: str):
             blender_executable = blender_executable,
             blend_path = last_blend,
             result_root = result_root,
+            root_dist_dir = root_dist_dir,
         ))
 
 
@@ -110,16 +112,14 @@ def get_unreal_kwargs(*, blender_executable: str, root: str, result_root: str):
 
 def get_arguments(
             blender_executable: str,
-            main_root: str,
-            root = configuration.Folder.INTERMEDIATE_BLEND_STATIC,
-            result_root = configuration.Folder.INTERMEDIATE_UNREAL_STATIC,
+            root: str,
+            result_root: str,
+            root_dist_dir: str = configuration.Folder.UNREAL_STATIC,
         ):
-
-    root = os.path.join(main_root, *root)
-    result_root = os.path.join(main_root, *result_root)
 
     return get_unreal_kwargs(
             blender_executable = blender_executable,
             root = root,
             result_root = result_root,
+            root_dist_dir = root_dist_dir,
         )

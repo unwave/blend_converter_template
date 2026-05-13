@@ -72,11 +72,10 @@ def get_program(
 
 def get_arguments(
             blender_executable: str,
-            main_root: str,
-            root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL
+            root: str,
+            intermediate_root: str,
+            result_root: str,
         ):
-
-    root = os.path.join(main_root, *root)
 
     from blend_converter import utils
 
@@ -93,8 +92,8 @@ def get_arguments(
         arguments.append(dict(
             blender_executable = blender_executable,
             blend_path = last_blend,
-            intermediate_root = os.path.join(main_root, *configuration.Folder.INTERMEDIATE_PANDA3D_SKELETAL),
-            result_root = os.path.join(main_root, *configuration.Folder.PANDA3D_SKELETAL),
+            intermediate_root = intermediate_root,
+            result_root = result_root,
         ))
 
 

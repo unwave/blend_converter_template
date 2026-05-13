@@ -157,13 +157,10 @@ def get_program(
 
 def get_static_arguments(
             blender_executable: str,
-            main_root: str,
-            root = configuration.Folder.BLEND_STATIC,
-            result_root = configuration.Folder.INTERMEDIATE_BLEND_STATIC,
+            root: str,
+            result_root: str,
         ):
 
-    root = os.path.join(main_root, *root)
-    result_root = os.path.join(main_root, *result_root)
 
     from blend_converter import utils
 
@@ -206,13 +203,10 @@ def get_static_arguments(
 
 def get_skeletal_arguments(
             blender_executable: str,
-            main_root: str,
-            root = configuration.Folder.BLEND_SKELETAL,
-            result_root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,
+            root: str,
+            result_root: str,
         ):
 
-    root = os.path.join(main_root, *root)
-    result_root = os.path.join(main_root, *result_root)
 
     from blend_converter import utils
 

@@ -3,12 +3,14 @@ import os
 import sys
 import subprocess
 import json
+import inspect
 
 import wx
 import wx.lib.filebrowsebutton
+import wx.lib.scrolledpanel
 
-from blend_converter import tool_settings
 from blend_converter import utils
+from blend_converter import common
 
 
 ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -26,22 +28,13 @@ else:
         dataclass = lambda x: x
 
 
-@dataclasses.dataclass
-class Launch_Options(tool_settings.Settings):
-
-    program_names: typing.List[str] = None
-
-    blender_executable: str = ''
-
-    main_root: str = ''
-
-
-def start_launcher(strings: typing.List[str]):
+def start_launcher(programs):
 
     app = wx.App()
-    frame = Launcher(strings)
+    frame = Launcher(programs)
     frame.Show()
     app.MainLoop()
+
 
 class File_Drop_Target(wx.FileDropTarget):
 
@@ -87,7 +80,7 @@ class FolderBrowseButtonWithHistory(wx.lib.filebrowsebutton.FileBrowseButtonWith
 
 
 
-def get_file_path_widget(parent: wx.Window, label: str, is_folder = False):
+def get_file_path_widget(parent: wx.Window, label: str = "", is_folder = False):
 
 
     def on_change(event):
@@ -117,78 +110,202 @@ def get_file_path_widget(parent: wx.Window, label: str, is_folder = False):
     return widget
 
 
+
+class Program(wx.Panel):
+
+
+    def __init__(self, parent, program_name: str):
+        super().__init__(parent, style = wx.BORDER_THEME)
+
+        self.widget_map: typing.Dict[str, wx.Window] = {}
+        self.program_name = program_name
+
+        self.init_ui()
+
+
+    def init_ui(self):
+
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(main_sizer)
+
+        header_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        main_sizer.Add(header_sizer, 0, wx.EXPAND)
+
+        label_widget = wx.StaticText(self, label = self.program_name)
+        header_sizer.Add(label_widget, 1, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        delete_button = wx.Button(self, label = "X", size=(30, 30))
+        delete_button.Bind(wx.EVT_BUTTON, self.on_delete)
+        header_sizer.Add(delete_button, 0, wx.EXPAND | wx.ALL, 5)
+
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        main_sizer.Add(self.sizer, 0, wx.EXPAND | wx.ALL, 5)
+
+
+    def on_delete(self, event):
+
+        frame: Launcher = self.GetTopLevelParent()
+        frame.Freeze()
+
+        parent: wx.lib.scrolledpanel.ScrolledPanel = self.GetParent()
+
+        self.Destroy()
+
+        parent.Layout()
+        parent.SetupScrolling()
+
+        frame.enable_start_button()
+
+        frame.Thaw()
+
+
+def get_program_panel(parent: wx.Window, function: typing.Callable, program_name: str):
+
+
+    def get_type(parameter: inspect.Parameter):
+
+        if parameter.annotation is not inspect._empty:
+            return parameter.annotation
+        elif parameter.default is not inspect._empty:
+            return type(parameter.default)
+        else:
+            return None
+
+
+    def get_value(parameter: inspect.Parameter):
+
+        if parameter.default is not inspect._empty:
+            return parameter.default
+        else:
+            parameter_type = get_type(parameter)
+
+            if parameter_type is None:
+                return None
+            else:
+                return parameter_type()
+
+
+    panel = Program(parent, program_name)
+
+    signature = inspect.signature(function)
+
+    for name, parameter in signature.parameters.items():
+
+        parameter_type = get_type(parameter)
+
+        if name == 'blender_executable':
+            widget = get_file_path_widget(panel)
+        elif name.endswith('root'):
+            widget = get_file_path_widget(panel, is_folder = True)
+        elif parameter_type is str:
+            widget = wx.TextCtrl(panel, value = get_value(parameter))
+        else:
+            continue
+
+        label = f"{name.replace('_', ' ').title()}:"
+
+        label_widget = wx.StaticText(panel, label = label)
+        panel.sizer.Add(label_widget , 0, wx.EXPAND | wx.ALL, 1)
+
+        panel.sizer.Add(widget, 0, wx.EXPAND | wx.ALL, 1)
+        panel.widget_map[name] = widget
+
+
+    return panel
+
+
 class Launcher(wx.Frame):
 
 
-    result: Launch_Options = None
+    def __init__(self, programs: typing.Dict[str, typing.Tuple[typing.Callable, typing.Callable]]):
+
+        super().__init__(None, title = "Blend Converter GUI Launcher", size=(700, 800))
+
+        self.programs = programs
+
+        self.init_ui()
 
 
-    def __init__(self, program_names: typing.List[str]):
+        self.config = {}
 
-        super().__init__(None, title = "Blend Converter GUI Launcher", size=(600, 600))
-
-        panel = wx.Panel(self)
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-
-        self.checked_programs: typing.List[str] = []
-
-        self.program_names = program_names
+        self.config_file = os.path.join(ROOT, 'launcher.json')
+        if os.path.exists(self.config_file):
+            with open(self.config_file) as f:
+                self.config.update(json.load(f))
 
 
-        self.blender_ctrl = get_file_path_widget(panel, "Blender:")
-        sizer.Add(self.blender_ctrl , 0, wx.ALL | wx.EXPAND, 5)
-
-        self.root_ctrl = get_file_path_widget(panel, "Blends:", is_folder = True)
-        sizer.Add(self.root_ctrl , 0, wx.ALL | wx.EXPAND, 5)
-
-
-        sizer.Add(wx.StaticText(panel, label = 'Programs:') , 0, wx.ALL | wx.EXPAND, 5)
-
-        self.programs_ctrl = wx.CheckListBox(panel)
-        sizer.Add(self.programs_ctrl, 1, wx.ALL | wx.EXPAND, 5)
-        self.programs_ctrl.Bind(wx.EVT_CHECKLISTBOX, self.on_toggle_programs_ctrl)
-        self.programs_ctrl.AppendItems(program_names)
-
-
-        self.start_button = wx.Button(panel, label = 'Start')
-        self.start_button.Bind(wx.EVT_BUTTON, self.on_start)
-        sizer.Add(self.start_button, 0, wx.ALL | wx.EXPAND, 5)
-        self.start_button.Enable(False)
-
-
-        self.copy_button = wx.Button(panel, label = 'Copy Start Command')
-        self.copy_button.Bind(wx.EVT_BUTTON, self.on_copy_command)
-        sizer.Add(self.copy_button, 0, wx.ALL | wx.EXPAND, 5)
-        self.copy_button.Enable(False)
-
-
-        self.config = wx.FileConfig(localFilename = os.path.join(ROOT, 'launcher.ini'))
         self.Bind(wx.EVT_CLOSE, self.on_close)
-        self.apply_config()
 
-
-        panel.SetSizerAndFit(sizer)
+        self.Layout()
         self.Centre()
 
 
-    def on_toggle_programs_ctrl(self, event = None):
-        self.start_button.Enable(bool(self.programs_ctrl.GetCheckedItems()))
-        self.copy_button.Enable(bool(self.programs_ctrl.GetCheckedItems()))
+    def init_ui(self):
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer)
+
+
+        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(button_sizer, 0, wx.EXPAND)
+
+
+        self.start_button = wx.Button(self, label = 'Start')
+        self.start_button.Bind(wx.EVT_BUTTON, self.on_start)
+        button_sizer.Add(self.start_button, 1, wx.EXPAND | wx.ALL, 5)
+        self.start_button.Enable(False)
+
+        self.copy_button = wx.Button(self, label = 'Copy Command')
+        self.copy_button.Bind(wx.EVT_BUTTON, self.on_copy_command)
+        button_sizer.Add(self.copy_button, 1, wx.EXPAND | wx.ALL, 5)
+        self.copy_button.Enable(False)
+
+
+        program_selector_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(program_selector_sizer, 0, wx.EXPAND | wx.ALL)
+
+        program_selector_sizer.Add(wx.StaticText(self, label = "Add program:"), 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        self.program_selector = wx.ComboBox(self, choices = list(self.programs), style = wx.CB_READONLY)
+        self.program_selector.Bind(wx.EVT_COMBOBOX, self.on_add_program)
+        self.program_selector.Bind(wx.EVT_MOUSEWHEEL, lambda x: x)
+        program_selector_sizer.Add(self.program_selector, 1, wx.EXPAND | wx.ALL, 5)
+
+
+        self.scroll_panel = wx.lib.scrolledpanel.ScrolledPanel(self)
+        sizer.Add(self.scroll_panel, 1, wx.EXPAND | wx.ALL, 5)
+        self.scroll_panel.SetupScrolling()
+
+        self.scroll_panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.scroll_panel.SetSizer(self.scroll_panel_sizer)
+
+
+    def enable_start_button(self, event = None):
+        self.start_button.Enable(bool(self.scroll_panel_sizer.GetItemCount()))
+        self.copy_button.Enable(bool(self.scroll_panel_sizer.GetItemCount()))
+
+
+    def get_definitions(self):
+
+        definitions: typing.List[common.Program_Definition] = []
+
+        sizer_item: wx.SizerItem
+        for sizer_item in self.scroll_panel_sizer.GetChildren():
+
+            panel: Program = sizer_item.GetWindow()
+
+            kwargs = {key: value.GetValue() for key, value in panel.widget_map.items()}
+            definitions.append(common.Program_Definition.from_callable(*self.programs[panel.program_name], kwargs=kwargs))
+
+        return definitions
 
 
     def get_command(self):
 
-        options =  Launch_Options(
-            program_names = [self.program_names[i] for i in self.programs_ctrl.GetCheckedItems()],
-            blender_executable = self.blender_ctrl.GetValue(),
-            main_root = self.root_ctrl.GetValue(),
-        )
-
         return [
             sys.executable,
             os.path.join(ROOT, 'start.py'),
-            options._to_json(),
+            json.dumps(self.get_definitions(), default = lambda x: x._to_dict()),
         ]
 
 
@@ -209,37 +326,69 @@ class Launcher(wx.Frame):
         pyperclip.copy(utils.get_command_from_list(self.get_command()))
 
 
-    def apply_config(self):
-        user_input = json.loads(self.config.Read('user_input', '{}'))
+    def write_config(self):
 
-        self.blender_ctrl.SetHistory(user_input.get('blender_ctrl_history', []))
-        self.root_ctrl.SetHistory(user_input.get('root_ctrl_history', []))
-
-        self.blender_ctrl.SetValue(user_input.get('blender_ctrl_value', ''))
-        self.root_ctrl.SetValue(user_input.get('root_ctrl_value', ''))
-
-        for name in user_input.get('checked_programs_names', []):
-            self.programs_ctrl.Check(self.programs_ctrl.FindString(name))
-
-        self.on_toggle_programs_ctrl()
+        with open(self.config_file, 'w') as f:
+            json.dump(self.config, f, indent = 4)
 
 
-    def save_config(self):
-        user_input = dict(
-            blender_ctrl_history = self.blender_ctrl.GetHistory(),
-            root_ctrl_history = self.root_ctrl.GetHistory(),
-            blender_ctrl_value = self.blender_ctrl.GetValue(),
-            root_ctrl_value = self.root_ctrl.GetValue(),
-            checked_programs_names = [self.program_names[i] for i in self.programs_ctrl.GetCheckedItems()],
-        )
-        self.config.Write('user_input', json.dumps(user_input))
-        self.config.Flush()
+    def save_history(self):
+
+        history = self.config.setdefault('history', {})
+
+        sizer_item: wx.SizerItem
+        for sizer_item in self.scroll_panel_sizer.GetChildren():
+
+            panel: Program = sizer_item.GetWindow()
+
+            program_history = history.setdefault(panel.program_name, {})
+
+            for widget_name, widget in panel.widget_map.items():
+
+                if hasattr(widget, 'GetHistory'):
+
+                    widget_history = program_history.get(widget_name, [])
+                    widget_history = widget_history + widget.GetHistory()
+                    widget_history = list(dict.fromkeys(widget_history))
+                    program_history[widget_name] = widget_history
+
+
+    def load_history(self, panel: Program):
+
+        history = self.config.setdefault('history', {})
+
+        for widget_name, widget in panel.widget_map.items():
+            if hasattr(widget, 'SetHistory'):
+                widget.SetHistory(history.get(panel.program_name, {}).get(widget_name, []))
 
 
     def on_close(self, event):
-        self.save_config()
+        self.save_history()
+        self.write_config()
         event.Skip()
 
+
+    def on_add_program(self, event):
+
+        self.Freeze()
+
+        program_name = self.program_selector.GetValue()
+        self.program_selector.SetSelection(-1)
+
+        panel = get_program_panel(self.scroll_panel, self.programs[program_name][1], program_name)
+
+        self.load_history(panel)
+
+        self.scroll_panel_sizer.Add(panel, 0, wx.EXPAND | wx.ALL, 5)
+
+        self.scroll_panel.Layout()
+        self.scroll_panel.SetupScrolling()
+
+        self.scroll_panel.ScrollChildIntoView(panel)
+
+        self.enable_start_button()
+
+        self.Thaw()
 
 
 def set_path_ctrl(ctrl: wx.lib.filebrowsebutton.FileBrowseButtonWithHistory, path: str, check: typing.Callable):
@@ -286,6 +435,33 @@ def get_path_ctrl_menu(ctrl: wx.lib.filebrowsebutton.FileBrowseButtonWithHistory
         control.SetBackgroundColour(WX_WHITE_COLOR)
         ctrl.Refresh()
 
+        remove_from_history(ctrl, path)
+
     menu.Bind(wx.EVT_MENU, on_delete_from_history, delete_item)
 
     return menu
+
+
+def remove_from_history(ctrl: wx.lib.filebrowsebutton.FileBrowseButtonWithHistory, path: str):
+
+    main_frame: Launcher = ctrl.GetTopLevelParent()
+
+    history = main_frame.config.get('history')
+    if not history:
+        return
+
+    panel: Program = ctrl.GetParent()
+
+    program_history = history.get(panel.program_name, {})
+    if not program_history:
+        return
+
+    for widget_name, widget in panel.widget_map.items():
+
+        if ctrl != widget:
+            continue
+
+        widget_history = program_history.get(widget_name, [])
+
+        if path in widget_history:
+            widget_history.remove(path)

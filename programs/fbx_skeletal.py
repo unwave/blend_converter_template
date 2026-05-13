@@ -81,16 +81,11 @@ def get_program(
 
 def get_arguments(
             blender_executable: str,
-            main_root: str,
-            root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,
-            result_root = configuration.Folder.FBX_SKELETAL,
+            root: str,
+            result_root: str,
         ):
 
     from blend_converter import utils
-
-    root = os.path.join(main_root, *root)
-    result_root = os.path.join(main_root, *result_root)
-
 
     arguments = []
 

@@ -50,13 +50,9 @@ def get_program(
 
 def get_arguments(
             blender_executable: str,
-            main_root: str,
-            root = configuration.Folder.INTERMEDIATE_BLEND_SKELETAL,
-            result_root = configuration.Folder.BLEND_RIG,
+            root: str,
+            result_root: str,
         ):
-
-    root = os.path.join(main_root, *root)
-    result_root = os.path.join(main_root, *result_root)
 
     from blend_converter import utils
 
