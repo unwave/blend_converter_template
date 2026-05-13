@@ -9,8 +9,6 @@ import json
 
 from blend_converter import common
 
-from . import app_launcher
-
 
 ROOT = os.path.join(os.path.dirname(__file__))
 
@@ -126,8 +124,6 @@ def load_program_collections():
 
 def main():
 
-    programs = get_program_paths()
-
     print(sys.argv)
     print()
 
@@ -139,5 +135,7 @@ def main():
             sys.excepthook = except_hook
 
         launch_converter(program_collection)
+
     else:
-        app_launcher.start_launcher(programs)
+        from . import app_launcher
+        app_launcher.start_launcher(get_program_paths())
