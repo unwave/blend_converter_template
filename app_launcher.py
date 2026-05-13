@@ -86,6 +86,37 @@ class FolderBrowseButtonWithHistory(wx.lib.filebrowsebutton.FileBrowseButtonWith
         dialog.Destroy()
 
 
+
+def get_file_path_widget(parent: wx.Window, label: str, is_folder = False):
+
+
+    def on_change(event):
+        set_path_ctrl(widget, widget.GetValue(), check = os.path.isdir if is_folder else os.path.isfile)
+
+
+    def on_menu(event):
+
+        menu = get_path_ctrl_menu(widget)
+
+        parent.PopupMenu(menu)
+        menu.Destroy()
+
+
+    if is_folder:
+        cls = FolderBrowseButtonWithHistory
+    else:
+        cls = wx.lib.filebrowsebutton.FileBrowseButtonWithHistory
+
+
+    widget = cls(parent, labelText = label, changeCallback = on_change)
+
+    widget.SetDropTarget(File_Drop_Target(widget))
+    widget.GetHistoryControl().Bind(wx.EVT_CONTEXT_MENU, on_menu)
+
+
+    return widget
+
+
 class Launcher(wx.Frame):
 
 
@@ -105,22 +136,11 @@ class Launcher(wx.Frame):
         self.program_names = program_names
 
 
-        sizer.Add(wx.StaticText(panel, label = 'Blender Executable File:') , 0, wx.ALL | wx.EXPAND, 5)
-
-        self.blender_ctrl = wx.lib.filebrowsebutton.FileBrowseButtonWithHistory(panel, labelText = "", changeCallback = self.on_blender_set)
+        self.blender_ctrl = get_file_path_widget(panel, "Blender:")
         sizer.Add(self.blender_ctrl , 0, wx.ALL | wx.EXPAND, 5)
 
-        self.blender_ctrl.SetDropTarget(File_Drop_Target(self.blender_ctrl))
-        self.blender_ctrl.GetHistoryControl().Bind(wx.EVT_CONTEXT_MENU, self.on_blender_ctrl_menu)
-
-
-        sizer.Add(wx.StaticText(panel, label = 'Asset Root Folder:') , 0, wx.ALL | wx.EXPAND, 5)
-
-        self.root_ctrl = FolderBrowseButtonWithHistory(panel, labelText = "", changeCallback = self.on_root_set)
+        self.root_ctrl = get_file_path_widget(panel, "Blends:", is_folder = True)
         sizer.Add(self.root_ctrl , 0, wx.ALL | wx.EXPAND, 5)
-
-        self.root_ctrl.SetDropTarget(File_Drop_Target(self.root_ctrl))
-        self.root_ctrl.GetHistoryControl().Bind(wx.EVT_CONTEXT_MENU, self.on_root_ctrl_menu)
 
 
         sizer.Add(wx.StaticText(panel, label = 'Programs:') , 0, wx.ALL | wx.EXPAND, 5)
@@ -187,30 +207,6 @@ class Launcher(wx.Frame):
         import pyperclip
 
         pyperclip.copy(utils.get_command_from_list(self.get_command()))
-
-
-    def on_blender_set(self, event):
-        set_path_ctrl(self.blender_ctrl, self.blender_ctrl.GetValue(), check = os.path.isfile)
-
-
-    def on_root_set(self, event):
-        set_path_ctrl(self.root_ctrl, self.root_ctrl.GetValue(), check = os.path.isdir)
-
-
-    def on_blender_ctrl_menu(self, event):
-
-        menu = get_path_ctrl_menu(self.blender_ctrl)
-
-        self.PopupMenu(menu)
-        menu.Destroy()
-
-
-    def on_root_ctrl_menu(self, event):
-
-        menu = get_path_ctrl_menu(self.root_ctrl)
-
-        self.PopupMenu(menu)
-        menu.Destroy()
 
 
     def apply_config(self):
