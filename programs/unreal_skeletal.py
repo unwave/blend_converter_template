@@ -95,7 +95,13 @@ def get_program(
     return program
 
 
-def get_unreal_kwargs(*, blender_executable: str, root: str, result_root: str, root_dist_dir: str):
+def get_arguments(
+            blender_executable: str,
+            root: str,
+            result_root: str,
+            root_dist_dir: str = configuration.Folder.UNREAL_SKELETAL,
+        ):
+
 
     from blend_converter import utils
 
@@ -118,18 +124,3 @@ def get_unreal_kwargs(*, blender_executable: str, root: str, result_root: str, r
 
 
     return arguments
-
-
-def get_arguments(
-            blender_executable: str,
-            root: str,
-            result_root: str,
-            root_dist_dir: str = configuration.Folder.UNREAL_SKELETAL,
-        ):
-
-    return get_unreal_kwargs(
-            blender_executable = blender_executable,
-            root = root,
-            result_root = result_root,
-            root_dist_dir = root_dist_dir,
-        )
