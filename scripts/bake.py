@@ -416,28 +416,11 @@ def get_root_bones(armature: 'bpy.types.Object', k_deform_root = '__bc_deform_ro
     )
 
 
-    tree = bpy_action.get_bone_tree(armature)
-
-    def get_descendants_count(bone: bpy.types.Bone):
-        return len(bpy_action.get_bone_descendants(tree, bone.name))
-
     if not deform_root:
         deform_root_name = bpy_action.find_deform_root(armature)
 
     if not control_root:
-
-        if deform_root:
-            control_bones = deform_root.parent_recursive
-        else:
-            control_bones = armature.data.bones
-
-        control_parents = [b for b in control_bones if not b.use_deform]
-        control_parents.sort(key=get_descendants_count)
-
-        if control_parents:
-            control_root_name = control_parents[-1].name
-        else:
-            control_root_name = ''
+        control_root_name = ''
 
     print("Deform root bone:", deform_root_name)
     print("Control root bone:", control_root_name)
