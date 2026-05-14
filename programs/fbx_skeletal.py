@@ -62,8 +62,8 @@ def get_program(
     program.run(blender, scripts_unreal.join_all_mesh_objects, dir_name, objects)
     program.run(blender, scripts_export.triangulate_geometry, objects)
 
-    program.run(blender, scripts_unreal.limit_total_bone_weights, 8)
-    program.run(blender, scripts_unreal.ensure_bone_count_limit_per_material)
+    program.run(blender, scripts_unreal.limit_total_bone_weights, is_instruction_enabled = False)
+    program.run(blender, scripts_unreal.ensure_bone_count_limit_per_material, is_instruction_enabled = False)
 
     program.run(blender, scripts_unreal.scale_armature, 1)
 
