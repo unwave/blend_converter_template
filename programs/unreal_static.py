@@ -63,6 +63,7 @@ def get_program(
     program.run(blender, scripts_export.triangulate_geometry, program.run(blender, scripts_bake.get_target_objects))
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SM')
 
+    material_definitions = program.run(blender, scripts_unreal.sanitize_material_names)
     material_definitions = program.run(blender, scripts_unreal.get_material_definitions_for_single_object)
 
 

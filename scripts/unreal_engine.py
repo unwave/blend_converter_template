@@ -201,6 +201,24 @@ def get_material_definitions_for_single_object():
     return dict(slot_name_to_name = slot_name_to_name, name_to_definition = name_to_definition)
 
 
+def sanitize_material_names():
+    """ To satisfy Unreal's asset naming requirement. """
+
+    for material in bpy.data.materials:
+
+        sanitized_name = configuration.get_ascii_underscored(material.name)
+
+        if sanitized_name == material.name:
+            continue
+
+        name = sanitized_name
+        index = 2
+        while name in bpy.data.materials:
+            name = sanitized_name + f'_{index}'
+
+        material.name = name
+
+
 @functools.lru_cache(None)
 def import_texture(os_path: str, ue_dir: str, name: typing.Optional[str] = None, **editor_property) -> 'unreal.Texture':
 
