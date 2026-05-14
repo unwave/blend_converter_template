@@ -637,6 +637,8 @@ def import_static_mesh(settings: S_Unreal_Fbx):
     options.set_editor_property('automated_import_should_detect_type', False)
     options.set_editor_property('mesh_type_to_import', unreal.FBXImportType.FBXIT_STATIC_MESH)
 
+    options.set_editor_property('reset_to_fbx_on_material_conflict', True)
+
     import_data = get_static_mesh_import_data(settings._asset_path)
     import_data.set_editor_property('combine_meshes', True)
     import_data.set_editor_property('auto_generate_collision', not settings.has_custom_collisions)
@@ -673,6 +675,7 @@ def import_skeletal_mesh(settings: S_Unreal_Fbx):
     options.set_editor_property('automated_import_should_detect_type', False)
     options.set_editor_property('mesh_type_to_import', unreal.FBXImportType.FBXIT_SKELETAL_MESH)
 
+    options.set_editor_property('reset_to_fbx_on_material_conflict', True)
 
     import_data = get_skeletal_mesh_import_data(settings._asset_path)
     import_data.set_editor_property('reorder_material_to_fbx_order', True)
