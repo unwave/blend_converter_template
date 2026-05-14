@@ -110,8 +110,26 @@ def get_material_definition(material: 'bpy.types.Material'):
     def get_first_image(socket_identifier: str):
 
         for node in principled.inputs[socket_identifier].descendants:
-            if node.be('ShaderNodeTexImage') and node.image:
-                return bpy_utils.get_block_abspath(node.image)
+            if node.be('ShaderNodeTexImage'):
+
+                if not node.image:
+                    continue
+
+                if node.image.source != 'FILE':
+                   continue
+
+                if not node.image.filepath:
+                    continue
+
+                filepath = bpy_utils.get_block_abspath(node.image)
+
+                if not os.path.exists(filepath):
+                    continue
+
+                if not os.path.isfile(filepath):
+                    continue
+
+                return filepath
 
         return ''
 
