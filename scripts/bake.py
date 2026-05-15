@@ -582,7 +582,15 @@ def create_game_rig_and_bake_actions(settings: S_Deform_Armature, do_bake_animat
 
         meshes = get_objects_for_armature(armature)
 
-        deform_root, control_root = get_root_bones(armature, settings)
+
+        with bpy_context.Focus(armature), bpy_context.State() as state:
+
+            state.set(armature.data, 'pose_position','REST')
+            armature.update_tag()
+            bpy.context.view_layer.update()
+
+            deform_root, control_root = get_root_bones(armature, settings)
+
 
         if not deform_root:
             continue
