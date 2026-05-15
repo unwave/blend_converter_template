@@ -11,7 +11,7 @@ from ..scripts import unreal_engine as scripts_unreal
 def get_program(
             blender_executable: str,
             blend_path: str,
-            result_root: str,
+            fbx_root: str,
             root_dist_dir: str,
         ):
     """ export as a fbx static mesh """
@@ -29,7 +29,7 @@ def get_program(
 
     dir_name = configuration.get_ascii_underscored(blend_path.dir_name)
 
-    fbx_path = os.path.join(result_root, dir_name, dir_name + '.fbx')
+    fbx_path = os.path.join(fbx_root, dir_name, dir_name + '.fbx')
 
     unreal = Unreal()
     blender = Blender(blender_executable)
@@ -89,7 +89,7 @@ def get_program(
 def get_arguments(
             blender_executable: str,
             source_root: str,
-            result_root: str,
+            fbx_root: str,
             root_dist_dir: str = configuration.Folder.UNREAL_STATIC,
         ):
 
@@ -108,7 +108,7 @@ def get_arguments(
         arguments.append(dict(
             blender_executable = blender_executable,
             blend_path = last_blend,
-            result_root = result_root,
+            fbx_root = fbx_root,
             root_dist_dir = root_dist_dir,
         ))
 

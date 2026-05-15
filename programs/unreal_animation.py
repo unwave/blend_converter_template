@@ -13,7 +13,7 @@ def get_program(
             blend_path,
             rig_name: str,
             animation_name: str,
-            result_root: str,
+            fbx_root: str,
             root_dist_dir: str,
             skeletal_root_dist_dir: str,
         ):
@@ -30,7 +30,7 @@ def get_program(
     rig_name = configuration.get_ascii_underscored(rig_name)
     animation_name = configuration.get_ascii_underscored(animation_name)
 
-    fbx_path = os.path.join(result_root, rig_name, animation_name + '.fbx')
+    fbx_path = os.path.join(fbx_root, rig_name, animation_name + '.fbx')
 
     unreal = Unreal()
     blender = Blender(blender_executable)
@@ -86,7 +86,7 @@ def get_program(
 def get_arguments(
             blender_executable: str,
             source_root: str,
-            result_root: str,
+            fbx_root: str,
             root_dist_dir: str = configuration.Folder.UNREAL_ANIMATION,
             skeletal_root_dist_dir: str = configuration.Folder.UNREAL_SKELETAL,
         ):
@@ -113,7 +113,7 @@ def get_arguments(
                 blend_path = last_blend,
                 rig_name = rig_name,
                 animation_name = animation_name,
-                result_root = result_root,
+                fbx_root = fbx_root,
                 root_dist_dir = root_dist_dir,
                 skeletal_root_dist_dir = skeletal_root_dist_dir,
             ))
