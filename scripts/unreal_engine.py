@@ -669,7 +669,7 @@ def import_skeletal_mesh(settings: S_Unreal_Fbx):
     options.set_editor_property('import_mesh', True)
     options.set_editor_property('import_textures', False)
     options.set_editor_property('import_materials', False)
-    options.set_editor_property('import_as_skeletal', False)
+    options.set_editor_property('import_as_skeletal', True)
     options.set_editor_property('import_animations', False)
 
     options.set_editor_property('automated_import_should_detect_type', False)
