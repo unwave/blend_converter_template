@@ -311,6 +311,8 @@ class Launcher(wx.Frame):
 
     def on_start(self, event):
 
+        self.save_history()
+
         env = os.environ.copy()
 
         for name in 'PROMPT', 'TERM_PROGRAM', 'TERM', 'TERMINAL_EMULATOR':
