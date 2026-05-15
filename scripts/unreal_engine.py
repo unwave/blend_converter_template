@@ -692,7 +692,15 @@ def import_skeletal_mesh(settings: S_Unreal_Fbx):
     materials = create_materials(settings.material_definitions, settings.destination_folder, is_skeletal = True)
     set_skeletal_mesh_materials(asset, materials)
 
+
     unreal.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty = False)
+
+    if asset.skeleton:
+        unreal.EditorAssetLibrary.save_loaded_asset(asset.skeleton, only_if_is_dirty = False)
+
+    if asset.physics_asset:
+        unreal.EditorAssetLibrary.save_loaded_asset(asset.physics_asset, only_if_is_dirty = False)
+
 
     unreal.log(f"Skeletal Mesh imported: {settings}")
 
