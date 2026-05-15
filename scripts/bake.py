@@ -508,10 +508,6 @@ def get_root_bones(armature: 'bpy.types.Object', settings: S_Deform_Armature):
     return deform_root_name, control_root_name
 
 
-def validate_root_bones():
-    for armature in get_armature_objects():
-        get_root_bones(armature)
-
 
 def unassign_deform_bones_with_missing_weights():
 

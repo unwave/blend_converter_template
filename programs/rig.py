@@ -41,7 +41,6 @@ def get_program(
     program.run(blender, scripts_export.remove_unused_uv_layouts)
     program.run(blender, bpy_utils.remove_all_node_groups_from_materials)
     program.run(blender, bpy_utils.use_backface_culling)
-    program.run(blender, scripts_bake.validate_root_bones)
 
     program.run(blender, scripts_export.save_blend_with_repack, result_path)
 
