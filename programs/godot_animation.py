@@ -61,7 +61,7 @@ def get_program(
 
 def get_arguments(
             blender_executable: str,
-            root: str,
+            source_root: str,
             result_root: str,
         ):
 
@@ -70,7 +70,7 @@ def get_arguments(
 
     arguments = []
 
-    for rig_folder in configuration.get_folders(root):
+    for rig_folder in configuration.get_folders(source_root):
 
         rig_name = os.path.basename(rig_folder)
 

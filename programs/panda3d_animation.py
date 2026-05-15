@@ -64,12 +64,12 @@ def get_program(
     return program
 
 
-def get_anim_programs(root: str):
+def get_anim_programs(source_root: str):
 
     from blend_converter import utils
     programs = utils.Appendable_Dict()
 
-    for folder in configuration.get_folders(root):
+    for folder in configuration.get_folders(source_root):
 
         rig_name = os.path.basename(folder)
 
@@ -85,7 +85,7 @@ def get_anim_programs(root: str):
 
 def get_arguments(
             blender_executable: str,
-            root: str,
+            source_root: str,
             intermediate_root: str,
             result_root: str,
         ):
@@ -94,7 +94,7 @@ def get_arguments(
 
     arguments = []
 
-    asset_folders = configuration.get_folders(root)
+    asset_folders = configuration.get_folders(source_root)
 
     for folder in asset_folders:
 

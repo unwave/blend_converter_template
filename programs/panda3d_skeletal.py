@@ -72,7 +72,7 @@ def get_program(
 
 def get_arguments(
             blender_executable: str,
-            root: str,
+            source_root: str,
             intermediate_root: str,
             result_root: str,
         ):
@@ -81,7 +81,7 @@ def get_arguments(
 
     arguments = []
 
-    asset_folders = configuration.get_folders(root)
+    asset_folders = configuration.get_folders(source_root)
 
     for folder in asset_folders:
 

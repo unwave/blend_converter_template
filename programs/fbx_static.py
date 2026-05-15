@@ -69,7 +69,7 @@ def get_program(
 
 def get_arguments(
             blender_executable: str,
-            root: str,
+            source_root: str,
             result_root: str,
         ):
 
@@ -78,7 +78,7 @@ def get_arguments(
 
     arguments = []
 
-    for folder in configuration.get_folders(root):
+    for folder in configuration.get_folders(source_root):
 
         last_blend = utils.get_last_blend(folder)
         if not last_blend:
