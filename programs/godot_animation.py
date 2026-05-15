@@ -48,7 +48,7 @@ def get_program(
     program.run(blender, scripts_godot.rename_objects_for_godot, 'SK')
     program.run(blender, scripts_export.make_local)
     program.run(blender, scripts_godot.add_export_timestamp)
-    program.run(blender, scripts_bake.create_game_rig_and_bake_actions)
+    program.run(blender, scripts_bake.create_game_rig_and_bake_actions, scripts_bake.S_Deform_Armature())
     program.run(blender, scripts_export.delete_non_armature_objects)
     program.run(blender, scripts_export.rename_all_armatures)
 

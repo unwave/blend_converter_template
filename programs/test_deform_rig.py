@@ -42,7 +42,7 @@ def get_program(
     program.run(blender, scripts_bake.reveal_collections)
 
     program.run(blender, scripts_bake.unassign_deform_bones_with_missing_weights)
-    program.run(blender, scripts_bake.create_game_rig_and_bake_actions, False)
+    program.run(blender, scripts_bake.create_game_rig_and_bake_actions, scripts_bake.S_Deform_Armature(), False)
 
     program.run(blender, bpy_data.save_as_mainfile, result_path)
 

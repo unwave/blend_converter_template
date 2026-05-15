@@ -9,6 +9,7 @@ import uuid
 from .. import configuration
 
 from blend_converter import utils as bc_utils
+from blend_converter import settings_base
 
 
 if 'bpy' in sys.modules:
@@ -348,34 +349,114 @@ def get_objects_for_armature(armature: 'bpy.types.Object'):
     return objects
 
 
-def get_root_bones(armature: 'bpy.types.Object', k_deform_root = '__bc_deform_root', k_control_root = '__bc_control_root'):
+class S_Deform_Armature(settings_base.Settings):
+
+
+    deform_root_bone: str = ''
+    """
+    The name of the deformed root bone.
+
+    The bone also must have `use_deform = True`.
+
+    #### Default: `''`
+    """
+
+
+    control_root_bone: str = ''
+    """
+    The name of the control root bone.
+    Used for the root motion in game engines.
+
+    #### Default: `''`
+    """
+
+
+    k_deform_root: str = '__bc_deform_root'
+    """
+    Another way to define the deformed root bone.
+
+    Assign a custom property of any type with the name to a single Edit bone to mark the deform root bone.
+
+    #### Default: `'__bc_deform_root'`
+    """
+
+
+    k_control_root: str = '__bc_control_root'
+    """
+    Another way to define the control root bone.
+
+    Assign a custom property of any type with the name to a single Edit bone to mark the control root bone."
+
+    #### Default: `'__bc_control_root'`
+    """
+
+
+def get_root_bones(armature: 'bpy.types.Object', settings: S_Deform_Armature):
 
     sentinel = object()
 
-    roots = [b for b in armature.data.bones if b.get(k_deform_root, sentinel) is not sentinel]
-    if len(roots) > 1:
-        raise Exception(
-            f"Multiple deform roots."
+    deform_root = armature.data.bones.get(settings.deform_root_bone)
+
+    if deform_root and not deform_root.use_deform:
+        print(
+            f"The deform root bone specified is not used as such."
             "\n\t" f"Armature: {armature.name_full}"
-            "\n\t" f"Bones: {roots}"
+            "\n\t" f"Bone: {settings.deform_root_bone}"
         )
-    elif not roots:
         deform_root = None
-    else:
-        deform_root = roots[0]
 
-
-    roots = [b for b in armature.data.bones if b.get(k_control_root, sentinel) is not sentinel]
-    if len(roots) > 1:
-        raise Exception(
-            f"Multiple control roots."
+    if settings.deform_root_bone and not deform_root:
+        print(
+            f"The deform root bone specified was not found."
             "\n\t" f"Armature: {armature.name_full}"
-            "\n\t" f"Bones: {roots}"
+            "\n\t" f"Bone: {settings.deform_root_bone}"
         )
-    elif not roots:
+
+    if not deform_root:
+
+        roots = [b for b in armature.data.bones if b.get(settings.k_deform_root, sentinel) is not sentinel]
+        if len(roots) > 1:
+            raise Exception(
+                f"Multiple deform roots."
+                "\n\t" f"Armature: {armature.name_full}"
+                "\n\t" f"Bones: {roots}"
+            )
+        elif not roots:
+            deform_root = None
+        else:
+            deform_root = roots[0]
+
+
+    control_root = armature.data.bones.get(settings.control_root_bone)
+
+    if control_root and control_root.use_deform:
+        print(
+            f"The control root bone specified must not be deform."
+            "\n\t" f"Armature: {armature.name_full}"
+            "\n\t" f"Bone: {settings.control_root_bone}"
+        )
         control_root = None
-    else:
-        control_root = roots[0]
+
+    if settings.control_root_bone and not control_root:
+        print(
+                f"The control root bone specified was not found."
+                "\n\t" f"Armature: {armature.name_full}"
+                "\n\t" f"Bone: {settings.control_root_bone}"
+            )
+
+    if not control_root:
+
+        roots = [b for b in armature.data.bones if b.get(settings.k_control_root, sentinel) is not sentinel]
+        if len(roots) > 1:
+            raise Exception(
+                f"Multiple control roots."
+                "\n\t" f"Armature: {armature.name_full}"
+                "\n\t" f"Bones: {roots}"
+            )
+        elif not roots:
+            control_root = None
+        else:
+            control_root = roots[0]
 
 
     if deform_root and control_root:
@@ -401,12 +482,12 @@ def get_root_bones(armature: 'bpy.types.Object', k_deform_root = '__bc_deform_ro
     if deform_root:
         deform_root_message = f"Deform root: {deform_root.name}"
     else:
-        deform_root_message = f"Assign a custom property of any type with name '{k_deform_root}' to a single Edit bone to mark the deform root bone."
+        deform_root_message = f"Assign a custom property of any type with name '{settings.k_deform_root}' to a single Edit bone to mark the deform root bone."
 
     if control_root:
         control_root_message = f"Deform root: {control_root.name}"
     else:
-        control_root_message = f"Assign a custom property of any type with name '{k_control_root}' to a single Edit bone to mark the control root bone."
+        control_root_message = f"Assign a custom property of any type with name '{settings.k_control_root}' to a single Edit bone to mark the control root bone."
 
     bc_utils.print_in_color(bc_utils.get_color_code(224, 51, 29, 10, 10, 10),
         f"Fail to find specified deform or control root bones in the control armature."
@@ -491,7 +572,9 @@ def bake_animation(
         )[0]
 
 
-def create_game_rig_and_bake_actions(do_bake_animation = True):
+def create_game_rig_and_bake_actions(settings: S_Deform_Armature, do_bake_animation = True):
+
+    settings = S_Deform_Armature()._update(settings)
 
     baked_actions = []
 
@@ -499,7 +582,7 @@ def create_game_rig_and_bake_actions(do_bake_animation = True):
 
         meshes = get_objects_for_armature(armature)
 
-        deform_root, control_root = get_root_bones(armature)
+        deform_root, control_root = get_root_bones(armature, settings)
 
         if not deform_root:
             continue
