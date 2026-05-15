@@ -12,7 +12,7 @@ def get_program(
             blender_executable: str,
             blend_path: str,
             fbx_root: str,
-            root_dist_dir: str,
+            root_destination_folder: str,
         ):
     """ export as a fbx static mesh """
 
@@ -76,7 +76,7 @@ def get_program(
     fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
         destination_name = stem,
-        destination_folder = scripts_unreal.join_path(root_dist_dir, stem),
+        destination_folder = scripts_unreal.join_path(root_destination_folder, stem),
         material_definitions = material_definitions,
         has_custom_collisions = has_custom_collisions
     )
@@ -90,7 +90,7 @@ def get_arguments(
             blender_executable: str,
             source_root: str,
             fbx_root: str,
-            root_dist_dir: str = configuration.Folder.UNREAL_STATIC,
+            root_destination_folder: str = configuration.Folder.UNREAL_STATIC,
         ):
 
     from blend_converter import utils
@@ -109,7 +109,7 @@ def get_arguments(
             blender_executable = blender_executable,
             blend_path = last_blend,
             fbx_root = fbx_root,
-            root_dist_dir = root_dist_dir,
+            root_destination_folder = root_destination_folder,
         ))
 
 
