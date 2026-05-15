@@ -95,6 +95,12 @@ def get_file_path_widget(parent: wx.Window, label: str = "", is_folder = False):
         menu.Destroy()
 
 
+    def on_scroll(event):
+
+        if event.AltDown():
+            event.Skip()
+
+
     if is_folder:
         cls = FolderBrowseButtonWithHistory
     else:
@@ -105,6 +111,7 @@ def get_file_path_widget(parent: wx.Window, label: str = "", is_folder = False):
 
     widget.SetDropTarget(File_Drop_Target(widget))
     widget.GetHistoryControl().Bind(wx.EVT_CONTEXT_MENU, on_menu)
+    widget.GetHistoryControl().Bind(wx.EVT_MOUSEWHEEL, on_scroll)
 
 
     return widget
