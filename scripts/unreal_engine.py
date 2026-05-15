@@ -606,8 +606,8 @@ class S_Unreal_Fbx(tool_settings.Settings):
 
     fbx_path: str = ''
 
-    dist_dir: str = ''
-    dist_name: str = ''
+    destination_folder: str = ''
+    destination_name: str = ''
 
     material_definitions: dict = None
     has_custom_collisions: bool = False
@@ -618,7 +618,7 @@ class S_Unreal_Fbx(tool_settings.Settings):
 
     @property
     def _asset_path(self):
-        return unreal.Paths.combine((self.dist_dir, self.dist_name))
+        return unreal.Paths.combine((self.destination_folder, self.destination_name))
 
 
 def import_static_mesh(settings: S_Unreal_Fbx):
@@ -646,13 +646,13 @@ def import_static_mesh(settings: S_Unreal_Fbx):
     options.set_editor_property('static_mesh_import_data', import_data)
 
 
-    task = get_import_task(options, settings.fbx_path, settings.dist_dir, settings.dist_name)
+    task = get_import_task(options, settings.fbx_path, settings.destination_folder, settings.destination_name)
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
 
     asset: unreal.StaticMesh = unreal.load_asset(settings._asset_path)
 
-    materials = create_materials(settings.material_definitions, settings.dist_dir, is_skeletal = False)
+    materials = create_materials(settings.material_definitions, settings.destination_folder, is_skeletal = False)
     set_static_mesh_materials(asset, materials.values())
 
     unreal.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty = False)
@@ -682,14 +682,14 @@ def import_skeletal_mesh(settings: S_Unreal_Fbx):
     options.set_editor_property('skeletal_mesh_import_data', import_data)
 
 
-    task = get_import_task(options, settings.fbx_path, settings.dist_dir, settings.dist_name)
+    task = get_import_task(options, settings.fbx_path, settings.destination_folder, settings.destination_name)
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
     assert len(task.imported_object_paths) == 1
 
     asset: unreal.SkeletalMesh = unreal.load_asset(task.imported_object_paths[0])
 
-    materials = create_materials(settings.material_definitions, settings.dist_dir, is_skeletal = True)
+    materials = create_materials(settings.material_definitions, settings.destination_folder, is_skeletal = True)
     set_skeletal_mesh_materials(asset, materials)
 
     unreal.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty = False)
@@ -717,7 +717,7 @@ def import_skeleton(settings: S_Unreal_Fbx):
     # options.set_editor_property('skeletal_mesh_import_data', import_data)
 
 
-    task = get_import_task(options, settings.fbx_path, settings.dist_dir, settings.dist_name)
+    task = get_import_task(options, settings.fbx_path, settings.destination_folder, settings.destination_name)
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
 
@@ -751,7 +751,7 @@ def import_anim_sequence(settings: S_Unreal_Fbx):
     import_data.set_editor_property('custom_sample_rate', settings.frame_rate)
     options.set_editor_property('anim_sequence_import_data', import_data)
 
-    task = get_import_task(options, settings.fbx_path, settings.dist_dir, settings.dist_name)
+    task = get_import_task(options, settings.fbx_path, settings.destination_folder, settings.destination_name)
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
     unreal.log(f"Animation Sequence imported: {settings}")

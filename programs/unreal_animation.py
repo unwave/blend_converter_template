@@ -72,8 +72,8 @@ def get_program(
 
     ue_fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
-        dist_dir =  scripts_unreal.join_path(root_dist_dir, rig_name),
-        dist_name = f'A_{rig_name}_{animation_name}',
+        destination_folder =  scripts_unreal.join_path(root_dist_dir, rig_name),
+        destination_name = f'A_{rig_name}_{animation_name}',
         skeleton_asset_path = scripts_unreal.join_path(skeletal_root_dist_dir, rig_name, f'{rig_name}_Skeleton'),
         frame_rate = program.run(blender, scripts_unreal.get_frame_rate)
     )

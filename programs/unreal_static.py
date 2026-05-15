@@ -75,8 +75,8 @@ def get_program(
 
     fbx_settings = scripts_unreal.S_Unreal_Fbx(
         fbx_path = fbx_path,
-        dist_name = stem,
-        dist_dir = scripts_unreal.join_path(root_dist_dir, stem),
+        destination_name = stem,
+        destination_folder = scripts_unreal.join_path(root_dist_dir, stem),
         material_definitions = material_definitions,
         has_custom_collisions = has_custom_collisions
     )
