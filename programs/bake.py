@@ -75,12 +75,10 @@ def get_program(
 
     objects = program.run(blender, scripts_bake.convert_to_mesh_non_mesh_objects, objects)
 
-    ignore_type = ['ARMATURE'] if is_skeletal else []
-
     if not is_skeletal:
         program.run(blender, scripts_bake.apply_shape_keys, objects)
 
-    program.run(blender, scripts_bake.apply_modifiers, objects, ignore_type = ignore_type)
+    program.run(blender, scripts_bake.apply_modeling_modifiers, objects, is_skeletal)
 
     program.run(blender, scripts_bake.delete_empty_meshes, program.run(blender, scripts_bake.get_target_objects))
     objects = program.run(blender, scripts_bake.get_target_objects)
@@ -102,7 +100,7 @@ def get_program(
 
     program.run(blender, bpy_uv.reunwrap_bad_uvs, objects, uv_layer_name = uv_layer_name)
 
-    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_UNWRAP, ignore_type = ignore_type)
+    program.run(blender, scripts_bake.apply_post_unwrap_modifiers, objects, is_skeletal)
 
     program.run(blender, bpy_utils.bisect_by_mirror_modifiers, objects)
 
@@ -136,7 +134,7 @@ def get_program(
 
     program.run(blender, bpy_utils.assign_new_materials, objects, tasks)
 
-    program.run(blender, scripts_bake.apply_modifiers, objects, scripts_bake.Modifier_Type.POST_BAKE, ignore_type = ignore_type)
+    program.run(blender, scripts_bake.apply_post_bake_modifiers, objects, is_skeletal)
 
     program.run(blender, bpy_utils.apply_scale, objects)
     program.run(blender, scripts_bake.join_objects, objects)

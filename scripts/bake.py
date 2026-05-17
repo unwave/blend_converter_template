@@ -19,6 +19,7 @@ if 'bpy' in sys.modules:
     from blend_converter.blender import bpy_context
     from blend_converter.blender import bpy_action
     from blend_converter.blender import bpy_material
+    from blend_converter.blender import bpy_modifier
 
 
 def get_bone_custom_shapes():
@@ -279,12 +280,87 @@ class Modifier_Type:
     POST_BAKE = 'PB'
 
 
-def apply_modifiers(objects: typing.List['bpy.types.Object'], modifier_type_prefix: str = '', ignore_type = set()):
-    if not modifier_type_prefix:
-        pattern = '|'.join([Modifier_Type.POST_UNWRAP, Modifier_Type.POST_BAKE])
-        bpy_utils.apply_modifiers(objects, ignore_name = pattern, ignore_type = ignore_type)
-    else:
-        bpy_utils.apply_modifiers(objects, include_name = modifier_type_prefix, ignore_type = ignore_type)
+def get_modelling_modifiers(object: 'bpy.types.Object'):
+
+    result = []
+
+    for modifier in list(object.modifiers):
+
+        if modifier.name.startswith(Modifier_Type.POST_UNWRAP):
+            continue
+
+        if modifier.name.startswith(Modifier_Type.POST_BAKE):
+            continue
+
+        result.append(modifier.name)
+
+    return result
+
+
+def get_post_unwrap_modifiers(object: 'bpy.types.Object'):
+
+    result = []
+
+    for modifier in list(object.modifiers):
+
+        if not modifier.name.startswith(Modifier_Type.POST_UNWRAP):
+            continue
+
+        result.append(modifier.name)
+
+    return result
+
+
+def get_post_bake_modifiers(object: 'bpy.types.Object'):
+
+    result = []
+
+    for modifier in list(object.modifiers):
+
+        if not modifier.name.startswith(Modifier_Type.POST_BAKE):
+            continue
+
+        result.append(modifier.name)
+
+    return result
+
+
+def get_armature_modifier(object: 'bpy.types.Object'):
+
+    for modifier in reversed(object.modifiers):
+        if modifier.type == 'ARMATURE':
+            return modifier.name
+
+
+def _apply_modifiers(filter_func: typing.Callable, objects: typing.List['bpy.types.Object'], preserve_armature: bool):
+
+    with bpy_context.Focus(objects):
+
+        for object in objects:
+
+            modifiers_to_apply = filter_func(object)
+            if not modifiers_to_apply:
+                continue
+
+            if preserve_armature:
+                armature_modifier = get_armature_modifier(object)
+                if armature_modifier in modifiers_to_apply:
+                    modifiers_to_apply.remove(armature_modifier)
+
+            for name in modifiers_to_apply:
+                bpy_modifier.apply_modifier(object.modifiers[name])
+
+
+def apply_modeling_modifiers(objects: typing.List['bpy.types.Object'], preserve_armature = False):
+    _apply_modifiers(get_modelling_modifiers, objects, preserve_armature)
+
+
+def apply_post_unwrap_modifiers(objects: typing.List['bpy.types.Object'], preserve_armature = False):
+    _apply_modifiers(get_post_unwrap_modifiers, objects, preserve_armature)
+
+
+def apply_post_bake_modifiers(objects: typing.List['bpy.types.Object'], preserve_armature = False):
+    _apply_modifiers(get_post_bake_modifiers, objects, preserve_armature)
 
 
 def delete_hidden_modifiers(objects: typing.List['bpy.types.Object']):
