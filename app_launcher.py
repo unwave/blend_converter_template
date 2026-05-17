@@ -11,6 +11,7 @@ import wx.lib.scrolledpanel
 
 from blend_converter import utils
 from blend_converter import common
+from blend_converter.gui import wxp_utils
 
 
 ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -267,6 +268,11 @@ class Launcher(wx.Frame):
         button_sizer.Add(self.copy_button, 1, wx.EXPAND | wx.ALL, 5)
         self.copy_button.Enable(False)
 
+        self.create_shortcut_button = wx.Button(self, label = 'Create Shortcut')
+        self.create_shortcut_button.Bind(wx.EVT_BUTTON, self.on_create_shortcut)
+        button_sizer.Add(self.create_shortcut_button, 1, wx.EXPAND | wx.ALL, 5)
+        self.create_shortcut_button.Enable(False)
+
 
         program_selector_sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(program_selector_sizer, 0, wx.EXPAND | wx.ALL)
@@ -288,8 +294,12 @@ class Launcher(wx.Frame):
 
 
     def enable_start_button(self, event = None):
-        self.start_button.Enable(bool(self.scroll_panel_sizer.GetItemCount()))
-        self.copy_button.Enable(bool(self.scroll_panel_sizer.GetItemCount()))
+
+        do_enable = bool(self.scroll_panel_sizer.GetItemCount())
+
+        self.start_button.Enable(do_enable)
+        self.copy_button.Enable(do_enable)
+        self.create_shortcut_button.Enable(do_enable)
 
 
     def get_program_collections(self):
@@ -333,6 +343,45 @@ class Launcher(wx.Frame):
         import pyperclip
 
         pyperclip.copy(utils.get_command_from_list(self.get_command()))
+
+
+    def on_create_shortcut(self, event):
+
+
+        if os.name != 'nt':
+            return
+
+
+        with wxp_utils.Generic_Selector_Dialog(self, {'name': 'BC Template'}, title = f"Create Shortcut") as dialog:
+
+            dialog.CenterOnScreen()
+
+            if dialog.ShowModal() != wx.ID_OK:
+                return
+
+            dialog_data = dialog.get_data()
+
+        name = dialog_data['name']
+        if not name:
+            return
+
+        from blend_converter.windows import win_utils
+
+        command = self.get_command()
+
+        target_path = command[0]
+        arguments = subprocess.list2cmdline(command[1:])
+
+        shortcut_path = win_utils.create_shortcut(
+            name = name,
+            target_path = target_path,
+            arguments = arguments,
+            working_directory = os.getcwd(),
+        )
+
+        utils.os_show(shortcut_path)
+
+        self.save_history()
 
 
     def write_config(self):
