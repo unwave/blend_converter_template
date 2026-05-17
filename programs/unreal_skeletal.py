@@ -70,7 +70,7 @@ def get_program(
     program.run(blender, scripts_unreal.limit_total_bone_weights, is_instruction_enabled = False)
     program.run(blender, scripts_unreal.ensure_bone_count_limit_per_material, is_instruction_enabled = False)
 
-    program.run(blender, scripts_unreal.scale_armature)
+    program.run(blender, scripts_unreal.scale_armature, 100)
 
     material_definitions = program.run(blender, scripts_unreal.sanitize_material_names)
     material_definitions = program.run(blender, scripts_unreal.get_material_definitions_for_single_object)

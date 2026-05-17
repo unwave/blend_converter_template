@@ -58,7 +58,7 @@ def get_program(
 
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SK')
 
-    program.run(blender, scripts_unreal.scale_armature)
+    program.run(blender, scripts_unreal.scale_armature, 100)
 
 
     program.run(blender, bpy_export.export_fbx, fbx_path, bpy_export.S_Fbx(

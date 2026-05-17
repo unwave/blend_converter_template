@@ -1103,7 +1103,7 @@ def join_all_mesh_objects(collection_name: str, objects: typing.List['bpy.types.
     bpy_context.Focus(all_objects).__enter__().visible_collection.name = collection_name
 
 
-def scale_armature(factor = 100):
+def scale_armature(factor: float):
 
     bpy.context.scene.tool_settings.use_keyframe_insert_auto = False  # this is for the inspection
 
