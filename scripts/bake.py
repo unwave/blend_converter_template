@@ -818,3 +818,9 @@ def get_x_resolution(resolution: int = 1024):
 
 def get_y_resolution(resolution: int = 1024):
     return resolution
+
+def get_alpha_x_resolution(resolution: int = 1024):
+    return resolution
+
+def get_alpha_y_resolution(resolution: int = 1024):
+    return resolution

@@ -89,6 +89,8 @@ def get_program(
 
     x_resolution = program.run(blender, scripts_bake.get_x_resolution)
     y_resolution = program.run(blender, scripts_bake.get_y_resolution)
+    alpha_x_resolution = program.run(blender, scripts_bake.get_alpha_x_resolution)
+    alpha_y_resolution = program.run(blender, scripts_bake.get_alpha_y_resolution)
 
     program.run(blender, bpy_uv.unwrap,
         objects,
@@ -114,6 +116,8 @@ def get_program(
             uv_layer_bake = uv_layer_name,
             width = x_resolution,
             height = y_resolution,
+            alpha_width = alpha_x_resolution,
+            alpha_height = alpha_y_resolution,
         ),
         bake_settings = tool_settings.S_Bake(
             texture_name_prefix = get_texture_prefix(blend_path.dir_name),
