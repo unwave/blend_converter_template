@@ -10,6 +10,7 @@ import functools
 from .. import configuration
 
 from ..scripts import bake as bake_scripts
+from blend_converter import utils as bc_utils
 
 
 if 'bpy' in sys.modules:
@@ -19,7 +20,6 @@ if 'bpy' in sys.modules:
 
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_context
-    from blend_converter import utils as bc_utils
     from blend_converter.blender import bpy_material
     from blend_converter.blender import bpy_action
     from blend_converter.blender import bpy_uv
@@ -28,29 +28,8 @@ if 'bpy' in sys.modules:
 
 if 'unreal' in sys.modules:
     import unreal
-elif typing.TYPE_CHECKING:
-    import unreal
-else:
-
-    class dummy:
-
-        def __getattribute__(self, key):
-            return self
-
-        def __getattr___(self, key):
-            return self
-
-        def __getitem__(self, key):
-            return self
-
-        def __call__(self, *args, **kwargs):
-
-            if len(args) == 1 and callable(args[0]):
-                return args[0]
-            else:
-                return self
-
-    unreal = dummy()
+elif not typing.TYPE_CHECKING:
+    unreal = bc_utils.Dummy()
 
 
 from blend_converter import tool_settings
