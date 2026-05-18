@@ -240,9 +240,7 @@ def import_texture(os_path: str, ue_dir: str, name: typing.Optional[str] = None,
     task.factory = factory
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
-    assert len(task.imported_object_paths) == 1
-
-    asset = unreal.load_asset(task.imported_object_paths[0])
+    asset: unreal.Texture = get_task_assets(task)[0]
 
     for key, value in editor_property.items():
         asset.set_editor_property(key, value)
@@ -629,7 +627,7 @@ def import_static_mesh(settings: S_Unreal_Fbx):
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
 
-    asset: unreal.StaticMesh = unreal.load_asset(settings._asset_path)
+    asset: unreal.StaticMesh = get_task_assets(task)[0]
 
     materials = create_materials(settings.material_definitions, settings.destination_folder, is_skeletal = False)
     set_static_mesh_materials(asset, materials.values())
@@ -664,9 +662,7 @@ def import_skeletal_mesh(settings: S_Unreal_Fbx):
     task = get_import_task(options, settings.fbx_path, settings.destination_folder, settings.destination_name)
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
-    assert len(task.imported_object_paths) == 1
-
-    asset: unreal.SkeletalMesh = unreal.load_asset(task.imported_object_paths[0])
+    asset: unreal.SkeletalMesh = get_task_assets(task)[0]
 
     materials = create_materials(settings.material_definitions, settings.destination_folder, is_skeletal = True)
     set_skeletal_mesh_materials(asset, materials)
@@ -1148,3 +1144,14 @@ def join_path(*paths):
     path = os.path.join(*paths).replace(os.sep, '/')
     path = path.lstrip('/')
     return '/' + path
+
+
+if hasattr(unreal.AssetImportTask, 'get_objects'):
+
+    def get_task_assets(task: unreal.AssetImportTask):
+        return task.get_objects()
+
+else:
+
+    def get_task_assets(task: unreal.AssetImportTask):
+        return [unreal.EditorAssetLibrary.load_asset(path) for path in task.imported_object_paths]
