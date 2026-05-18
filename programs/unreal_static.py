@@ -5,6 +5,7 @@ from .. import configuration
 from ..scripts import bake as scripts_bake
 from ..scripts import export as scripts_export
 from ..scripts import unreal_engine as scripts_unreal
+from ..scripts import unreal_material
 
 
 
@@ -63,8 +64,8 @@ def get_program(
     program.run(blender, scripts_export.triangulate_geometry, program.run(blender, scripts_bake.get_target_objects))
     program.run(blender, scripts_unreal.rename_objects_for_unreal, 'SM')
 
-    material_definitions = program.run(blender, scripts_unreal.sanitize_material_names)
-    material_definitions = program.run(blender, scripts_unreal.get_material_definitions_for_single_object)
+    program.run(blender, unreal_material.sanitize_material_names)
+    material_definitions = program.run(blender, unreal_material.get_material_definitions_for_single_object)
 
 
     program.run(blender, bpy_export.export_fbx, fbx_path, bpy_export.S_Fbx(
