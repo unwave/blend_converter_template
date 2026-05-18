@@ -46,7 +46,7 @@ def get_program(
 
     program.tags.add('panda3d')
 
-    program._prog_type = 'P3D SKELETAL 👾'
+    program.label = 'P3D SKELETAL 👾'
 
     program.run(blender, bpy_data.open_mainfile, blend_path)
 

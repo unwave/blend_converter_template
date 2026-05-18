@@ -43,7 +43,7 @@ def get_program(
 
     program.tags.add('unreal')
 
-    program._prog_type = 'UNREAL SKELETAL 👾'
+    program.label = 'UNREAL SKELETAL 👾'
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 

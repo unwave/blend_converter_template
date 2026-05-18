@@ -46,9 +46,9 @@ def get_program(
     )
 
     if is_skeletal:
-        program._prog_type = 'BAKE SKELETAL 🍪'
+        program.label = 'BAKE SKELETAL 🍪'
     else:
-        program._prog_type = 'BAKE STATIC 🍪'
+        program.label = 'BAKE STATIC 🍪'
 
 
     program.run(blender, bpy_data.open_mainfile, blend_path)

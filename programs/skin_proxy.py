@@ -34,7 +34,7 @@ def get_program(
         settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
-    program._prog_type = 'SKIN PROXY 🤸'
+    program.label = 'SKIN PROXY 🤸'
 
     program.run(blender, bpy_data.open_mainfile, blend_path)
 

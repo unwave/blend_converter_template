@@ -26,7 +26,7 @@ def get_program(blender_executable: str, blend_path, result_dir):
         settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
     )
 
-    program._prog_type = 'SCAN 🗿'
+    program.label = 'SCAN 🗿'
 
     program.run(blender, bpy_data.open_mainfile, blend_path)
 

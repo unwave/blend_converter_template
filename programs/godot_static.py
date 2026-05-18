@@ -38,7 +38,7 @@ def get_program(
 
     program.tags.add('godot')
 
-    program._prog_type = 'GODOT STATIC 👾'
+    program.label = 'GODOT STATIC 👾'
 
     program.run(blender, bpy_data.open_mainfile, blend_path)
 

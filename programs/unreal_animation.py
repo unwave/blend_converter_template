@@ -44,7 +44,7 @@ def get_program(
 
     program.tags.add('unreal')
 
-    program._prog_type = 'UNREAL ANIMATION 👾'
+    program.label = 'UNREAL ANIMATION 👾'
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 

@@ -38,7 +38,7 @@ def get_program(
 
     program.tags.add('fbx')
 
-    program._prog_type = 'FBX STATIC'
+    program.label = 'FBX STATIC'
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 

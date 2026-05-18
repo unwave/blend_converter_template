@@ -44,7 +44,7 @@ def get_program(
 
     program.tags.add('panda3d')
 
-    program._prog_type = 'P3D ANIMATION 👾'
+    program.label = 'P3D ANIMATION 👾'
 
     program.run(blender, bpy_data.open_mainfile, blend_path)
 

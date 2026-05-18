@@ -28,8 +28,8 @@ def except_hook(exc_type, exc_value, exc_traceback):
     input('Press Enter to exit.')
 
 
-def get_func_name(entry: 'updater.Program_Entry'):
-    return getattr(entry.program, '_prog_type', 'NONE')
+def get_program_label(entry: 'updater.Program_Entry'):
+    return getattr(entry.program, 'label', 'NONE')
 
 
 def launch_converter(program_collections: typing.List[common.Program_Collection]):
@@ -39,7 +39,7 @@ def launch_converter(program_collections: typing.List[common.Program_Collection]
 
     print('conversion app start:', time.strftime('%Y.%m.%d %H:%M:%S'))
     columns = [
-        ('func', 170, get_func_name),
+        ('label', 170, get_program_label),
     ]
     app = updater_ui.Main_Frame.get_app(program_collections, columns)
 

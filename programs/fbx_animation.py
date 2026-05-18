@@ -39,7 +39,7 @@ def get_program(
 
     program.tags.add('fbx')
 
-    program._prog_type = 'FBX ANIMATION'
+    program.label = 'FBX ANIMATION'
 
     program.run(blender, scripts_export.check_if_writable, fbx_path)
 
