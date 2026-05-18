@@ -229,7 +229,7 @@ def import_texture(os_path: str, ue_dir: str, name: typing.Optional[str] = None,
     task.automated = True
     task.replace_existing = True
     task.replace_existing_settings = True
-    task.save = True
+    task.save = False
 
     task.filename = os_path
     task.destination_path = ue_dir
@@ -539,7 +539,7 @@ def get_import_task(options, filename: str, destination_path: str, destination_n
     task.set_editor_property('automated', True)
     task.set_editor_property('replace_existing', True)
     task.set_editor_property('replace_existing_settings', True)
-    task.set_editor_property('save', True)
+    task.set_editor_property('save', False)
 
     task.set_editor_property('options', options)
 
@@ -713,6 +713,7 @@ def import_anim_sequence(settings: S_Unreal_Fbx):
     options.set_editor_property('anim_sequence_import_data', import_data)
 
     task = get_import_task(options, settings.fbx_path, settings.destination_folder, settings.destination_name)
+    task.save = True
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
     unreal.log(f"Animation Sequence imported: {settings}")
