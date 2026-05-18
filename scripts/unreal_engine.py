@@ -684,32 +684,6 @@ def import_skeletal_mesh(settings: S_Unreal_Fbx):
     unreal.log(f"Skeletal Mesh imported: {settings}")
 
 
-def import_skeleton(settings: S_Unreal_Fbx):
-
-    settings = S_Unreal_Fbx._from_dict(settings)
-
-    options = unreal.FbxImportUI()
-
-    options.set_editor_property('import_mesh', False)
-    options.set_editor_property('import_textures', False)
-    options.set_editor_property('import_materials', False)
-    options.set_editor_property('import_as_skeletal', True)
-    options.set_editor_property('import_animations', False)
-
-    options.set_editor_property('automated_import_should_detect_type', False)
-    # options.set_editor_property('mesh_type_to_import', unreal.FBXImportType.FBXIT_SKELETAL_MESH)
-
-
-    # import_data = get_skeletal_mesh_import_data(settings._asset_path)
-    # options.set_editor_property('skeletal_mesh_import_data', import_data)
-
-
-    task = get_import_task(options, settings.fbx_path, settings.destination_folder, settings.destination_name)
-    unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
-
-
-    unreal.log(f"Skeletal Mesh imported: {settings}")
-
 
 def import_anim_sequence(settings: S_Unreal_Fbx):
 
