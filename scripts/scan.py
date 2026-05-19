@@ -54,7 +54,12 @@ def apply_weighted_smooth(object: 'bpy.types.Object', sharp = True, sharp_degree
         bpy_modifier.apply_weighted_normal(object)
 
 
-def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Object, bpy.types.Object]]', result_dir: str):
+def the_bake(
+        objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Object, bpy.types.Object]]',
+        result_dir: str,
+        width = 4096,
+        height = 4096,
+    ):
 
     from blend_converter.blender import bpy_bake
     from blend_converter.blender import bake_settings
@@ -69,7 +74,8 @@ def the_bake(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy.types.Obje
     uv_layer_name = bpy_utils.get_uuid1_hex()
 
     _settings = tool_settings.S_Bake(
-        resolution = 4096,
+        width = width,
+        height = height,
         image_dir = os.path.join(result_dir, 'textures'),
         bake_types = bake_types,
         use_selected_to_active=True,
