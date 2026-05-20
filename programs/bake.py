@@ -97,7 +97,7 @@ def get_program(
         uv_layer_name = uv_layer_name,
         uv_layer_reuse = 'REUSE',
         settings = tool_settings.S_Unwrap_UVs(uv_layer_name = uv_layer_name),
-        ministry_of_flat_settings = tool_settings.S_Ministry_Of_Flat(timeout = 10, texture_resolution = y_resolution),
+        ministry_of_flat_settings = tool_settings.S_Ministry_Of_Flat(timeout = 10.0, texture_resolution = y_resolution),
     )
 
     program.run(blender, bpy_uv.reunwrap_bad_uvs, objects, uv_layer_name = uv_layer_name)
