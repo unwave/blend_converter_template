@@ -82,7 +82,14 @@ def get_program(
         has_custom_collisions = has_custom_collisions
     )
 
+
+    init_interchange = program.run(unreal, scripts_unreal.get_console_variable_bool_value, scripts_unreal.INTERCHANGE_FLAG)
+    program.run(unreal, scripts_unreal.set_console_variable_bool_value, scripts_unreal.INTERCHANGE_FLAG, False)
+
     program.run(unreal, scripts_unreal.import_static_mesh, fbx_settings)
+
+    program.run(unreal, scripts_unreal.set_console_variable_bool_value, scripts_unreal.INTERCHANGE_FLAG, init_interchange)
+
 
     return program
 

@@ -91,7 +91,14 @@ def get_program(
         material_definitions = material_definitions,
     )
 
+
+    init_interchange = program.run(unreal, scripts_unreal.get_console_variable_bool_value, scripts_unreal.INTERCHANGE_FLAG)
+    program.run(unreal, scripts_unreal.set_console_variable_bool_value, scripts_unreal.INTERCHANGE_FLAG, False)
+
     program.run(unreal, scripts_unreal.import_skeletal_mesh, fbx_settings)
+
+    program.run(unreal, scripts_unreal.set_console_variable_bool_value, scripts_unreal.INTERCHANGE_FLAG, init_interchange)
+
 
     return program
 

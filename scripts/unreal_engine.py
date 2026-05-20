@@ -696,3 +696,14 @@ else:
 
     def get_task_assets(task: unreal.AssetImportTask):
         return [unreal.EditorAssetLibrary.load_asset(path) for path in task.imported_object_paths]
+
+
+INTERCHANGE_FLAG = 'Interchange.FeatureFlags.Import.FBX'
+
+
+def get_console_variable_bool_value(name: str):
+    return unreal.SystemLibrary.get_console_variable_bool_value(name)
+
+
+def set_console_variable_bool_value(name: str, value: bool):
+    unreal.SystemLibrary.execute_console_command(None, f'{name} {value}')

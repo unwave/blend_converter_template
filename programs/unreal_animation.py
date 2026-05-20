@@ -78,7 +78,14 @@ def get_program(
         frame_rate = program.run(blender, scripts_unreal.get_frame_rate)
     )
 
+
+    init_interchange = program.run(unreal, scripts_unreal.get_console_variable_bool_value, scripts_unreal.INTERCHANGE_FLAG)
+    program.run(unreal, scripts_unreal.set_console_variable_bool_value, scripts_unreal.INTERCHANGE_FLAG, False)
+
     program.run(unreal, scripts_unreal.import_anim_sequence, ue_fbx_settings)
+
+    program.run(unreal, scripts_unreal.set_console_variable_bool_value, scripts_unreal.INTERCHANGE_FLAG, init_interchange)
+
 
     return program
 
