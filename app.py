@@ -57,7 +57,7 @@ def launch_converter(program_collections: typing.List[common.Program_Collection]
     app.MainLoop()
 
 
-def get_program_paths():
+def get_programs():
 
     from .programs import bake
     from .programs import godot_static
@@ -133,4 +133,4 @@ def main():
 
     else:
         from . import app_launcher
-        app_launcher.start_launcher(dict(sorted(get_program_paths().items())))
+        app_launcher.start_launcher(dict(sorted(get_programs().items())))
