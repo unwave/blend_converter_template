@@ -6,6 +6,7 @@ from ..scripts import bake as scripts_bake
 from ..scripts import export as scripts_export
 from ..scripts import unreal_engine as scripts_unreal
 
+from blend_converter.unreal import S_Execution_Handler
 
 
 def get_program(
@@ -16,6 +17,7 @@ def get_program(
             fbx_root: str,
             root_destination_folder: str,
             skeletal_root_destination_folder: str,
+            remote_execution_settings: S_Execution_Handler = None,
         ):
     """ export as an animation only fbx file """
 
@@ -32,7 +34,10 @@ def get_program(
 
     fbx_path = os.path.join(fbx_root, rig_name, animation_name + '.fbx')
 
-    unreal = Unreal()
+    if remote_execution_settings:
+        remote_execution_settings = S_Execution_Handler._from_dict(remote_execution_settings)
+
+    unreal = Unreal(remote_execution_settings)
     blender = Blender(blender_executable)
 
     program = common.Program(
@@ -96,6 +101,7 @@ def get_arguments(
             fbx_root: str,
             root_destination_folder: str = configuration.Folder.UNREAL_ANIMATION,
             skeletal_root_destination_folder: str = configuration.Folder.UNREAL_SKELETAL,
+            remote_execution_settings: S_Execution_Handler = None,
         ):
 
 
@@ -123,6 +129,7 @@ def get_arguments(
                 fbx_root = fbx_root,
                 root_destination_folder = root_destination_folder,
                 skeletal_root_destination_folder = skeletal_root_destination_folder,
+                remote_execution_settings = remote_execution_settings,
             ))
 
 

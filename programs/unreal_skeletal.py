@@ -7,12 +7,15 @@ from ..scripts import export as scripts_export
 from ..scripts import unreal_engine as scripts_unreal
 from ..scripts import unreal_material
 
+from blend_converter.unreal import S_Execution_Handler
+
 
 def get_program(
             blender_executable: str,
             blend_path: str,
             fbx_root: str,
             root_destination_folder: str,
+            remote_execution_settings: S_Execution_Handler = None,
         ):
     """ export as a fbx skeletal mesh """
 
@@ -31,7 +34,10 @@ def get_program(
 
     fbx_path = os.path.join(fbx_root, dir_name, dir_name + '.fbx')
 
-    unreal = Unreal()
+    if remote_execution_settings:
+        remote_execution_settings = S_Execution_Handler._from_dict(remote_execution_settings)
+
+    unreal = Unreal(remote_execution_settings)
     blender = Blender(blender_executable)
 
     program = common.Program(
@@ -108,6 +114,7 @@ def get_arguments(
             source_root: str,
             fbx_root: str,
             root_destination_folder: str = configuration.Folder.UNREAL_SKELETAL,
+            remote_execution_settings: S_Execution_Handler = None,
         ):
 
 
@@ -128,6 +135,7 @@ def get_arguments(
             blend_path = last_blend,
             fbx_root = fbx_root,
             root_destination_folder = root_destination_folder,
+            remote_execution_settings = remote_execution_settings,
         ))
 
 
