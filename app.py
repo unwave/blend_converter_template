@@ -133,4 +133,4 @@ def main():
 
     else:
         from . import app_launcher
-        app_launcher.start_launcher(get_program_paths())
+        app_launcher.start_launcher(dict(sorted(get_program_paths().items())))
