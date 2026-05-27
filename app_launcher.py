@@ -270,6 +270,9 @@ def get_program_panel(parent: wx.Window, function: typing.Callable, program_name
             widget = get_file_path_widget(panel, is_folder = True)
         elif parameter_type is str:
             widget = wx.TextCtrl(panel, value = value)
+        elif parameter_type is bool:
+            widget = wx.ToggleButton(panel, label = "Toggle")
+            widget.SetValue(value)
         elif issubclass(parameter_type, settings_base.Settings):
             widget = get_settings_widget(panel, settings = value if value else parameter_type())
         else:
