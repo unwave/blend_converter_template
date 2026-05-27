@@ -11,6 +11,8 @@ import wx.lib.scrolledpanel
 
 from blend_converter import utils
 from blend_converter import common
+from blend_converter import settings_base
+from blend_converter.gui import program_ui
 from blend_converter.gui import wxp_utils
 
 
@@ -118,6 +120,66 @@ def get_file_path_widget(parent: wx.Window, label: str = "", is_folder = False):
     return widget
 
 
+def get_settings_widget(parent: wx.Window, settings: settings_base.Settings):
+
+    button = wx.Button(parent, label = "Edit")
+
+    final_settings = settings._to_dict()
+
+
+    def iter_arguments():
+
+        for key in typing.get_type_hints(type(settings)):
+
+            if key.startswith('_'):
+                continue
+
+            spec = settings._get_attribute_spec(key)
+
+            path = [settings.__class__.__name__] + [key]
+
+            yield common.Argument_Walk_Item(
+                path,
+                spec.default,
+                spec,
+                final_settings.get(key, common.SENTINEL),
+                False
+            )
+
+
+    def on_configure(event):
+
+        with program_ui.Property_Grid_Dialog(parent, iter_arguments()) as dialog:
+
+            dialog.SetSize((1000, 800))
+            dialog.SetTitle(f"Settings Edit — {settings.__class__.__name__}")
+            dialog.CenterOnScreen()
+
+            dialog.ShowModal()
+
+
+        if not dialog.do_save:
+            return
+
+        if not dialog.changes:
+            return
+
+        for path, value in dialog.changes.items():
+            common._replace_dictionary_argument_recursive(final_settings, path[1:], value)
+
+
+    button.Bind(wx.EVT_BUTTON, on_configure)
+
+
+    def GetValue():
+        return final_settings
+
+    button.GetValue = GetValue
+
+
+    return button
+
+
 
 class Program(wx.Panel):
 
@@ -200,13 +262,16 @@ def get_program_panel(parent: wx.Window, function: typing.Callable, program_name
     for name, parameter in signature.parameters.items():
 
         parameter_type = get_type(parameter)
+        value = get_value(parameter)
 
         if name == 'blender_executable':
             widget = get_file_path_widget(panel)
         elif name.endswith('root'):
             widget = get_file_path_widget(panel, is_folder = True)
         elif parameter_type is str:
-            widget = wx.TextCtrl(panel, value = get_value(parameter))
+            widget = wx.TextCtrl(panel, value = value)
+        elif issubclass(parameter_type, settings_base.Settings):
+            widget = get_settings_widget(panel, settings = value if value else parameter_type())
         else:
             continue
 
