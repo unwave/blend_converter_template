@@ -94,9 +94,7 @@ def get_arguments(
 
     arguments = []
 
-    asset_folders = configuration.get_folders(source_root)
-
-    for folder in asset_folders:
+    for folder in configuration.get_folders(source_root):
 
         last_blend = utils.get_last_blend(folder)
         if not last_blend:
