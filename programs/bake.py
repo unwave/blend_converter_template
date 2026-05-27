@@ -19,6 +19,7 @@ def get_program(
             result_root: str,
             textures_folder: str,
             is_skeletal: bool,
+            skip_bake: bool = False,
         ):
     """ Convert to an exportable blend file, e.g. bake materials, apply modifiers. """
 
@@ -49,6 +50,9 @@ def get_program(
         program.label = 'BAKE SKELETAL 🍪'
     else:
         program.label = 'BAKE STATIC 🍪'
+
+    if skip_bake:
+        program.label = 'SKIP BAKE'
 
 
     program.run(blender, bpy_data.open_mainfile, blend_path)
@@ -83,7 +87,7 @@ def get_program(
     program.run(blender, scripts_bake.delete_empty_meshes, program.run(blender, scripts_bake.get_target_objects))
     objects = program.run(blender, scripts_bake.get_target_objects)
 
-    program.run(blender, bpy_utils.clean_up_topology_and_triangulate_ngons, objects)
+    program.run(blender, bpy_utils.clean_up_topology_and_triangulate_ngons, objects, is_instruction_enabled = not skip_bake)
 
     uv_layer_name = program.run(blender, bpy_utils.get_uuid1_hex)
 
@@ -98,16 +102,17 @@ def get_program(
         uv_layer_reuse = 'REUSE',
         settings = tool_settings.S_Unwrap_UVs(uv_layer_name = uv_layer_name),
         ministry_of_flat_settings = tool_settings.S_Ministry_Of_Flat(timeout = 10.0, texture_resolution = y_resolution),
+        is_instruction_enabled = not skip_bake,
     )
 
-    program.run(blender, bpy_uv.reunwrap_bad_uvs, objects, uv_layer_name = uv_layer_name)
+    program.run(blender, bpy_uv.reunwrap_bad_uvs, objects, uv_layer_name = uv_layer_name, is_instruction_enabled = not skip_bake)
 
     program.run(blender, scripts_bake.apply_post_unwrap_modifiers, objects, is_skeletal)
 
-    program.run(blender, bpy_utils.bisect_by_mirror_modifiers, objects)
+    program.run(blender, bpy_utils.bisect_by_mirror_modifiers, objects, is_instruction_enabled = not skip_bake)
 
-    program.run(blender, bpy_uv.scale_uv_to_world_per_uv_island, objects, uv_layer_name)
-    program.run(blender, bpy_uv.scale_uv_to_world_per_uv_layout, objects, uv_layer_name)
+    program.run(blender, bpy_uv.scale_uv_to_world_per_uv_island, objects, uv_layer_name, is_instruction_enabled = not skip_bake)
+    program.run(blender, bpy_uv.scale_uv_to_world_per_uv_layout, objects, uv_layer_name, is_instruction_enabled = not skip_bake)
 
     tasks = program.run(blender, bpy_utils.pack_and_task,
         objects,
@@ -130,13 +135,14 @@ def get_program(
             width = x_resolution,
             height = y_resolution,
         ),
+        is_instruction_enabled = not skip_bake,
     )
 
-    pre_bake_labels = program.run(blender, bpy_utils.label_mix_shader_nodes, objects)
+    pre_bake_labels = program.run(blender, bpy_utils.label_mix_shader_nodes, objects, is_instruction_enabled = not skip_bake)
 
-    program.run(blender, bpy_utils.copy_and_bake, objects, tasks, pre_bake_labels = pre_bake_labels)
+    program.run(blender, bpy_utils.copy_and_bake, objects, tasks, pre_bake_labels = pre_bake_labels, is_instruction_enabled = not skip_bake)
 
-    program.run(blender, bpy_utils.assign_new_materials, objects, tasks)
+    program.run(blender, bpy_utils.assign_new_materials, objects, tasks, is_instruction_enabled = not skip_bake)
 
     program.run(blender, scripts_bake.apply_post_bake_modifiers, objects, is_skeletal)
 
@@ -146,10 +152,10 @@ def get_program(
     if is_skeletal:
          program.run(blender, scripts_bake.unassign_deform_bones_with_missing_weights)
 
-    program.run(blender, bpy_utils.select_uv_layer, objects, uv_layer_name)
+    program.run(blender, bpy_utils.select_uv_layer, objects, uv_layer_name, is_instruction_enabled = not skip_bake)
     program.run(blender, scripts_bake.hide_non_target_objects)
 
-    program.run(blender, scripts_bake.make_paths_relative)
+    program.run(blender, scripts_bake.make_paths_relative, is_instruction_enabled = not skip_bake)
     program.run(blender, bpy_data.save_as_mainfile, result_path)
 
 

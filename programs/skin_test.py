@@ -3,49 +3,17 @@ import os
 from .. import configuration
 
 from ..scripts import bake as scripts_bake
+from ..programs.bake import get_program as get_bake_program
 
 
-def get_program(
-        *,
-        blender_executable: str,
-        blend_path: str,
-        result_root: str,
-    ):
-    """ For iterative testing of skinning and weight panting quality, same as the baking but simplified and faster by disregarding materials """
+def get_program(*args, create_game_rig = False, **kwargs):
 
-    from blend_converter.blender.executor import Blender
-    from blend_converter.blender import bpy_utils
-    from blend_converter.blender import bpy_data
-    from blend_converter import common
-    from blend_converter import utils
+    program = get_bake_program(*args, **kwargs)
 
-    blend_path = common.File(blend_path)
+    blender = program.instructions[-1].executor
 
-    asset_folder = os.path.join(result_root, blend_path.dir_name)
-
-    result_path = os.path.join(asset_folder, blend_path.dir_name + '.blend')
-
-    blender = Blender(blender_executable)
-
-    program = common.Program(
-        blend_path = blend_path,
-        result_path = result_path,
-        blender_executable = blender_executable,
-        settings_path = os.path.join(blend_path.dir, 'bc_instructions.ini'),
-    )
-
-    program.label = 'SKIN TEST 🧐'
-
-    program.run(blender, bpy_data.open_mainfile, blend_path)
-
-    objects = program.run(blender, scripts_bake.get_target_objects)
-
-    program.run(blender, scripts_bake.reset_timeline)
-    program.run(blender, scripts_bake.apply_modifiers, objects, '.*', ignore_type = ['ARMATURE'])
-    program.run(blender, bpy_utils.apply_scale, objects)
-    program.run(blender, scripts_bake.join_objects, objects)
-
-    program.run(blender, bpy_data.save_as_mainfile, result_path)
+    program.run(blender, scripts_bake.unassign_deform_bones_with_missing_weights, instruction_insert_index = -1, is_instruction_enabled = create_game_rig)
+    program.run(blender, scripts_bake.create_game_rig_and_bake_actions, scripts_bake.S_Deform_Armature(), False, instruction_insert_index = -1, is_instruction_enabled = create_game_rig)
 
     return program
 
@@ -54,6 +22,7 @@ def get_arguments(
             blender_executable: str,
             source_root: str,
             result_root: str,
+            create_game_rig: bool,
         ):
 
 
@@ -76,6 +45,10 @@ def get_arguments(
             blender_executable = blender_executable,
             blend_path = last_blend,
             result_root = result_root,
+            textures_folder = None,
+            is_skeletal = True,
+            skip_bake = True,
+            create_game_rig = create_game_rig,
         ))
 
     return arguments

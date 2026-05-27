@@ -68,7 +68,6 @@ def get_program_paths():
     from .programs import unreal_animation
     from .programs import skin_test
     from .programs import skin_proxy
-    from .programs import test_deform_rig
     from .programs import scan
     from .programs import rig
     from .programs import panda3d_static
@@ -88,7 +87,6 @@ def get_program_paths():
         ue_animation = [unreal_animation.get_program, unreal_animation.get_arguments],
         skin_test = [skin_test.get_program, skin_test.get_arguments],
         skin_proxy = [skin_proxy.get_program, skin_proxy.get_arguments],
-        test_deform_rig = [test_deform_rig.get_program, test_deform_rig.get_arguments],
         scan = [scan.get_program, scan.get_arguments],
         rig = [rig.get_program, rig.get_arguments],
         panda3d_static = [panda3d_static.get_program, panda3d_static.get_arguments],
