@@ -90,19 +90,18 @@ def get_arguments(
             result_root: str,
         ):
 
-    from blend_converter import utils
 
     arguments = []
 
     for folder in configuration.get_folders(source_root):
 
-        last_blend = utils.get_last_blend(folder)
-        if not last_blend:
+        blend_path = configuration.get_blend(folder)
+        if not blend_path:
             continue
 
         arguments.append(dict(
             blender_executable = blender_executable,
-            blend_path = last_blend,
+            blend_path = blend_path,
             intermediate_root = intermediate_root,
             result_root = result_root,
         ))

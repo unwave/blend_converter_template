@@ -108,19 +108,18 @@ def get_arguments(
             remote_execution_settings: S_Execution_Handler = None,
         ):
 
-    from blend_converter import utils
 
     arguments = []
 
     for folder in configuration.get_folders(source_root):
 
-        last_blend = utils.get_last_blend(folder)
-        if not last_blend:
+        blend_path = configuration.get_blend(folder)
+        if not blend_path:
             continue
 
         arguments.append(dict(
             blender_executable = blender_executable,
-            blend_path = last_blend,
+            blend_path = blend_path,
             fbx_root = fbx_root,
             root_destination_folder = root_destination_folder,
             remote_execution_settings = remote_execution_settings,

@@ -66,8 +66,6 @@ def get_arguments(
         ):
 
 
-    from blend_converter import utils
-
     arguments = []
 
     for rig_folder in configuration.get_folders(source_root):
@@ -78,13 +76,13 @@ def get_arguments(
 
             animation_name = os.path.basename(anim_folder)
 
-            last_blend = utils.get_last_blend(anim_folder)
-            if not last_blend:
+            blend_path = configuration.get_blend(anim_folder)
+            if not blend_path:
                 continue
 
             arguments.append(dict(
                 blender_executable = blender_executable,
-                blend_path = last_blend,
+                blend_path = blend_path,
                 rig_name = rig_name,
                 animation_name = animation_name,
                 result_root = result_root,
