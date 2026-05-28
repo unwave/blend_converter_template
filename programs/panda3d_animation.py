@@ -13,6 +13,8 @@ def get_program(
             blender_executable: str,
             blend_path,
             intermediate_root: str,
+            rig_name: str,
+            animation_name: str,
             result_root: str,
         ):
 
@@ -25,8 +27,8 @@ def get_program(
     blend_path = common.File(blend_path)
 
     # the paths should be on the same drive
-    gltf_path = os.path.join(intermediate_root, blend_path.dir_name, blend_path.dir_name + '.gltf')
-    bam_path = os.path.join(result_root, blend_path.dir_name, blend_path.dir_name + '.bam' )
+    gltf_path = os.path.join(intermediate_root, rig_name, animation_name + '.gltf')
+    bam_path = os.path.join(result_root, rig_name, animation_name + '.bam' )
 
     # prevents :express(warning): Filename is incorrect case: and writing extra .bam.pz if the file exists
     bam_path = os.path.realpath(bam_path)
@@ -64,25 +66,6 @@ def get_program(
     return program
 
 
-def get_anim_programs(source_root: str):
-
-    from blend_converter import utils
-    programs = utils.Appendable_Dict()
-
-    for folder in configuration.get_folders(source_root):
-
-        rig_name = os.path.basename(folder)
-
-        for blend_file in configuration.get_blends(folder):
-
-            animation_name = os.path.splitext(os.path.basename(blend_file))[0]
-
-            programs.append(get_program(blend_file, rig_name, animation_name))
-
-
-    return programs
-
-
 def get_arguments(
             blender_executable: str,
             source_root: str,
@@ -93,18 +76,26 @@ def get_arguments(
 
     arguments = []
 
-    for folder in configuration.get_folders(source_root):
+    for rig_folder in configuration.get_folders(source_root):
 
-        blend_path = configuration.get_blend(folder)
-        if not blend_path:
-            continue
+        rig_name = os.path.basename(rig_folder)
 
-        arguments.append(dict(
-            blender_executable = blender_executable,
-            blend_path = blend_path,
-            intermediate_root = intermediate_root,
-            result_root = result_root,
-        ))
+        for anim_folder in configuration.get_folders(rig_folder):
+
+            animation_name = os.path.basename(anim_folder)
+
+            blend_path = configuration.get_blend(anim_folder)
+            if not blend_path:
+                continue
+
+            arguments.append(dict(
+                blender_executable = blender_executable,
+                blend_path = blend_path,
+                intermediate_root = intermediate_root,
+                rig_name = rig_name,
+                animation_name = animation_name,
+                result_root = result_root,
+            ))
 
 
     return arguments
