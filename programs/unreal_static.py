@@ -8,7 +8,7 @@ from ..scripts import unreal_engine as scripts_unreal
 from ..scripts import unreal_material
 
 
-from blend_converter.unreal import S_Execution_Handler
+from blend_converter.unreal.executor import S_Execution_Handler
 
 
 def get_program(
@@ -20,7 +20,7 @@ def get_program(
         ):
     """ export as a fbx static mesh """
 
-    from blend_converter.unreal import Unreal
+    from blend_converter.unreal.executor import Unreal
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_utils
     from blend_converter.blender import bpy_data

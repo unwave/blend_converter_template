@@ -6,7 +6,7 @@ from ..scripts import bake as scripts_bake
 from ..scripts import export as scripts_export
 from ..scripts import unreal_engine as scripts_unreal
 
-from blend_converter.unreal import S_Execution_Handler
+from blend_converter.unreal.executor import S_Execution_Handler
 
 
 def get_program(
@@ -21,7 +21,7 @@ def get_program(
         ):
     """ export as an animation only fbx file """
 
-    from blend_converter.unreal import Unreal
+    from blend_converter.unreal.executor import Unreal
     from blend_converter.blender.executor import Blender
     from blend_converter.blender import bpy_data
     from blend_converter.blender import bpy_export
