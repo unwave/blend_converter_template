@@ -44,8 +44,32 @@ def get_blends(folder: os.PathLike):
     return [file for file in os.scandir(folder) if file.is_file() and not file.name.startswith('_') and file.name.endswith('.blend')]
 
 
-def get_blend(folder: os.PathLike):
-    return bc_utils.get_last_blend(folder)
+EXT_LENGTH = len('.blend')
+
+
+def sort_by_name(file: os.DirEntry):
+
+    name = file.name[:-EXT_LENGTH].lower()
+
+    parts = []
+
+    for substring in re.split(r'(\d+)', name):
+        if substring.isdigit():
+            parts.append((0, int(substring)))
+        else:
+            parts.append((1, substring))
+
+    return (parts, -len(name))
+
+
+def get_blend(folder: str):
+
+    files = [f for f in os.scandir(folder) if f.is_file() and f.name.lower().endswith('.blend')]
+
+    if not files:
+        return None
+
+    return max(files, key = sort_by_name).path
 
 
 IGNORE_PREFIX = ('#', '__bc')
