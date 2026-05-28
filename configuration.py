@@ -40,10 +40,6 @@ def get_folders(folder: os.PathLike):
         return []
 
 
-def get_blends(folder: os.PathLike):
-    return [file for file in os.scandir(folder) if file.is_file() and not file.name.startswith('_') and file.name.endswith('.blend')]
-
-
 EXT_LENGTH = len('.blend')
 
 
