@@ -89,6 +89,22 @@ class S_Target_Objects(settings_base.Settings):
     """
 
 
+    exclude_displayed_as_wire: bool = True
+    """
+    Exclude objects that are displayed as `Wire`.
+
+    #### Default: `True`
+    """
+
+
+    exclude_displayed_as_bounds: bool = True
+    """
+    Exclude objects that are displayed as `Bounds`.
+
+    #### Default: `True`
+    """
+
+
 def get_bone_custom_shapes():
 
     shapes: typing.Set[bpy.types.Object] = set()
@@ -190,6 +206,18 @@ def get_target_objects(settings: S_Target_Objects = None):
 
                 if not will_have_polygons(o, depsgraph):
                     continue
+
+
+        if settings.exclude_displayed_as_wire:
+
+            if o.display_type == 'WIRE':
+                continue
+
+
+        if settings.exclude_displayed_as_bounds:
+
+            if o.display_type == 'BOUNDS':
+                continue
 
 
         result.append(o)
