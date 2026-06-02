@@ -191,11 +191,9 @@ def get_target_objects(settings: S_Target_Objects = None):
 
             if o in meshable_objects:
 
-                if o.type == 'MESH' and not o.data.polygons:
+                if not will_have_polygons(o):
                     continue
 
-                if o.type != 'MESH' and not will_have_polygons(o):
-                    continue
 
         result.append(o)
 
