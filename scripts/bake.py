@@ -117,15 +117,11 @@ def get_mesh_deformers():
     return result
 
 
-def will_have_polygons(object: 'bpy.types.Object'):
+def will_have_polygons(object: 'bpy.types.Object', depsgraph: 'bpy.types.Depsgraph'):
 
-    depsgraph = bpy.context.evaluated_depsgraph_get()
-
-    evaluated_object = object.evaluated_get(depsgraph)
-
-    mesh = bpy.data.meshes.new_from_object(evaluated_object, depsgraph=depsgraph)
-    has_polygons = bool(len(mesh.polygons))
-    bpy.data.meshes.remove(mesh)
+    evaluated = object.evaluated_get(depsgraph)
+    has_polygons = bool(evaluated.to_mesh().polygons)
+    evaluated.to_mesh_clear()
 
     return has_polygons
 
@@ -143,6 +139,7 @@ def get_target_objects(settings: S_Target_Objects = None):
     custom_shapes = get_bone_custom_shapes()
     mesh_deformers = get_mesh_deformers()
     SENTINEL = object()
+    depsgraph = bpy.context.evaluated_depsgraph_get()
 
     meshable_objects = set(bpy_utils.get_meshable_objects(all_objects))
 
@@ -191,7 +188,7 @@ def get_target_objects(settings: S_Target_Objects = None):
 
             if o in meshable_objects:
 
-                if not will_have_polygons(o):
+                if not will_have_polygons(o, depsgraph):
                     continue
 
 
