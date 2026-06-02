@@ -22,6 +22,73 @@ if 'bpy' in sys.modules:
     from blend_converter.blender import bpy_modifier
 
 
+if typing.TYPE_CHECKING:
+    import dataclasses
+else:
+    class dataclasses:
+        dataclass = lambda x: x
+
+
+@dataclasses.dataclass
+class S_Target_Objects(settings_base.Settings):
+
+
+    only_meshable: bool = True
+    """
+    If True — only the objects that can be converted to mesh are considered.
+
+    #### Default: `True`
+    """
+
+
+    only_visible: bool = True
+    """
+    If True — only the visible objects are considered.
+
+    #### Default: `True`
+    """
+
+
+    exclude_hashtag: bool = True
+    """
+    Exclude objects that have their names or any collection's name, they are inside, starting with `#`.
+
+    #### Default: `True`
+    """
+
+
+    exclude_custom_shape: bool = True
+    """
+    Exclude objects that are used as custom shapes for bones.
+
+    #### Default: `True`
+    """
+
+
+    exclude_property_name: list = [configuration.ATOOL_COLLISION_OBJECT_PROP_KEY, configuration.UNREAL_COLLISION_PROP_KEY]
+    """
+    Exclude objects that have any custom property matching any name in the list.
+
+    #### Default: `[configuration.ATOOL_COLLISION_OBJECT_PROP_KEY, configuration.UNREAL_COLLISION_PROP_KEY]`
+    """
+
+
+    exclude_mesh_deform: bool = True
+    """
+    Exclude objects that are used as deformers for Mesh Deform modifiers.
+
+    #### Default: `True`
+    """
+
+
+    exclude_no_polygons: bool = True
+    """
+    Exclude objects that will not have polygons.
+
+    #### Default: `True`
+    """
+
+
 def get_bone_custom_shapes():
 
     shapes: typing.Set[bpy.types.Object] = set()
@@ -63,49 +130,77 @@ def will_have_polygons(object: 'bpy.types.Object'):
     return has_polygons
 
 
-def get_target_objects():
+def get_target_objects(settings: S_Target_Objects = None):
+
+    settings = S_Target_Objects()._update(settings)
 
 
-    objects: typing.List[bpy.types.Object] = []
+    all_objects = bpy_utils.get_view_layer_objects()
+
+    result: typing.List[bpy.types.Object] = []
+
 
     custom_shapes = get_bone_custom_shapes()
-
     mesh_deformers = get_mesh_deformers()
+    SENTINEL = object()
+
+    meshable_objects = set(bpy_utils.get_meshable_objects(all_objects))
 
 
-    for o in bpy_utils.get_meshable_objects(bpy_utils.get_view_layer_objects()):
+    for o in all_objects:
 
-        if not o.visible_get():
+
+        if settings.only_meshable:
+
+            if not o in meshable_objects:
+                continue
+
+
+        if settings.only_visible:
+
+            if not o.visible_get():
+                continue
+
+
+        if settings.exclude_hashtag:
+
+            if o.name.strip().startswith('#'):
+                continue
+
+            if any(c.name.strip().startswith('#') for c in o.users_collection):
+                continue
+
+
+        if any(o.get(name, SENTINEL) is not SENTINEL for name in settings.exclude_property_name):
             continue
 
-        if o.name.strip().startswith('#'):
-            continue
 
-        if any(c.name.strip().startswith('#') for c in o.users_collection):
-            continue
+        if settings.exclude_custom_shape:
 
-        if o.get(configuration.ATOOL_COLLISION_OBJECT_PROP_KEY) is not None:
-            continue
+            if o in custom_shapes:
+                continue
 
-        # the box collision must not be triangulated, Otherwise Unreal Engine doesn't recognize it
-        if o.get(configuration.UNREAL_COLLISION_PROP_KEY) is not None:
-            continue
 
-        if o in custom_shapes:
-            continue
+        if settings.exclude_mesh_deform:
 
-        if o in mesh_deformers:
-            continue
+            if o in mesh_deformers:
+                continue
 
-        if o.type == 'MESH' and not o.data.polygons:
-            continue
 
-        if o.type != 'MESH' and not will_have_polygons(o):
-            continue
+        if settings.exclude_no_polygons:
 
-        objects.append(o)
+            if o in meshable_objects:
 
-    return objects
+                if o.type == 'MESH' and not o.data.polygons:
+                    continue
+
+                if o.type != 'MESH' and not will_have_polygons(o):
+                    continue
+
+        result.append(o)
+
+
+    return result
 
 
 def hide_non_target_objects():
@@ -824,3 +919,6 @@ def get_alpha_x_resolution(resolution: int = 1024):
 
 def get_alpha_y_resolution(resolution: int = 1024):
     return resolution
+
+def get_target_objects_settings(settings: S_Target_Objects):
+    return settings

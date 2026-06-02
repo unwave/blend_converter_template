@@ -93,4 +93,8 @@ COLLISION_IDENTIFIER_PROP_KEY = '__bc_collision_shape'
 """ Collision shape types that would be used in this pipeline, matching the Atool's ones. """
 
 UNREAL_COLLISION_PROP_KEY = '__bc_ue_collision_shape_type'
-""" Prefixes of the Unreal Engine supported collision shape types. (UBX_, UCP_, USP_, UCX_) """
+"""
+Prefixes of the Unreal Engine supported collision shape types. (UBX_, UCP_, USP_, UCX_)
+
+**The box collision must not be triangulated, otherwise Unreal Engine doesn't recognize it.**
+"""

@@ -62,6 +62,8 @@ def get_program(
     program.run(blender, scripts_bake.set_legacy_ik_solver)
     program.run(blender, scripts_bake.delete_undefined_nodes)
 
+    target_objects_settings = program.run(blender, scripts_bake.get_target_objects_settings, scripts_bake.S_Target_Objects())
+
     custom_per_blend.fix(blender, program)
 
     if is_skeletal:
@@ -70,9 +72,9 @@ def get_program(
     program.run(blender, scripts_bake.find_missing)
     program.run(blender, scripts_bake.reveal_collections)
 
-    program.run(blender, scripts_bake.apply_particle_systems, program.run(blender, scripts_bake.get_target_objects))
+    program.run(blender, scripts_bake.apply_particle_systems, program.run(blender, scripts_bake.get_target_objects, target_objects_settings))
 
-    objects = program.run(blender, scripts_bake.get_target_objects)
+    objects = program.run(blender, scripts_bake.get_target_objects, target_objects_settings)
 
 
     program.run(blender, scripts_bake.delete_hidden_modifiers, objects)
@@ -84,8 +86,8 @@ def get_program(
 
     program.run(blender, scripts_bake.apply_modeling_modifiers, objects, is_skeletal)
 
-    program.run(blender, scripts_bake.delete_empty_meshes, program.run(blender, scripts_bake.get_target_objects))
-    objects = program.run(blender, scripts_bake.get_target_objects)
+    program.run(blender, scripts_bake.delete_empty_meshes, program.run(blender, scripts_bake.get_target_objects, target_objects_settings))
+    objects = program.run(blender, scripts_bake.get_target_objects, target_objects_settings)
 
     program.run(blender, bpy_utils.clean_up_topology_and_triangulate_ngons, objects, is_instruction_enabled = not skip_bake)
 
