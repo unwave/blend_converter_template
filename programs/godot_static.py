@@ -55,7 +55,7 @@ def get_program(
     program.run(blender, scripts_godot.rename_objects_for_godot, 'SM')
     program.run(blender, scripts_godot.add_export_timestamp)
 
-    program.run(blender, bpy_export.export_gltf, gltf_path, bpy_export.S_GLTF(export_format='GLTF_SEPARATE'))
+    program.run(blender, bpy_export.export_gltf, gltf_path, bpy_export.S_GLTF(export_format='GLTF_SEPARATE', use_visible = True))
 
     program.run(blender, scripts_godot.set_gd_import_script, gltf_path, '', is_instruction_enabled = False)
 
