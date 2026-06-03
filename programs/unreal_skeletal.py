@@ -55,7 +55,6 @@ def get_program(
 
     program.run(blender, bpy_data.open_mainfile, blend_path)
 
-    program.run(blender, scripts_bake.reveal_collections)
     program.run(blender, scripts_export.scene_clean_up)
     program.run(blender, scripts_export.remove_unused_uv_layouts)
     program.run(blender, bpy_utils.remove_all_node_groups_from_materials)

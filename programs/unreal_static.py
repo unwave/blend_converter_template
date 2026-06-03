@@ -56,7 +56,6 @@ def get_program(
 
     program.run(blender, bpy_data.open_mainfile, blend_path)
 
-    program.run(blender, scripts_bake.reveal_collections)
     has_custom_collisions = program.run(blender, scripts_export.convert_all_collision_shapes)
     program.run(blender, scripts_export.convert_collisions_to_convex)
     program.run(blender, scripts_export.scene_clean_up)

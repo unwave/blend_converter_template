@@ -489,28 +489,6 @@ def delete_hidden_modifiers(objects: typing.List['bpy.types.Object']):
                 object.modifiers.remove(modifier)
 
 
-def reveal_collections():
-    """
-    Recursively traverse and unhide collections according to the ignore prefix.
-
-    `bpy_utils.get_view_layer_objects()` will include hidden objects, but not from disabled layers.
-    Whether or not an object should be processed depends on the ignore prefix, not visibility in viewport.
-    Because for the sake of export, whether a collection layer is hidden or disabled, it's the same.
-    """
-
-    def traverse(layer_collection: bpy.types.LayerCollection):
-
-        for layer in layer_collection.children:
-
-            layer.exclude = False
-            layer.hide_viewport = False
-            layer.collection.hide_viewport = False
-
-            traverse(layer)
-
-    traverse(bpy.context.view_layer.layer_collection)
-
-
 def get_armature_objects():
 
     objects: typing.List[bpy.types.Object] = []

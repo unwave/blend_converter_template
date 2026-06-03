@@ -50,7 +50,6 @@ def get_program(
 
     program.run(blender, bpy_data.open_mainfile, blend_path)
 
-    program.run(blender, scripts_bake.reveal_collections)
 
     program.run(blender, scripts_panda3d.assign_collision_placeholders)
     program.run(blender, scripts_panda3d.assign_curve_placeholders)

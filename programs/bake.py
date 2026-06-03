@@ -70,7 +70,6 @@ def get_program(
         program.run(blender, scripts_bake.reset_timeline)
 
     program.run(blender, scripts_bake.find_missing)
-    program.run(blender, scripts_bake.reveal_collections)
 
     program.run(blender, scripts_bake.apply_particle_systems, program.run(blender, scripts_bake.get_target_objects, target_objects_settings))
 
