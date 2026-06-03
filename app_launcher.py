@@ -86,6 +86,9 @@ class FolderBrowseButtonWithHistory(wx.lib.filebrowsebutton.FileBrowseButtonWith
 def get_file_path_widget(parent: wx.Window, label: str = "", is_folder = False):
 
 
+    frame: Launcher = parent.GetTopLevelParent()
+
+
     def on_change(event):
         set_path_ctrl(widget, widget.GetValue(), check = os.path.isdir if is_folder else os.path.isfile)
 
@@ -98,10 +101,33 @@ def get_file_path_widget(parent: wx.Window, label: str = "", is_folder = False):
         menu.Destroy()
 
 
-    def on_scroll(event):
+    def on_scroll(event: wx.MouseEvent):
 
-        if event.AltDown():
-            event.Skip()
+        direction = 1 if event.GetWheelRotation() > 0 else -1
+
+        if event.ControlDown():
+
+            ctrl = widget.GetHistoryControl()
+
+            history = widget.GetHistory()
+            if not history:
+                return
+
+            try:
+                index = history.index(ctrl.GetValue()) - direction
+                if index >= len(history):
+                    index = 0
+            except ValueError:
+                index = 0
+
+            ctrl.SetValue(history[index])
+
+        else:
+
+            x, y = frame.scroll_panel.GetViewStart()
+            delta = event.GetLinesPerAction() * direction
+
+            frame.scroll_panel.Scroll(x, y - delta)
 
 
     if is_folder:
