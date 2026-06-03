@@ -226,34 +226,29 @@ def get_target_objects(settings: S_Target_Objects = None):
     return result
 
 
-def hide_non_target_objects():
+def hide_other_objects(objects: typing.List['bpy.types.Object']):
 
 
-    def traverse(layer_collection: bpy.types.LayerCollection):
+    visible_objects = set(objects)
 
-        for layer in layer_collection.children:
-
-            if layer.name.startswith('#'):
-                layer.hide_viewport = True
-
-            traverse(layer)
-
-    traverse(bpy.context.view_layer.layer_collection)
+    for object in objects:
+        armature = object.find_armature()
+        if armature:
+            visible_objects.add(armature)
 
 
-    custom_shapes = get_bone_custom_shapes()
-    for object in custom_shapes:
-        if object.visible_get():
-            object.hide_set(True)
+    for object in bpy.context.scene.objects:
 
-
-    for object in bpy.data.objects:
-        if object.name.startswith('#'):
+        if object not in visible_objects:
             if object.visible_get():
                 object.hide_set(True)
 
 
+def reveal_objects(collection_name: str, objects: typing.List['bpy.types.Object']):
 
+    focus = bpy_context.Focus(objects).__enter__()
+    focus.visible_collection.name = collection_name
+    focus.references.__exit__(None, None, None)
 
 
 def find_missing():

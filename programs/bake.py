@@ -154,7 +154,10 @@ def get_program(
          program.run(blender, scripts_bake.unassign_deform_bones_with_missing_weights)
 
     program.run(blender, bpy_utils.select_uv_layer, objects, uv_layer_name, is_instruction_enabled = not skip_bake)
-    program.run(blender, scripts_bake.hide_non_target_objects)
+
+    objects = program.run(blender, scripts_bake.get_target_objects, target_objects_settings)
+    program.run(blender, scripts_bake.hide_other_objects, objects)
+    program.run(blender, scripts_bake.reveal_objects, "Target Objects", objects)
 
     program.run(blender, scripts_bake.make_paths_relative, is_instruction_enabled = not skip_bake)
     program.run(blender, bpy_data.save_as_mainfile, result_path)
