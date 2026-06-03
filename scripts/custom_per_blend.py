@@ -71,7 +71,7 @@ def set_color_attribute_materials():
             return False
 
 
-    for object in bpy_utils.get_view_layer_objects():
+    for object in bpy.context.scene.objects:
 
         if object.type != 'MESH':
             continue

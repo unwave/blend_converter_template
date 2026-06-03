@@ -38,7 +38,7 @@ def remove_unused_uv_layouts():
 
     from blend_converter.blender import bpy_utils
 
-    for object in bpy_utils.get_unique_mesh_objects(bpy_utils.get_view_layer_objects()):
+    for object in bpy_utils.get_unique_mesh_objects(bpy.context.scene.objects):
 
         if len(object.data.uv_layers) <= 1:
             continue
@@ -369,7 +369,7 @@ def convert_all_collision_shapes():
 
     collisions_count = 0
 
-    for object in bpy_utils.get_view_layer_objects():
+    for object in bpy.context.scene.objects:
 
         collision_type = object.get(configuration.ATOOL_COLLISION_OBJECT_PROP_KEY)
         if collision_type:
@@ -387,7 +387,7 @@ def convert_collisions_to_convex():
     https://forums.unrealengine.com/t/box-collision-non-uniform-scale-issue/382743
     """
 
-    for object in bpy_utils.get_view_layer_objects():
+    for object in bpy.context.scene.objects:
 
         if not object.get(configuration.UNREAL_COLLISION_PROP_KEY):
             continue
@@ -417,7 +417,7 @@ def rename_all_armatures():
     This is a special hack in the Unreal Engine FBX exporter just for Blender. 😽
     """
 
-    for object in bpy_utils.get_view_layer_objects():
+    for object in bpy.context.scene.objects:
 
         if object.type != 'ARMATURE':
             continue
@@ -499,4 +499,4 @@ def check_if_writable(path: str):
 
 
 def remove_other_object_types(types: typing.Set[str]):
-    bpy.data.batch_remove([o for o in bpy_utils.get_view_layer_objects() if not o.type in types])
+    bpy.data.batch_remove([o for o in bpy.context.scene.objects if not o.type in types])

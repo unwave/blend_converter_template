@@ -95,7 +95,7 @@ class Bam_Edit:
 def assign_curve_placeholders():
     """ Collect curves data information to be late recrated inside panda3d."""
 
-    for object in bpy_utils.get_view_layer_objects():
+    for object in bpy.context.scene.objects:
 
         if not isinstance(object.data, bpy.types.Curve):
             continue
@@ -132,7 +132,7 @@ def assign_curve_placeholders():
 
 def assign_collision_placeholders():
 
-    for object in bpy_utils.get_view_layer_objects():
+    for object in bpy.context.scene.objects:
 
 
         collision_object_type = object.get(configuration.ATOOL_COLLISION_OBJECT_PROP_KEY)

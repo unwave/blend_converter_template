@@ -106,7 +106,7 @@ def get_material_definitions_for_single_object():
     name_to_definition: typing.Dict[str, S_Material_Definition] = {}
 
 
-    object = next((o for o in bpy_utils.get_view_layer_objects() if o.type == 'MESH'), None)
+    object = next((o for o in bpy.context.scene.objects if o.type == 'MESH'), None)
     if not object:
         return dict(slot_name_to_name = slot_name_to_name, name_to_definition = name_to_definition)
 

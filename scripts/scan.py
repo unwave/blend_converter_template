@@ -18,7 +18,7 @@ def make_low_poly_and_cage(target_triangles = 15000):
 
     objects: typing.List[typing.Tuple[bpy.types.Object, bpy.types.Object, bpy.types.Object]] = []
 
-    for high in bpy_utils.get_view_layer_objects():
+    for high in bpy.context.scene.objects:
 
         if high.type != 'MESH':
             continue
@@ -111,5 +111,5 @@ def delete_non_low_poly(objects: 'typing.List[typing.Tuple[bpy.types.Object, bpy
 
 def convert_to_mesh():
 
-    for object in bpy_utils.get_meshable_objects(bpy_utils.get_view_layer_objects()):
+    for object in bpy_utils.get_meshable_objects(bpy.context.scene.objects):
         bpy_utils.convert_to_mesh(object)

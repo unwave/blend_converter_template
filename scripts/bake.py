@@ -147,7 +147,7 @@ def get_target_objects(settings: S_Target_Objects = None):
     settings = S_Target_Objects()._update(settings)
 
 
-    all_objects = bpy_utils.get_view_layer_objects()
+    all_objects = bpy.context.scene.objects
 
     result: typing.List[bpy.types.Object] = []
 
@@ -515,7 +515,7 @@ def get_armature_objects():
 
     objects: typing.List[bpy.types.Object] = []
 
-    for object in bpy_utils.get_view_layer_objects():
+    for object in bpy.context.scene.objects:
 
         if not object.visible_get():
             continue
