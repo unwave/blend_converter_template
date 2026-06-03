@@ -316,11 +316,11 @@ def join_objects(objects: typing.List['bpy.types.Object']):
     """
     All mesh objects inside a collection will be joined into a single one, but if a collection starts with:
 
-	`#`: collection and its content will be ignored
+    `#`: collection and its content will be ignored
 
-	`-`: join as if the all the objects of the collection would belong to the parent collection, use for organizational purposes
+    `-`: join as if the all the objects of the collection would belong to the parent collection, use for organizational purposes
 
-	`!`: direct child objects of the collection won't be joined
+    `!`: direct child objects of the collection won't be joined
     """
 
 
