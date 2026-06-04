@@ -32,7 +32,7 @@ def get_program(blender_executable: str, blend_path, result_dir):
 
     program.run(blender, scripts_scan.convert_to_mesh)
 
-    objects = program.run(blender, scripts_scan.make_low_poly_and_cage)
+    objects = program.run(blender, scripts_scan.make_low_poly_and_cage, scripts_scan.S_Low_Poly())
 
     program.run(blender, scripts_scan.the_bake, objects, result_dir)
 

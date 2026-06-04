@@ -2,6 +2,7 @@ import sys
 import os
 import typing
 
+from blend_converter import settings_base
 
 if 'bpy' in sys.modules:
     import bpy
@@ -14,7 +15,53 @@ if 'bpy' in sys.modules:
     from blend_converter.blender import bpy_material
 
 
-def make_low_poly_and_cage(target_triangles = 15000):
+class S_Low_Poly(settings_base.Settings):
+
+
+    target_triangles: int = 15000
+    """
+    Target amount of triangles in the low Poly mesh.
+
+    #### Default: `15000`
+    """
+
+
+    cage_offset_ratio: float = 0.05
+    """
+    The cage expand ratio relative to the absolute size of the model.
+
+    #### Default: `0.05`
+    """
+
+
+    voxel_count: int = 200
+    """
+    Resolution of the cage expand guiding mesh.
+
+    #### Default: `200`
+    """
+
+
+    apply_smooth_by_angle: bool = True
+    """
+    Whether or not to apply Smooth By Angle to the low poly mesh.
+
+    #### Default: `True`
+    """
+
+
+    sharp_degrees: float = 90 * 0.95
+    """
+    The degrees of Smooth By Angle if applied.
+
+    #### Default: `90 * 0.95`
+    """
+
+
+
+def make_low_poly_and_cage(settings: S_Low_Poly):
+
+    settings = S_Low_Poly()._update(settings)
 
     objects: typing.List[typing.Tuple[bpy.types.Object, bpy.types.Object, bpy.types.Object]] = []
 
@@ -31,27 +78,24 @@ def make_low_poly_and_cage(target_triangles = 15000):
         bpy_context.call_for_object(high, bpy.ops.object.shade_smooth, keep_sharp_edges = False)
 
         print(f"Creating low poly for: {name}")
-        low = bpy_mesh.get_decimated_copy(high, target_triangles = target_triangles)
-        apply_weighted_smooth(low, sharp_degrees = 90 * 0.95)
+        low = bpy_mesh.get_decimated_copy(high, target_triangles = settings.target_triangles)
         low.name = name + '(low poly)'
 
+
+        if settings.apply_smooth_by_angle:
+            bpy_modifier.apply_smooth_by_angle(low, settings.sharp_degrees)
+            bpy_modifier.apply_weighted_normal(low, keep_sharp = True, mode = 'FACE_AREA_WITH_ANGLE')
+        else:
+            bpy_modifier.apply_weighted_normal(low)
+
+
         print(f"Creating cage for: {name}")
-        cage = bpy_mesh.make_bake_cage(low)
+        cage = bpy_mesh.make_bake_cage(low, cage_offset_ratio = settings.cage_offset_ratio, voxel_count = settings.voxel_count)
         cage.name = name + '(cage)'
 
         objects.append((high, low, cage))
 
     return objects
-
-
-def apply_weighted_smooth(object: 'bpy.types.Object', sharp = True, sharp_degrees = 45):
-
-    if sharp:
-        bpy_modifier.apply_smooth_by_angle(object, sharp_degrees)
-        bpy_modifier.apply_weighted_normal(object, keep_sharp = True, mode = 'FACE_AREA_WITH_ANGLE')
-    else:
-        bpy_context.call_for_object(object, bpy.ops.object.shade_smooth, keep_sharp_edges = False)
-        bpy_modifier.apply_weighted_normal(object)
 
 
 def the_bake(
