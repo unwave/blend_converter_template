@@ -91,7 +91,9 @@ def the_bake(
 
         bpy_uv.unwrap([low], uv_layer_name)
 
-        bpy_uv.pack([low], tool_settings.S_Pack_UVs(uv_layer_name=uv_layer_name))
+        pack_settings = tool_settings.S_Pack_UVs(width = width, height = height, uv_layer_name=uv_layer_name)
+        bpy_uv.pack([low], pack_settings)
+        bpy_uv.ensure_pixel_per_island([low], pack_settings)
 
         bpy_material.convert_materials_to_principled([low])
 
