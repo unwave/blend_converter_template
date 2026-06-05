@@ -918,3 +918,13 @@ def get_alpha_y_resolution(resolution: int = 1024):
 
 def get_target_objects_settings(settings: S_Target_Objects):
     return settings
+
+
+def limit_bendy_bones(maximum = 3):
+    """ Cap the maximum amount of bendy bone segments per bone. """
+
+    for armature in get_armature_objects():
+
+        for bone in armature.data.bones:
+
+            bone.bbone_segments = min(bone.bbone_segments, maximum)

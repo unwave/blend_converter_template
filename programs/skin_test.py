@@ -12,8 +12,11 @@ def get_program(*args, create_game_rig = False, **kwargs):
 
     blender = program.instructions[-1].executor
 
-    program.run(blender, scripts_bake.unassign_deform_bones_with_missing_weights, instruction_insert_index = -1, is_instruction_enabled = create_game_rig)
-    program.run(blender, scripts_bake.create_game_rig_and_bake_actions, scripts_bake.S_Deform_Armature(), False, instruction_insert_index = -1, is_instruction_enabled = create_game_rig)
+    kwargs = dict(instruction_insert_index = -1, is_instruction_enabled = create_game_rig)
+
+    program.run(blender, scripts_bake.unassign_deform_bones_with_missing_weights, **kwargs)
+    program.run(blender, scripts_bake.limit_bendy_bones, **kwargs)
+    program.run(blender, scripts_bake.create_game_rig_and_bake_actions, scripts_bake.S_Deform_Armature(), False, **kwargs)
 
     return program
 

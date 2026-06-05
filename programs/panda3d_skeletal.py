@@ -57,6 +57,7 @@ def get_program(
     program.run(blender, bpy_utils.use_backface_culling)
     program.run(blender, scripts_export.triangulate_geometry, program.run(blender, scripts_bake.get_target_objects))
     program.run(blender, scripts_export.delete_unused_materials)
+    program.run(blender, scripts_bake.limit_bendy_bones)
     program.run(blender, scripts_bake.create_game_rig_and_bake_actions,  scripts_bake.S_Deform_Armature(), False)
     program.run(blender, scripts_export.rename_all_armatures)
 
