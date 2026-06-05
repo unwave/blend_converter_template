@@ -664,14 +664,19 @@ def get_root_bones(armature: 'bpy.types.Object', settings: S_Deform_Armature):
     )
 
 
-    if not deform_root:
+    if deform_root:
+        deform_root_name = deform_root.name
+    else:
         deform_root_name = bpy_action.find_deform_root(armature)
 
-    if not control_root:
+    if control_root:
+        control_root_name = control_root.name
+    else:
         control_root_name = ''
 
     print("Deform root bone:", deform_root_name)
     print("Control root bone:", control_root_name)
+
     return deform_root_name, control_root_name
 
 
