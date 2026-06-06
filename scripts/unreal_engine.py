@@ -289,7 +289,7 @@ def get_bone_custom_shapes():
 
 def reduce_to_single_mesh(collection_name: str):
 
-    scene_objects = bpy.context.scene.objects
+    scene_objects = list(bpy.context.scene.objects)
 
     collision_shapes = set(o for o in scene_objects if o.get(configuration.UNREAL_COLLISION_PROP_KEY))
 
@@ -587,7 +587,7 @@ def join_all_mesh_objects(collection_name: str, objects: typing.List['bpy.types.
         bpy.ops.object.join()
         bpy.ops.object.material_slot_remove_unused()
 
-    all_objects = bpy.context.scene.objects
+    all_objects = list(bpy.context.scene.objects)
 
     bpy.data.batch_remove(bpy.data.collections)
 

@@ -65,7 +65,7 @@ def make_low_poly_and_cage(settings: S_Low_Poly):
 
     objects: typing.List[typing.Tuple[bpy.types.Object, bpy.types.Object, bpy.types.Object]] = []
 
-    for high in bpy.context.scene.objects:
+    for high in list(bpy.context.scene.objects):
 
         if high.type != 'MESH':
             continue

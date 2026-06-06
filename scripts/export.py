@@ -369,7 +369,7 @@ def convert_all_collision_shapes():
 
     collisions_count = 0
 
-    for object in bpy.context.scene.objects:
+    for object in list(bpy.context.scene.objects):
 
         collision_type = object.get(configuration.ATOOL_COLLISION_OBJECT_PROP_KEY)
         if collision_type:
@@ -387,7 +387,7 @@ def convert_collisions_to_convex():
     https://forums.unrealengine.com/t/box-collision-non-uniform-scale-issue/382743
     """
 
-    for object in bpy.context.scene.objects:
+    for object in list(bpy.context.scene.objects):
 
         if not object.get(configuration.UNREAL_COLLISION_PROP_KEY):
             continue
