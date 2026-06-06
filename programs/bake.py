@@ -119,7 +119,7 @@ def get_program(
         objects,
         tool_settings.S_Bake_Materials(
             image_dir = textures_folder,
-            uv_layer_bake = uv_layer_name,
+            uv_layer_name = uv_layer_name,
             width = x_resolution,
             height = y_resolution,
             alpha_width = alpha_x_resolution,
