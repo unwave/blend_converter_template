@@ -933,3 +933,13 @@ def limit_bendy_bones(maximum = 3):
         for bone in armature.data.bones:
 
             bone.bbone_segments = min(bone.bbone_segments, maximum)
+
+
+def use_preview_frame_range():
+    """ Use the preview frame range if currently enabled. """
+
+    if not bpy.context.scene.use_preview_range:
+        return
+
+    bpy.context.scene.frame_start = bpy.context.scene.frame_preview_start
+    bpy.context.scene.frame_end = bpy.context.scene.frame_preview_end
